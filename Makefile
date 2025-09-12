@@ -1,5 +1,4 @@
 .PHONY: validate
 
 validate:
-	@node scripts/validate.js
-
+	@node scripts/validate.cjs

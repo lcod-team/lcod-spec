@@ -2,9 +2,10 @@
   "name": "lcod-spec",
   "private": true,
   "version": "0.0.0",
+  "type": "module",
   "license": "UNLICENSED",
   "scripts": {
-    "validate": "node scripts/validate.js"
+    "validate": "node scripts/validate.cjs"
   },
   "devDependencies": {
     "@iarna/toml": "^3.0.0",

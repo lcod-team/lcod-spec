@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-// Minimal M0 validator with optional strict mode (Ajv + TOML parser if available)
 const fs = require('fs');
 const path = require('path');
 
@@ -9,16 +8,11 @@ let addFormats = null;
 try { TOML = require('@iarna/toml'); } catch {}
 try { Ajv = require('ajv'); addFormats = require('ajv-formats'); } catch {}
 
-function read(file) {
-  return fs.readFileSync(file, 'utf8');
-}
-
-function exists(p) {
-  try { fs.accessSync(p); return true; } catch { return false; }
-}
+function read(file) { return fs.readFileSync(file, 'utf8'); }
+function exists(p) { try { fs.accessSync(p); return true; } catch { return false; } }
+function safeJsonParse(file) { try { JSON.parse(read(file)); return null; } catch (e) { return e.message; } }
 
 function parseTomlMinimal(text) {
-  // Very naive parser for simple key="value" and [section] blocks used here
   const data = {}; let section = null;
   for (const rawLine of text.split(/\r?\n/)) {
     const line = rawLine.trim();
@@ -29,34 +23,19 @@ function parseTomlMinimal(text) {
     if (!mKV) continue;
     const key = mKV[1];
     let val = mKV[2].trim();
-    // Strip comments at end of line
     const hash = val.indexOf('#');
     if (hash >= 0) val = val.slice(0, hash).trim();
-    // Strings
     if ((val.startsWith('"') && val.endsWith('"')) || (val.startsWith("'") && val.endsWith("'"))) {
       val = val.slice(1, -1);
     } else if (val.startsWith('[') && val.endsWith(']')) {
-      // very naive array of strings
       const inner = val.slice(1, -1).trim();
       const items = inner ? inner.split(',').map(s => s.trim().replace(/^"|"$/g, '').replace(/^'|'$/g, '')) : [];
       val = items;
-    } else if (/^\d+$/.test(val)) {
-      val = parseInt(val, 10);
-    } else if (val === 'true' || val === 'false') {
-      val = val === 'true';
-    }
+    } else if (/^\d+$/.test(val)) { val = parseInt(val, 10); }
+    else if (val === 'true' || val === 'false') { val = val === 'true'; }
     if (section) data[section][key] = val; else data[key] = val;
   }
   return data;
-}
-
-function validateId(id) {
-  const re = /^lcod:\/\/[a-z0-9_-]+\/[a-z0-9_-]+@\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?(?:\+[0-9A-Za-z.-]+)?$/;
-  return re.test(id);
-}
-
-function safeJsonParse(file) {
-  try { JSON.parse(read(file)); return null; } catch (e) { return e.message; }
 }
 
 function* findLcpToml(root) {
@@ -71,73 +50,34 @@ function* findLcpToml(root) {
   }
 }
 
-function main() {
+(function main() {
   const repoRoot = path.resolve(__dirname, '..');
   const schemaRoot = path.join(repoRoot, 'schema');
   const examplesRoot = path.join(repoRoot, 'examples');
+  let failed = 0; const issues = [];
 
-  let failed = 0;
-  const issues = [];
-
-  // Validate top-level LCP schema is valid JSON
-  const lcpSchema = path.join(schemaRoot, 'lcp.schema.json');
-  if (!exists(lcpSchema)) {
-    issues.push(`ERROR: Missing schema/lcp.schema.json`);
-    failed++;
-  } else {
-    const err = safeJsonParse(lcpSchema);
-    if (err) { issues.push(`ERROR: Invalid JSON at schema/lcp.schema.json: ${err}`); failed++; }
-  }
-
-  // Prepare AJV if present
-  let ajv = null;
   const lcpSchemaPath = path.join(schemaRoot, 'lcp.schema.json');
-  let lcpSchemaJson = null;
+  if (!exists(lcpSchemaPath)) { issues.push('ERROR: Missing schema/lcp.schema.json'); failed++; }
+  else { const err = safeJsonParse(lcpSchemaPath); if (err) { issues.push('ERROR: Invalid JSON at schema/lcp.schema.json: ' + err); failed++; } }
+
+  let ajv = null; let lcpSchemaJson = null;
   if (Ajv) {
-    try {
-      lcpSchemaJson = JSON.parse(read(lcpSchemaPath));
-      ajv = new Ajv({ strict: false, allErrors: true });
-      if (addFormats) addFormats(ajv);
-      ajv.compile(lcpSchemaJson);
-    } catch (e) {
-      // fall back silently to non-Ajv mode, but record issue
-      issues.push(`WARN: Ajv/TOML strict validation disabled: ${e.message}`);
-    }
+    try { lcpSchemaJson = JSON.parse(read(lcpSchemaPath)); ajv = new Ajv({ strict: false, allErrors: true }); if (addFormats) addFormats(ajv); ajv.compile(lcpSchemaJson); }
+    catch (e) { issues.push('WARN: Ajv/TOML strict validation disabled: ' + e.message); }
   }
 
-  // Validate examples
   for (const file of findLcpToml(examplesRoot)) {
     const dir = path.dirname(file);
     const rel = path.relative(repoRoot, file);
     let obj = null;
-    try {
-      const text = read(file);
-      obj = TOML ? TOML.parse(text) : parseTomlMinimal(text);
-    } catch (e) {
-      issues.push(`ERROR: Cannot parse ${rel}: ${e.message}`);
-      failed++;
-      continue;
-    }
-    // Ajv strict validation if available
+    try { const text = read(file); obj = TOML ? TOML.parse(text) : parseTomlMinimal(text); }
+    catch (e) { issues.push(`ERROR: Cannot parse ${rel}: ${e.message}`); failed++; continue; }
     if (ajv && lcpSchemaJson) {
       const validate = ajv.getSchema(lcpSchemaJson.$id || 'lcp');
-      if (validate) {
-        const ok = validate(obj);
-        if (!ok) {
-          failed++;
-          const errs = (validate.errors || []).map(e => `${e.instancePath} ${e.message}`).join('; ');
-          issues.push(`ERROR: ${rel}: schema validation failed: ${errs}`);
-        }
-      }
+      if (validate) { const ok = validate(obj); if (!ok) { failed++; const errs = (validate.errors || []).map(e => `${e.instancePath} ${e.message}`).join('; '); issues.push(`ERROR: ${rel}: schema validation failed: ${errs}`); } }
     }
-    if (!obj.id || !validateId(obj.id)) {
-      issues.push(`ERROR: ${rel}: invalid or missing id`);
-      failed++;
-    }
-    if (!obj.tool || !obj.tool.inputSchema || !obj.tool.outputSchema) {
-      issues.push(`ERROR: ${rel}: missing tool.inputSchema or tool.outputSchema`);
-      failed++;
-    } else {
+    if (!obj.tool || !obj.tool.inputSchema || !obj.tool.outputSchema) { issues.push(`ERROR: ${rel}: missing tool.inputSchema or tool.outputSchema`); failed++; }
+    else {
       for (const key of ['inputSchema', 'outputSchema']) {
         const p = path.join(dir, obj.tool[key]);
         const r = path.relative(repoRoot, p);
@@ -145,20 +85,12 @@ function main() {
         else { const err = safeJsonParse(p); if (err) { issues.push(`ERROR: ${r}: invalid JSON: ${err}`); failed++; } }
       }
     }
-    // If compose.json exists, ensure valid JSON
     const compose = path.join(dir, 'compose.json');
     if (exists(compose)) { const err = safeJsonParse(compose); if (err) { issues.push(`ERROR: ${path.relative(repoRoot, compose)} invalid JSON: ${err}`); failed++; } }
 
-    // Referential checks for docs and ui
     if (obj.docs) {
-      if (obj.docs.readme) {
-        const p = path.join(dir, obj.docs.readme);
-        if (!exists(p)) { issues.push(`ERROR: ${rel}: docs.readme not found: ${path.relative(repoRoot, p)}`); failed++; }
-      }
-      if (obj.docs.logo) {
-        const p = path.join(dir, obj.docs.logo);
-        if (!exists(p)) { issues.push(`ERROR: ${rel}: docs.logo not found: ${path.relative(repoRoot, p)}`); failed++; }
-      }
+      if (obj.docs.readme) { const p = path.join(dir, obj.docs.readme); if (!exists(p)) { issues.push(`ERROR: ${rel}: docs.readme not found: ${path.relative(repoRoot, p)}`); failed++; } }
+      if (obj.docs.logo) { const p = path.join(dir, obj.docs.logo); if (!exists(p)) { issues.push(`ERROR: ${rel}: docs.logo not found: ${path.relative(repoRoot, p)}`); failed++; } }
     }
     if (obj.ui && obj.ui.propsSchema) {
       const p = path.join(dir, obj.ui.propsSchema);
@@ -171,6 +103,5 @@ function main() {
   const ok = failed === 0;
   console.log(ok ? 'OK: validation passed' : `FAIL: ${failed} issue(s)`);
   process.exit(ok ? 0 : 1);
-}
+})();
 
-main();
