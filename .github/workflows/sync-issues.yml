@@ -1,0 +1,70 @@
+name: Sync M0 Issues
+
+on:
+  push:
+    paths:
+      - 'ROADMAP.md'
+      - '.github/workflows/sync-issues.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Parse ROADMAP and create issues
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const path = require('path');
+            const file = path.join(process.env.GITHUB_WORKSPACE, 'ROADMAP.md');
+            const text = fs.readFileSync(file, 'utf8');
+            const lines = text.split(/\r?\n/);
+            const items = [];
+            const re = /^- \[( |x)\]\s*(M0-\d+)\s+(.+?)(?:\s+—\s+(done|partial))?\s*$/i;
+            for (const line of lines) {
+              const m = line.match(re);
+              if (!m) continue;
+              const checked = m[1] !== ' ';
+              const code = m[2];
+              const title = m[3].trim();
+              const status = (m[4] || '').toLowerCase();
+              // Create issues only for unchecked and not explicitly "done"
+              if (!checked && status !== 'done') {
+                items.push({ code, title, status });
+              }
+            }
+
+            // Ensure labels exist
+            async function ensureLabel(name, color, description) {
+              try {
+                await github.rest.issues.getLabel({ owner: context.repo.owner, repo: context.repo.repo, name });
+              } catch (e) {
+                await github.rest.issues.createLabel({ owner: context.repo.owner, repo: context.repo.repo, name, color, description });
+              }
+            }
+            await ensureLabel('M0', '0e8a16', 'Milestone M0');
+            await ensureLabel('spec', '1d76db', 'Specification');
+
+            // Get existing open issues to avoid duplicates by title
+            const existing = await github.paginate(github.rest.issues.listForRepo, { owner: context.repo.owner, repo: context.repo.repo, state: 'open' });
+            const existingTitles = new Set(existing.map(i => i.title));
+
+            for (const it of items) {
+              const issueTitle = `${it.code} — ${it.title}`;
+              if (existingTitles.has(issueTitle)) continue;
+              const body = `Auto-created from ROADMAP.md.\n\nItem: ${it.code}\nStatus: ${it.status || 'pending'}\n\nSee ROADMAP.md for acceptance criteria and context.`;
+              await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: issueTitle,
+                body,
+                labels: ['M0', 'spec']
+              });
+            }
+            core.info(`Processed ${items.length} items from ROADMAP.md`);
