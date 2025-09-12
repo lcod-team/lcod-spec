@@ -9,3 +9,7 @@ Specification for **LCOD Component Package (LCP)** and implementation convention
 - Component folder layout (impl/*, tests/*, assets/*)
 
 See `OVERVIEW.md` for the ecosystem overview, and `docs/` and `examples/` for reference components.
+
+Quick validation
+
+- Install Node.js, then run `make validate` to check example packages against minimal M0 rules (IDs, file existence, JSON syntax).
