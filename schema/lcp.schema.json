@@ -2,41 +2,67 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://lcod.team/schemas/lcp.schema.json",
   "title": "LCOD Component Package (LCP)",
+  "description": "Descriptor for an LCOD component package (TOML source interpreted as this JSON shape).",
   "type": "object",
   "additionalProperties": false,
-  "required": [
-    "schemaVersion",
-    "id",
-    "name",
-    "namespace",
-    "version",
-    "kind"
-  ],
+  "required": ["schemaVersion", "id", "name", "namespace", "version", "kind", "tool"],
+  "$defs": {
+    "semver": {
+      "type": "string",
+      "description": "Semantic Version: MAJOR.MINOR.PATCH with optional prerelease/build.",
+      "pattern": "^\\d+\\.\\d+\\.\\d+(?:-[0-9A-Za-z.-]+)?(?:\\+[0-9A-Za-z.-]+)?$",
+      "examples": ["1.0.0", "2.1.0-beta.1", "1.2.3+build.5"]
+    },
+    "name": {
+      "type": "string",
+      "pattern": "^[a-z0-9_.-]+$",
+      "minLength": 1,
+      "description": "Lowercase name. Allowed: a-z, 0-9, underscore, dot, dash."
+    },
+    "namespace": {
+      "type": "string",
+      "pattern": "^[a-z0-9_.-]+$",
+      "minLength": 1,
+      "description": "Lowercase namespace. Allowed: a-z, 0-9, underscore, dot, dash."
+    },
+    "canonicalId": {
+      "type": "string",
+      "description": "Canonical component ID lcod://<namespace>/<name>@<version>",
+      "pattern": "^lcod://[a-z0-9_.-]+/[a-z0-9_.-]+@\\d+\\.\\d+\\.\\d+(?:-[0-9A-Za-z.-]+)?(?:\\+[0-9A-Za-z.-]+)?$",
+      "examples": [
+        "lcod://core/http_get@1.0.0",
+        "lcod://demo/my_weather@0.1.0"
+      ]
+    },
+    "schemaPath": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Relative path to a JSON Schema file within the package."
+    },
+    "idList": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/canonicalId" },
+      "uniqueItems": true
+    }
+  },
   "properties": {
-    "schemaVersion": { "type": "string" },
-    "id": {
-      "type": "string",
-      "description": "Canonical component ID",
-      "pattern": "^lcod://[a-z0-9_-]+/[a-z0-9_-]+@\\d+\\.\\d+\\.\\d+(?:-[0-9A-Za-z.-]+)?(?:\\+[0-9A-Za-z.-]+)?$"
-    },
-    "name": { "type": "string", "pattern": "^[a-z0-9_.-]+$" },
-    "namespace": { "type": "string", "pattern": "^[a-z0-9_.-]+$" },
-    "version": {
-      "type": "string",
-      "description": "SemVer",
-      "pattern": "^\\d+\\.\\d+\\.\\d+(?:-[0-9A-Za-z.-]+)?(?:\\+[0-9A-Za-z.-]+)?$"
-    },
+    "schemaVersion": { "type": "string", "description": "LCP schema version for this descriptor." },
+    "id": { "$ref": "#/$defs/canonicalId" },
+    "name": { "$ref": "#/$defs/name" },
+    "namespace": { "$ref": "#/$defs/namespace" },
+    "version": { "$ref": "#/$defs/semver" },
     "kind": {
       "type": "string",
-      "enum": ["function", "axiom", "ui", "workflow"]
+      "enum": ["function", "axiom", "ui", "workflow"],
+      "description": "Component kind."
     },
-    "summary": { "type": "string" },
+    "summary": { "type": "string", "description": "Short description for human readers." },
     "docs": {
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "readme": { "type": "string" },
-        "logo": { "type": "string" }
+        "readme": { "type": "string", "description": "Relative path to README.md." },
+        "logo": { "type": "string", "description": "Relative path to a logo or image file." }
       }
     },
     "tool": {
@@ -44,18 +70,18 @@
       "additionalProperties": false,
       "required": ["name", "inputSchema", "outputSchema"],
       "properties": {
-        "name": { "type": "string" },
+        "name": { "type": "string", "description": "Tool call name (MCP-style)." },
         "description": { "type": "string" },
-        "inputSchema": { "type": "string" },
-        "outputSchema": { "type": "string" }
+        "inputSchema": { "$ref": "#/$defs/schemaPath" },
+        "outputSchema": { "$ref": "#/$defs/schemaPath" }
       }
     },
     "hints": {
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "timeoutMs": { "type": "integer", "minimum": 0 },
-        "retries": { "type": "integer", "minimum": 0 },
+        "timeoutMs": { "type": "integer", "minimum": 0, "description": "Timeout hint in milliseconds." },
+        "retries": { "type": "integer", "minimum": 0, "description": "Retry count hint." },
         "idempotent": { "type": "boolean" },
         "pure": { "type": "boolean" }
       }
@@ -64,14 +90,7 @@
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "requires": {
-          "type": "array",
-          "items": {
-            "type": "string",
-            "pattern": "^lcod://[a-z0-9_-]+/[a-z0-9_-]+@\\d+"
-          },
-          "uniqueItems": true
-        }
+        "requires": { "$ref": "#/$defs/idList" }
       }
     },
     "implMatrix": {
@@ -81,7 +100,8 @@
         "languages": {
           "type": "array",
           "items": { "type": "string" },
-          "uniqueItems": true
+          "uniqueItems": true,
+          "description": "Languages for which native implementations exist."
         }
       }
     },
@@ -90,14 +110,24 @@
       "additionalProperties": false,
       "properties": {
         "kind": { "type": "string", "enum": ["react", "svelte", "vue", "webcomponent"] },
-        "propsSchema": { "type": "string" },
-        "slots": {
-          "type": "array",
-          "items": { "type": "string" },
-          "uniqueItems": true
-        }
+        "propsSchema": { "$ref": "#/$defs/schemaPath" },
+        "slots": { "type": "array", "items": { "type": "string" }, "uniqueItems": true }
       }
     }
-  }
+  },
+  "examples": [
+    {
+      "schemaVersion": "1.0",
+      "id": "lcod://core/http_get@1.0.0",
+      "name": "http_get",
+      "namespace": "core",
+      "version": "1.0.0",
+      "kind": "function",
+      "tool": {
+        "name": "http_get",
+        "inputSchema": "schema/http_get.in.json",
+        "outputSchema": "schema/http_get.out.json"
+      }
+    }
+  ]
 }
-
