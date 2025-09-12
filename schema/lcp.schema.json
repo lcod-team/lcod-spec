@@ -1,0 +1,103 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://lcod.team/schemas/lcp.schema.json",
+  "title": "LCOD Component Package (LCP)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "id",
+    "name",
+    "namespace",
+    "version",
+    "kind"
+  ],
+  "properties": {
+    "schemaVersion": { "type": "string" },
+    "id": {
+      "type": "string",
+      "description": "Canonical component ID",
+      "pattern": "^lcod://[a-z0-9_-]+/[a-z0-9_-]+@\\d+\\.\\d+\\.\\d+(?:-[0-9A-Za-z.-]+)?(?:\\+[0-9A-Za-z.-]+)?$"
+    },
+    "name": { "type": "string", "pattern": "^[a-z0-9_.-]+$" },
+    "namespace": { "type": "string", "pattern": "^[a-z0-9_.-]+$" },
+    "version": {
+      "type": "string",
+      "description": "SemVer",
+      "pattern": "^\\d+\\.\\d+\\.\\d+(?:-[0-9A-Za-z.-]+)?(?:\\+[0-9A-Za-z.-]+)?$"
+    },
+    "kind": {
+      "type": "string",
+      "enum": ["function", "axiom", "ui", "workflow"]
+    },
+    "summary": { "type": "string" },
+    "docs": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "readme": { "type": "string" },
+        "logo": { "type": "string" }
+      }
+    },
+    "tool": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "inputSchema", "outputSchema"],
+      "properties": {
+        "name": { "type": "string" },
+        "description": { "type": "string" },
+        "inputSchema": { "type": "string" },
+        "outputSchema": { "type": "string" }
+      }
+    },
+    "hints": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "timeoutMs": { "type": "integer", "minimum": 0 },
+        "retries": { "type": "integer", "minimum": 0 },
+        "idempotent": { "type": "boolean" },
+        "pure": { "type": "boolean" }
+      }
+    },
+    "deps": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "requires": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^lcod://[a-z0-9_-]+/[a-z0-9_-]+@\\d+"
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "implMatrix": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "languages": {
+          "type": "array",
+          "items": { "type": "string" },
+          "uniqueItems": true
+        }
+      }
+    },
+    "ui": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "type": "string", "enum": ["react", "svelte", "vue", "webcomponent"] },
+        "propsSchema": { "type": "string" },
+        "slots": {
+          "type": "array",
+          "items": { "type": "string" },
+          "uniqueItems": true
+        }
+      }
+    }
+  }
+}
+

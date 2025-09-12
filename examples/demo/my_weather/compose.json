@@ -1,0 +1,8 @@
+{
+  "compose": [
+    { "call": "lcod://core/localisation@1", "in": {}, "out": { "gps": "gps" } },
+    { "call": "lcod://core/extract_city@1", "in": { "gps": "$.gps" }, "out": { "city": "city" } },
+    { "call": "lcod://core/weather@1", "in": { "city": "$.city" }, "out": { "tempC": "tempC" } }
+  ]
+}
+

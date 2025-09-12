@@ -1,0 +1,29 @@
+schemaVersion = "1.0"
+id = "lcod://core/http_get@1.0.0"
+name = "http_get"
+namespace = "core"
+version = "1.0.0"
+kind = "function"
+summary = "HTTP GET primitive wrapper."
+
+[tool]
+name = "http_get"
+description = "Perform an HTTP GET request."
+inputSchema = "schema/http_get.in.json"
+outputSchema = "schema/http_get.out.json"
+
+[hints]
+timeoutMs = 5000
+retries = 0
+idempotent = true
+pure = false
+
+[deps]
+requires = []
+
+[docs]
+readme = "README.md"
+
+[implMatrix]
+languages = ["ts", "java"]
+
