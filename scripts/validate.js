@@ -1,7 +1,13 @@
 #!/usr/bin/env node
-// Minimal M0 validator: checks examples lcp.toml references and JSON syntax
+// Minimal M0 validator with optional strict mode (Ajv + TOML parser if available)
 const fs = require('fs');
 const path = require('path');
+
+let TOML = null;
+let Ajv = null;
+let addFormats = null;
+try { TOML = require('@iarna/toml'); } catch {}
+try { Ajv = require('ajv'); addFormats = require('ajv-formats'); } catch {}
 
 function read(file) {
   return fs.readFileSync(file, 'utf8');
@@ -83,13 +89,47 @@ function main() {
     if (err) { issues.push(`ERROR: Invalid JSON at schema/lcp.schema.json: ${err}`); failed++; }
   }
 
+  // Prepare AJV if present
+  let ajv = null;
+  const lcpSchemaPath = path.join(schemaRoot, 'lcp.schema.json');
+  let lcpSchemaJson = null;
+  if (Ajv) {
+    try {
+      lcpSchemaJson = JSON.parse(read(lcpSchemaPath));
+      ajv = new Ajv({ strict: false, allErrors: true });
+      if (addFormats) addFormats(ajv);
+      ajv.compile(lcpSchemaJson);
+    } catch (e) {
+      // fall back silently to non-Ajv mode, but record issue
+      issues.push(`WARN: Ajv/TOML strict validation disabled: ${e.message}`);
+    }
+  }
+
   // Validate examples
   for (const file of findLcpToml(examplesRoot)) {
     const dir = path.dirname(file);
     const rel = path.relative(repoRoot, file);
-    let text = '';
-    try { text = read(file); } catch (e) { issues.push(`ERROR: Cannot read ${rel}: ${e.message}`); failed++; continue; }
-    const obj = parseTomlMinimal(text);
+    let obj = null;
+    try {
+      const text = read(file);
+      obj = TOML ? TOML.parse(text) : parseTomlMinimal(text);
+    } catch (e) {
+      issues.push(`ERROR: Cannot parse ${rel}: ${e.message}`);
+      failed++;
+      continue;
+    }
+    // Ajv strict validation if available
+    if (ajv && lcpSchemaJson) {
+      const validate = ajv.getSchema(lcpSchemaJson.$id || 'lcp');
+      if (validate) {
+        const ok = validate(obj);
+        if (!ok) {
+          failed++;
+          const errs = (validate.errors || []).map(e => `${e.instancePath} ${e.message}`).join('; ');
+          issues.push(`ERROR: ${rel}: schema validation failed: ${errs}`);
+        }
+      }
+    }
     if (!obj.id || !validateId(obj.id)) {
       issues.push(`ERROR: ${rel}: invalid or missing id`);
       failed++;
@@ -117,4 +157,3 @@ function main() {
 }
 
 main();
-

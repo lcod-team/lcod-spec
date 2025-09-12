@@ -1,0 +1,15 @@
+{
+  "name": "lcod-spec",
+  "private": true,
+  "version": "0.0.0",
+  "license": "UNLICENSED",
+  "scripts": {
+    "validate": "node scripts/validate.js"
+  },
+  "devDependencies": {
+    "@iarna/toml": "^3.0.0",
+    "ajv": "^8.17.1",
+    "ajv-formats": "^3.0.1"
+  }
+}
+

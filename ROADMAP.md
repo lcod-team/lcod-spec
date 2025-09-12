@@ -5,25 +5,17 @@
 Goal: Ship the minimal spec to describe, validate and distribute a single component package.
 
 Tickets:
-- [ ] Create `schema/` and draft `schema/lcp.schema.json` covering:
-  - [ ] Identity fields: `schemaVersion`, `id` (URI `lcod://ns/name@semver`), `name`, `namespace`, `version` (SemVer), `kind` enum (`function|axiom|ui|workflow`)
-  - [ ] `summary`, `docs` section (`readme`, `logo`)
-  - [ ] `tool` section (`name`, `description`, `inputSchema`, `outputSchema`)
-  - [ ] `hints` (`timeoutMs`, `retries`, `idempotent`, `pure`)
-  - [ ] `deps` (`requires` array of canonical IDs)
-  - [ ] `implMatrix` (languages list, optional targets)
-  - [ ] Optional `ui` section (`kind`, `propsSchema`, `slots`)
-  - [ ] Referential integrity (schemas exist, enums validated)
-- [ ] Document folder conventions in `docs/structure.md`:
-  - [ ] `impl/<lang>/` with `meta.toml`, `deps.json`, targets (e.g. `node18/`)
-  - [ ] `schema/` for input/output/props JSON Schemas
-  - [ ] `tests/unit/*.json` for declarative tests and axiom mocks
-  - [ ] `assets/`, `doc_assets/`, optional `index.json`
-- [ ] Define guidance for tool input/output schemas (`docs/schemas.md`) with examples
-- [ ] Add reference examples in `examples/`:
-  - [ ] `core/http_get` (axiom wrapper shape, docs only)
-  - [ ] `demo/my_weather` (composite descriptor + sample compose.json skeleton)
-- [ ] Add conformance check script (README instructions) to validate examples against `lcp.schema.json`
+- [ ] M0-01 Finalize `schema/lcp.schema.json` with `$defs`, descriptions, examples
+- [ ] M0-02 Document ID and versioning (`docs/id-and-versioning.md`) and link from README
+- [ ] M0-03 Namespace policy (`docs/namespaces.md`) and link from README
+- [ ] M0-04 Folder conventions (`docs/structure.md`) — done
+- [ ] M0-05 Schema best practices (`docs/schemas.md`) — done
+- [ ] M0-06 Reference examples (`examples/core/http_get`, `examples/demo/my_weather`) — done
+- [ ] M0-07 Minimal validator (`scripts/validate.js`, `make validate`) — done
+- [ ] M0-08 Strict validator with Ajv + TOML (CI uses dev deps) — partial (falls back locally)
+- [ ] M0-09 CI workflow `.github/workflows/validate.yml` — done
+- [ ] M0-10 Minimal UI example (`examples/ui/hello_button`) — done
+- [ ] M0-11 Guide “Create a new component” (`docs/create-component.md`) — done
 
 ## M1 — Composition & tests
 - Specify `compose.json` (sequential by default, `$.path` lookups, `${var}` interpolation)
