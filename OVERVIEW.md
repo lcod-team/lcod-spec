@@ -6,7 +6,7 @@ This document provides an overview of the **LCOD** (Low‑Code On Demand) ecosys
 
 ## 1. Concept and Vision
 
-LCOD reimagines low‑code tooling as a **hierarchy of composable blocks**. Each block encapsulates a self‑contained function or UI element with clearly defined inputs, outputs, dependencies and documentation. Blocks can be primitives (axioms), wrappers around existing libraries, or composites built from other blocks. A lightweight **kernel** resolves, validates and executes these blocks. An ecosystem of tools around the kernel provides design‑time assistance, distribution, packaging, and integration.
+LCOD reimagines low‑code tooling as a **hierarchy of composable blocks**. Each block encapsulates a self‑contained function or UI element with clearly defined inputs, outputs, dependencies and documentation. Blocks can be primitives (axioms), contracts with multiple implementations, flow operators with slots, or composites built from other blocks. A lightweight **kernel** resolves, validates and executes these blocks. An ecosystem of tools around the kernel provides design‑time assistance, distribution, packaging, and integration.
 
 Key ideas:
 
@@ -76,7 +76,7 @@ flowchart TD
 
 **N1 (SDKs)** — language‑specific substrates supply primitive functions (axioms) such as `http.get`, `fs.read`, `time.now`, etc. They also allow registering native implementations of blocks when available (e.g., a Java service for `parse_city`). These SDKs handle details like asynchronous execution, concurrency, and platform‑specific dependencies.
 
-**N2 (Composition & tooling)** — builds on the kernel to load block descriptors (`lcp.toml`), interpret the `compose` operator, map inputs and outputs, run declarative tests with mocks and hints (timeout, retry, idempotence) and produce runtime metadata (traces, logs).
+**N2 (Composition & tooling)** — builds on the kernel to load block descriptors (`lcp.toml`), interpret the `compose` operator with slots, map inputs and outputs, bind contracts to implementations, run declarative tests with mocks and hints (timeout, retry, idempotence) and produce runtime metadata (traces, logs).
 
 **N3 (Adapters)** — optional modules that expose blocks through external interfaces such as HTTP (Express for Node, Spring Boot for Java), JSON‑RPC/MCP, CLIs or message queues. They translate between the kernel’s call semantics and the chosen transport.
 
@@ -172,16 +172,21 @@ When non‑standard file names are used, they must be listed in an optional `ind
 
 ## 4. Composition DSL
 
-Composite blocks specify their internal flow using a simple DSL expressed in JSON (or TOML) under `compose.json`. The kernel interprets this DSL at runtime.
+Composite blocks specify their internal flow using a simple DSL expressed in JSON (or TOML) under `compose.json`. The kernel interprets this DSL at runtime. The DSL supports:
+- Contract calls: `call: "lcod://contract/<domain>/<name>@<version>"`
+- Named slots: a default `children` slot when a block has a single child list, and multi‑slot objects (e.g., `{ then: [...], else: [...] }`).
+- Scopes and references: `$` (run state/out aliases), `$slot.*` (slot‑injected vars like `item/index`), `$env`, `$globals`, `$run`.
+- Flow blocks: if/then/else, foreach (array or stream), parallel, try/catch/finally, throw, with hints for retry/timeout and memory retention.
 
 Example composition for a `my_weather` block:
 
 ```json
 {
   "compose": [
-    { "call": "lcod://core/localisation@1", "in": {}, "out": { "gps": "gps" } },
-    { "call": "lcod://core/extract_city@1", "in": { "gps": "$.gps" }, "out": { "city": "city" } },
-    { "call": "lcod://core/weather@1", "in": { "city": "$.city" }, "out": { "tempC": "tempC" } }
+    { "call": "lcod://contract/location/get@1", "in": {}, "out": { "gps": "gps" } },
+    { "call": "lcod://contract/location/extract-city@1", "in": { "gps": "$.gps" }, "out": { "city": "city" } },
+    { "call": "lcod://contract/net/http-client@1", "in": { "url": "https://weather.example?city=$.city" }, "out": { "body": "raw" } },
+    { "call": "lcod://contract/json/parse@1", "in": { "raw": "$.raw" }, "out": { "tempC": "tempC" } }
   ]
 }
 ```
@@ -193,6 +198,20 @@ This declares a sequence of three calls:
 3. Call `weather` using the `city` field, exposing the final `tempC` output.
 
 Bindings are explicit: each `in` entry maps parameter names to literal values or paths in the accumulated local state (paths are indicated with `$.field`). Each `out` entry picks specific fields from the child output and exposes them under new names. There is no hidden state; all data flow is explicit and deterministic.
+
+Flow blocks with slots are expressed like:
+
+```json
+{ "call": "lcod://flow/if@1", "in": { "cond": "$.ok" }, "children": { "then": [ { "call": "…" } ], "else": [ { "call": "…" } ] } }
+```
+
+And a foreach with collection:
+
+```json
+{ "call": "lcod://flow/foreach@1", "in": { "list": "$.chars" }, "children": { "body": [
+  { "call": "lcod://contract/string/char-code@1", "in": { "ch": "$slot.item" }, "out": { "code": "code" } }
+] }, "collectPath": "$.code", "out": { "results": "codes" } }
+```
 
 Tests accompany composite blocks to verify flows. A test might look like:
 
@@ -271,4 +290,3 @@ It is useful to place a high‑level overview like this document in the root of 
 ## 11. Conclusion
 
 LCOD aims to provide a solid foundation for low‑code development with AI‑assisted design and native‑quality runtime. By standardizing the structure of components (`lcp.toml`), enforcing explicit dataflow (`compose`), and keeping the kernel minimal, it allows developers to mix and match reusable blocks across languages and platforms. A resolver abstracts the source of blocks and ensures reproducibility. A registry and RAG index make discovery and reuse practical. Together, these pieces enable a scalable ecosystem where humans and AI collaborate to build robust applications efficiently.
-

@@ -53,7 +53,7 @@
     "version": { "$ref": "#/$defs/semver" },
     "kind": {
       "type": "string",
-      "enum": ["function", "axiom", "ui", "workflow"],
+      "enum": ["function", "axiom", "ui", "workflow", "contract"],
       "description": "Component kind."
     },
     "summary": { "type": "string", "description": "Short description for human readers." },
@@ -75,6 +75,10 @@
         "inputSchema": { "$ref": "#/$defs/schemaPath" },
         "outputSchema": { "$ref": "#/$defs/schemaPath" }
       }
+    },
+    "implements": {
+      "$ref": "#/$defs/canonicalId",
+      "description": "Canonical contract ID implemented by this component (for kind=function/native)."
     },
     "hints": {
       "type": "object",
