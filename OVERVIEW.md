@@ -178,6 +178,10 @@ Composite blocks specify their internal flow using a simple DSL expressed in JSO
 - Scopes and references: `$` (run state/out aliases), `$slot.*` (slot‑injected vars like `item/index`), `$env`, `$globals`, `$run`.
 - Flow blocks: if/then/else, foreach (array or stream), parallel, try/catch/finally, throw, with hints for retry/timeout and memory retention.
 
+Kernel SDK for custom components
+
+- Custom flow/logic components can invoke their children via a stable API (planned): `ctx.runChildren()` and `ctx.runSlot(name, localState, slotVars)`. The compose runner passes slots in meta so that implementations can orchestrate nested flows without hard‑coded handling in the runner. This keeps flow operators versioned like any other component while enabling palette integration (icons, docs, evolution).
+
 Example composition for a `my_weather` block:
 
 ```json

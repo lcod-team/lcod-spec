@@ -1,0 +1,17 @@
+schemaVersion = "1.0"
+id = "lcod://impl/net/fetch@1.0.0"
+name = "fetch"
+namespace = "impl/net"
+version = "1.0.0"
+kind = "function"
+implements = "lcod://contract/net/http-client@1.0.0"
+summary = "Fetch-based implementation of the http-client contract"
+
+[tool]
+name = "http_get"
+description = "Perform an HTTP GET-like request"
+inputSchema = "schema/http.in.json"
+outputSchema = "schema/http.out.json"
+
+[docs]
+readme = "README.md"
