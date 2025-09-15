@@ -1,0 +1,20 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "../lcod-kernel-ts"
+		},
+		{
+			"path": "../lcod-registry"
+		},
+		{
+			"path": "../lcod-resolver"
+		},
+		{
+			"path": "../lcod-github"
+		}
+	],
+	"settings": {}
+}
