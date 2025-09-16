@@ -26,6 +26,7 @@ Tickets:
 - Specify test format (inputs/expected + axiom mocks)
 - Document policies & hints (timeout, retry, idempotence)
  - Kernel SDK: add `ctx.runChildren()` and `ctx.runSlot(name, localState, slotVars)` to allow custom components to orchestrate their slots without special‑casing in the runner. Compose runner passes meta with `children` to implementations.
+ - Examples: `examples/flow/foreach_demo` and `examples/flow/foreach_ctrl_demo` — done
 
 ## M2 — Distribution & security
 - `.lcpkg` archive format (+ integrity manifest)
