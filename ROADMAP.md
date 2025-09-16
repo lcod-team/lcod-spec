@@ -9,13 +9,13 @@ Tickets:
 - [ ] M0-02 Add `kind="contract"` and optional `implements` to schema; document contracts vs implementations
 - [ ] M0-03 Document ID and versioning (`docs/id-and-versioning.md`) and link from README — partial
 - [ ] M0-04 Namespace policy (`docs/namespaces.md`) — include reserved roots: `contract/`, `impl/`, `axiom/`, `flow/` — partial
-- [ ] M0-05 Folder conventions (`docs/structure.md`) — done
-- [ ] M0-06 Schema best practices (`docs/schemas.md`) — done
-- [ ] M0-07 Minimal validator (`scripts/validate.cjs`, `make validate`) — done
+- [x] M0-05 Folder conventions (`docs/structure.md`)
+- [x] M0-06 Schema best practices (`docs/schemas.md`)
+- [x] M0-07 Minimal validator (`scripts/validate.cjs`, `make validate`)
 - [ ] M0-08 Strict validator with Ajv + TOML (CI uses dev deps) — partial (falls back locally)
-- [ ] M0-09 CI workflow `.github/workflows/validate.yml` — done
-- [ ] M0-10 Minimal UI example (`examples/ui/hello_button`) — done
-- [ ] M0-11 Guide “Create a new component” (`docs/create-component.md`) — done
+- [x] M0-09 CI workflow `.github/workflows/validate.yml`
+- [x] M0-10 Minimal UI example (`examples/ui/hello_button`)
+- [x] M0-11 Guide “Create a new component” (`docs/create-component.md`)
 
 ## M1 — Composition & tests
 - Specify `compose.json` with slots (`children` default, named multi‑slots), scopes (`$`, `$slot`, `$env`, `$globals`, `$run`)
@@ -26,7 +26,7 @@ Tickets:
 - Specify test format (inputs/expected + axiom mocks)
 - Document policies & hints (timeout, retry, idempotence)
  - Kernel SDK: add `ctx.runChildren()` and `ctx.runSlot(name, localState, slotVars)` to allow custom components to orchestrate their slots without special‑casing in the runner. Compose runner passes meta with `children` to implementations.
- - Examples: `examples/flow/foreach_demo` and `examples/flow/foreach_ctrl_demo` — done
+ - [x] Examples: `examples/flow/foreach_demo` and `examples/flow/foreach_ctrl_demo`
 
 ## M2 — Distribution & security
 - `.lcpkg` archive format (+ integrity manifest)
