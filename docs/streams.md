@@ -11,3 +11,7 @@
 - `lcod://flow/break@1` stops iteration early with `$signal === "break"`.
 - Combine with `flow/if@1` inside the `body` slot to keep the composition declarative.
 - Example: `examples/flow/foreach_ctrl_demo` shows skipping even numbers and breaking once a threshold is reached.
+
+Notes
+- When `collectPath` is present and the input is empty, the `else` slot receives `{ item: undefined, index: -1 }` and its state is collected as the fallback value.
+- Async iterables are fully consumed before iteration starts; combine with streaming hints when large datasets require backpressure.
