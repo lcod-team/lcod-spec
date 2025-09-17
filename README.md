@@ -22,6 +22,7 @@ Spec docs
 - docs/errors.md — try/catch/finally and throw
 - docs/streams.md — Streams and chunked processing
 - docs/memory.md — Memory and retention policies
+- docs/quickstart.md — Validate and run the demo packages locally
 
 Quick validation
 
