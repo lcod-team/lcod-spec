@@ -8,6 +8,11 @@
   - `$env`, `$globals`, `$run` — environment variables, global symbols, run metadata
 - `let`: injects local variables into a slot scope for its children.
 
+### Collecting data from slots
+- `collectPath` on flow blocks resolves against `{ $: childState, $slot: slotVars }`.
+- Use `$slot.*` inside `collectPath` to access loop metadata (e.g., indices) without mutating state.
+- Example: `collectPath: "$slot.index"` gathers iteration indices (see `test/flow.foreach.test.js`).
+
 ## Examples
 - If: `{ "call": "lcod://flow/if@1", "in": { "cond": "$.ok" }, "children": { "then": [...], "else": [...] } }`
 - Foreach: `{ "call": "lcod://flow/foreach@1", "in": { "list": "$.items" }, "children": { "body": [...] } }`
