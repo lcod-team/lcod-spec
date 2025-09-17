@@ -25,4 +25,9 @@ Spec docs
 
 Quick validation
 
-- Install Node.js, then run `make validate` to check example packages against minimal M0 rules (IDs, file existence, JSON syntax).
+```
+npm install
+npm run validate
+```
+
+The validator parses `lcp.toml` with @iarna/toml, validates the descriptor against `schema/lcp.schema.json` (Ajv 2020), and ensures referenced schemas/doc files exist for all examples.

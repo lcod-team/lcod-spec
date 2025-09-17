@@ -21,17 +21,26 @@
     },
     "namespace": {
       "type": "string",
-      "pattern": "^[a-z0-9_.-]+$",
+      "pattern": "^[a-z0-9_.-]+(?:/[a-z0-9_.-]+)*$",
       "minLength": 1,
-      "description": "Lowercase namespace. Allowed: a-z, 0-9, underscore, dot, dash."
+      "description": "Lowercase namespace. Segments separated by `/`; allowed characters per segment: a-z, 0-9, underscore, dot, dash."
     },
-    "canonicalId": {
+    "componentId": {
       "type": "string",
       "description": "Canonical component ID lcod://<namespace>/<name>@<version>",
-      "pattern": "^lcod://[a-z0-9_.-]+/[a-z0-9_.-]+@\\d+\\.\\d+\\.\\d+(?:-[0-9A-Za-z.-]+)?(?:\\+[0-9A-Za-z.-]+)?$",
+      "pattern": "^lcod://[a-z0-9_.-]+(?:/[a-z0-9_.-]+)+@\\d+\\.\\d+\\.\\d+(?:-[0-9A-Za-z.-]+)?(?:\\+[0-9A-Za-z.-]+)?$",
       "examples": [
         "lcod://core/http_get@1.0.0",
         "lcod://demo/my_weather@0.1.0"
+      ]
+    },
+    "dependencyId": {
+      "type": "string",
+      "description": "Canonical ID reference allowing major-only shorthand (e.g. @1).",
+      "pattern": "^lcod://[a-z0-9_.-]+(?:/[a-z0-9_.-]+)+@(?:\\d+|\\d+\\.\\d+\\.\\d+(?:-[0-9A-Za-z.-]+)?(?:\\+[0-9A-Za-z.-]+)?)$",
+      "examples": [
+        "lcod://flow/foreach@1",
+        "lcod://impl/net/fetch@1.2.0"
       ]
     },
     "schemaPath": {
@@ -41,13 +50,18 @@
     },
     "idList": {
       "type": "array",
-      "items": { "$ref": "#/$defs/canonicalId" },
+      "items": { "$ref": "#/$defs/dependencyId" },
       "uniqueItems": true
     }
   },
   "properties": {
-    "schemaVersion": { "type": "string", "description": "LCP schema version for this descriptor." },
-    "id": { "$ref": "#/$defs/canonicalId" },
+    "schemaVersion": {
+      "type": "string",
+      "const": "1.0",
+      "description": "LCP schema version understood by this descriptor. Must be \"1.0\" for M0 packages.",
+      "examples": ["1.0"]
+    },
+    "id": { "$ref": "#/$defs/componentId" },
     "name": { "$ref": "#/$defs/name" },
     "namespace": { "$ref": "#/$defs/namespace" },
     "version": { "$ref": "#/$defs/semver" },
@@ -77,8 +91,8 @@
       }
     },
     "implements": {
-      "$ref": "#/$defs/canonicalId",
-      "description": "Canonical contract ID implemented by this component (for kind=function/native)."
+      "$ref": "#/$defs/dependencyId",
+      "description": "Canonical contract ID implemented by this component. Mandatory for function/workflow/ui implementations that fulfil a contract."
     },
     "hints": {
       "type": "object",
@@ -105,9 +119,10 @@
           "type": "array",
           "items": { "type": "string" },
           "uniqueItems": true,
-          "description": "Languages for which native implementations exist."
+          "description": "Languages for which native implementations exist (e.g. [\"ts\", \"java\"])."
         }
-      }
+      },
+      "description": "Implementation availability matrix for native (non-composite) components."
     },
     "ui": {
       "type": "object",
@@ -119,6 +134,25 @@
       }
     }
   },
+  "allOf": [
+    {
+      "if": { "properties": { "kind": { "const": "contract" } }, "required": ["kind"] },
+      "then": {
+        "properties": {
+          "implements": false,
+          "implMatrix": false
+        }
+      }
+    },
+    {
+      "if": { "properties": { "kind": { "enum": ["function", "workflow", "ui"] } }, "required": ["kind"] },
+      "then": {
+        "properties": {
+          "implements": { "$ref": "#/$defs/dependencyId" }
+        }
+      }
+    }
+  ],
   "examples": [
     {
       "schemaVersion": "1.0",

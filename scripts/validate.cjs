@@ -3,10 +3,24 @@ const fs = require('fs');
 const path = require('path');
 
 let TOML = null;
-let Ajv = null;
+let AjvFactory = null;
 let addFormats = null;
-try { TOML = require('@iarna/toml'); } catch {}
-try { Ajv = require('ajv'); addFormats = require('ajv-formats'); } catch {}
+try { TOML = require('@iarna/toml'); }
+catch (err) {
+  console.error('ERROR: Missing dependency @iarna/toml. Run `npm install` before validating.');
+  console.error(err.message);
+  process.exit(1);
+}
+try {
+  const AjvModule = require('ajv/dist/2020');
+  AjvFactory = AjvModule.default || AjvModule;
+  addFormats = require('ajv-formats');
+}
+catch (err) {
+  console.error('ERROR: Missing Ajv dependencies. Run `npm install` before validating.');
+  console.error(err.message);
+  process.exit(1);
+}
 
 function read(file) { return fs.readFileSync(file, 'utf8'); }
 function exists(p) { try { fs.accessSync(p); return true; } catch { return false; } }
@@ -61,9 +75,20 @@ function* findLcpToml(root) {
   else { const err = safeJsonParse(lcpSchemaPath); if (err) { issues.push('ERROR: Invalid JSON at schema/lcp.schema.json: ' + err); failed++; } }
 
   let ajv = null; let lcpSchemaJson = null;
-  if (Ajv) {
-    try { lcpSchemaJson = JSON.parse(read(lcpSchemaPath)); ajv = new Ajv({ strict: false, allErrors: true }); if (addFormats) addFormats(ajv); ajv.compile(lcpSchemaJson); }
-    catch (e) { issues.push('WARN: Ajv/TOML strict validation disabled: ' + e.message); }
+  let validateLcp = null;
+  try {
+    lcpSchemaJson = JSON.parse(read(lcpSchemaPath));
+    ajv = new AjvFactory({
+      strict: true,
+      strictSchema: true,
+      allErrors: true,
+      allowUnionTypes: true
+    });
+    addFormats(ajv);
+    validateLcp = ajv.compile(lcpSchemaJson);
+  } catch (e) {
+    issues.push('ERROR: Unable to compile LCP schema: ' + e.message);
+    failed++;
   }
 
   for (const file of findLcpToml(examplesRoot)) {
@@ -72,9 +97,13 @@ function* findLcpToml(root) {
     let obj = null;
     try { const text = read(file); obj = TOML ? TOML.parse(text) : parseTomlMinimal(text); }
     catch (e) { issues.push(`ERROR: Cannot parse ${rel}: ${e.message}`); failed++; continue; }
-    if (ajv && lcpSchemaJson) {
-      const validate = ajv.getSchema(lcpSchemaJson.$id || 'lcp');
-      if (validate) { const ok = validate(obj); if (!ok) { failed++; const errs = (validate.errors || []).map(e => `${e.instancePath} ${e.message}`).join('; '); issues.push(`ERROR: ${rel}: schema validation failed: ${errs}`); } }
+    if (validateLcp) {
+      const ok = validateLcp(obj);
+      if (!ok) {
+        failed++;
+        const errs = (validateLcp.errors || []).map(e => `${e.instancePath || '/'} ${e.message}${e.params && e.params.allowedValues ? ` (allowed: ${e.params.allowedValues.join(', ')})` : ''}`).join('; ');
+        issues.push(`ERROR: ${rel}: schema validation failed: ${errs}`);
+      }
     }
     if (!obj.tool || !obj.tool.inputSchema || !obj.tool.outputSchema) { issues.push(`ERROR: ${rel}: missing tool.inputSchema or tool.outputSchema`); failed++; }
     else {
@@ -104,4 +133,3 @@ function* findLcpToml(root) {
   console.log(ok ? 'OK: validation passed' : `FAIL: ${failed} issue(s)`);
   process.exit(ok ? 0 : 1);
 })();
-

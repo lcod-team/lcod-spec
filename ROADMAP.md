@@ -5,14 +5,14 @@
 Goal: Ship the minimal spec to describe, validate and distribute a single component package.
 
 Tickets:
-- [ ] M0-01 Finalize `schema/lcp.schema.json` with `$defs`, descriptions, examples
-- [ ] M0-02 Add `kind="contract"` and optional `implements` to schema; document contracts vs implementations
-- [ ] M0-03 Document ID and versioning (`docs/id-and-versioning.md`) and link from README — partial
-- [ ] M0-04 Namespace policy (`docs/namespaces.md`) — include reserved roots: `contract/`, `impl/`, `axiom/`, `flow/` — partial
+- [x] M0-01 Finalize `schema/lcp.schema.json` with `$defs`, descriptions, examples
+- [x] M0-02 Add `kind="contract"` and optional `implements` to schema; document contracts vs implementations
+- [x] M0-03 Document ID and versioning (`docs/id-and-versioning.md`) and link from README — partial
+- [x] M0-04 Namespace policy (`docs/namespaces.md`) — include reserved roots: `contract/`, `impl/`, `axiom/`, `flow/` — partial
 - [x] M0-05 Folder conventions (`docs/structure.md`)
 - [x] M0-06 Schema best practices (`docs/schemas.md`)
 - [x] M0-07 Minimal validator (`scripts/validate.cjs`, `make validate`)
-- [ ] M0-08 Strict validator with Ajv + TOML (CI uses dev deps) — partial (falls back locally)
+- [x] M0-08 Strict validator with Ajv + TOML (CI uses dev deps) — partial (falls back locally)
 - [x] M0-09 CI workflow `.github/workflows/validate.yml`
 - [x] M0-10 Minimal UI example (`examples/ui/hello_button`)
 - [x] M0-11 Guide “Create a new component” (`docs/create-component.md`)

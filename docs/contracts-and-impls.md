@@ -6,7 +6,7 @@
 
 ## IDs and Kinds
 - Contract: `kind = "contract"` (no code, only `tool.*` and docs)
-- Implementation: `kind = "function"` (or `native`) + `implements = <contract-id>`
+- Implementation: `kind = "function" | "workflow" | "ui"` + `implements = <contract-id>`
 
 ## Binding
 - A `bindings` config maps contract IDs to impl IDs. The lockfile records resolved bindings along with sources and integrity.
@@ -17,4 +17,3 @@
 
 ## Reserved Namespaces
 - `lcod://contract/*`, `lcod://impl/*`, `lcod://axiom/*`, `lcod://flow/*`, `lcod://ui/*`
-

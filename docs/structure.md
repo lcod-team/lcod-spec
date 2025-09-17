@@ -13,7 +13,7 @@ Recommended layout for a component package:
 - `index.json` — optional index for non‑standard names
 
 Notes:
+- Set `schemaVersion = "1.0"` for all M0 packages.
 - Prefer small, composable blocks with clear inputs/outputs.
 - Keep `lcp.toml` minimal and refer to files in the package.
-- Use SemVer for `version` and canonical IDs `lcod://ns/name@version`.
-
+- Use SemVer for `version` and canonical IDs `lcod://namespace/path/name@version`.
