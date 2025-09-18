@@ -24,6 +24,7 @@ Spec docs
 - docs/errors.md — try/catch/finally and throw
 - docs/streams.md — Streams and chunked processing
 - docs/memory.md — Memory and retention policies
+- docs/runtime-hints.md — Execution hints (`timeout`, `retries`, `idempotent`, `pure`)
 - docs/quickstart.md — Validate and run the demo packages locally
 - docs/tests.md — Declarative test format
 
