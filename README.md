@@ -8,7 +8,7 @@ Specification for **LCOD Component Package (LCP)** and implementation convention
 - Declarative unit tests (JSON) with axiom mocks
 - Component folder layout (impl/*, tests/*, assets/*)
 
-See `OVERVIEW.md` for the ecosystem overview.
+See [OVERVIEW.md](OVERVIEW.md) for the ecosystem overview.
 
 Spec docs
 
