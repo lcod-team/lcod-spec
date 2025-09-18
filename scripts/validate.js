@@ -6,8 +6,10 @@ const path = require('path');
 let TOML = null;
 let Ajv = null;
 let addFormats = null;
+let YAML = null;
 try { TOML = require('@iarna/toml'); } catch {}
 try { Ajv = require('ajv'); addFormats = require('ajv-formats'); } catch {}
+try { YAML = require('yaml'); } catch {}
 
 function read(file) {
   return fs.readFileSync(file, 'utf8');
@@ -57,6 +59,15 @@ function validateId(id) {
 
 function safeJsonParse(file) {
   try { JSON.parse(read(file)); return null; } catch (e) { return e.message; }
+}
+
+function safeYamlParse(file) {
+  try {
+    if (YAML && YAML.parse) YAML.parse(read(file));
+    return null;
+  } catch (e) {
+    return e.message;
+  }
 }
 
 function* findLcpToml(root) {
@@ -145,9 +156,16 @@ function main() {
         else { const err = safeJsonParse(p); if (err) { issues.push(`ERROR: ${r}: invalid JSON: ${err}`); failed++; } }
       }
     }
-    // If compose.json exists, ensure valid JSON
-    const compose = path.join(dir, 'compose.json');
-    if (exists(compose)) { const err = safeJsonParse(compose); if (err) { issues.push(`ERROR: ${path.relative(repoRoot, compose)} invalid JSON: ${err}`); failed++; } }
+    const composeYaml = path.join(dir, 'compose.yaml');
+    if (exists(composeYaml)) {
+      const err = safeYamlParse(composeYaml);
+      if (err) { issues.push(`ERROR: ${path.relative(repoRoot, composeYaml)} invalid YAML: ${err}`); failed++; }
+    }
+    const composeJson = path.join(dir, 'compose.json');
+    if (exists(composeJson)) {
+      const err = safeJsonParse(composeJson);
+      if (err) { issues.push(`ERROR: ${path.relative(repoRoot, composeJson)} invalid JSON: ${err}`); failed++; }
+    }
 
     // Referential checks for docs and ui
     if (obj.docs) {

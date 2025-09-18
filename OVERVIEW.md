@@ -172,7 +172,7 @@ When non‑standard file names are used, they must be listed in an optional `ind
 
 ## 4. Composition DSL
 
-Composite blocks specify their internal flow using a simple DSL expressed in JSON (or TOML) under `compose.json`. The kernel interprets this DSL at runtime. The DSL supports:
+Composite blocks specify their internal flow using a simple DSL expressed in YAML under `compose.yaml`. The kernel interprets this DSL at runtime. The DSL supports:
 - Contract calls: `call: "lcod://contract/<domain>/<name>@<version>"`
 - Named slots: a default `children` slot when a block has a single child list, and multi‑slot objects (e.g., `{ then: [...], else: [...] }`).
 - Scopes and references: `$` (run state/out aliases), `$slot.*` (slot‑injected vars like `item/index`), `$env`, `$globals`, `$run`.
@@ -184,15 +184,27 @@ Kernel SDK for custom components
 
 Example composition for a `my_weather` block:
 
-```json
-{
-  "compose": [
-    { "call": "lcod://contract/location/get@1", "in": {}, "out": { "gps": "gps" } },
-    { "call": "lcod://contract/location/extract-city@1", "in": { "gps": "$.gps" }, "out": { "city": "city" } },
-    { "call": "lcod://contract/net/http-client@1", "in": { "url": "https://weather.example?city=$.city" }, "out": { "body": "raw" } },
-    { "call": "lcod://contract/json/parse@1", "in": { "raw": "$.raw" }, "out": { "tempC": "tempC" } }
-  ]
-}
+```yaml
+compose:
+  - call: lcod://contract/location/get@1
+    in: {}
+    out:
+      gps: gps
+  - call: lcod://contract/location/extract-city@1
+    in:
+      gps: $.gps
+    out:
+      city: city
+  - call: lcod://contract/net/http-client@1
+    in:
+      url: https://weather.example?city=$.city
+    out:
+      body: raw
+  - call: lcod://contract/json/parse@1
+    in:
+      raw: $.raw
+    out:
+      tempC: tempC
 ```
 
 This declares a sequence of three calls:
@@ -205,16 +217,33 @@ Bindings are explicit: each `in` entry maps parameter names to literal values or
 
 Flow blocks with slots are expressed like:
 
-```json
-{ "call": "lcod://flow/if@1", "in": { "cond": "$.ok" }, "children": { "then": [ { "call": "…" } ], "else": [ { "call": "…" } ] } }
+```yaml
+call: lcod://flow/if@1
+in:
+  cond: $.ok
+children:
+  then:
+    - call: …
+  else:
+    - call: …
 ```
 
 And a foreach with collection:
 
-```json
-{ "call": "lcod://flow/foreach@1", "in": { "list": "$.chars" }, "children": { "body": [
-  { "call": "lcod://contract/string/char-code@1", "in": { "ch": "$slot.item" }, "out": { "code": "code" } }
-] }, "collectPath": "$.code", "out": { "results": "codes" } }
+```yaml
+call: lcod://flow/foreach@1
+in:
+  list: $.chars
+children:
+  body:
+    - call: lcod://contract/string/char-code@1
+      in:
+        ch: $slot.item
+      out:
+        code: code
+collectPath: $.code
+out:
+  results: codes
 ```
 
 Tests accompany composite blocks to verify flows. A test might look like:
@@ -270,7 +299,7 @@ An LLM can help designers search and assemble blocks at design time. To do so it
 
 ## 8. IDE and Graphical Editor
 
-An IDE built on LCOD presents two synchronized views: a **tree view** showing the hierarchical slots/children and a **flow view** showing the data/trigger graph. A palette lists available blocks (filtered by compatibility) and can search with RAG. An inspector panel displays the editable properties of the selected block, generated from its input schema and hints. When a UI block implements `[ui]`, the IDE can render a live preview using the provided preview component and props schema. The IDE persists the project descriptor (`lcp.toml` + `compose.json`) and generates code on demand.
+An IDE built on LCOD presents two synchronized views: a **tree view** showing the hierarchical slots/children and a **flow view** showing the data/trigger graph. A palette lists available blocks (filtered by compatibility) and can search with RAG. An inspector panel displays the editable properties of the selected block, generated from its input schema and hints. When a UI block implements `[ui]`, the IDE can render a live preview using the provided preview component and props schema. The IDE persists the project descriptor (`lcp.toml` + `compose.yaml`) and generates code on demand.
 
 ## 9. Distribution and Extensibility
 

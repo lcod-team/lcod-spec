@@ -36,7 +36,7 @@ You can pass a directory or an explicit `lcp.toml` path.
 ```
 cd ~/git/lcod-kernel-ts
 node bin/run-compose.mjs \
-  --compose ../lcod-spec/examples/flow/foreach_ctrl_demo/compose.json \
+  --compose ../lcod-spec/examples/flow/foreach_ctrl_demo/compose.yaml \
   --demo \
   --state ../lcod-spec/examples/flow/foreach_ctrl_demo/schema/foreach_ctrl_demo.in.json
 ```
@@ -48,4 +48,3 @@ The `--demo` flag registers built-in axioms/flow blocks so that the compose file
 - Validate with `npm run validate:lcp -- <path>`
 - Run it via `bin/run-compose.mjs`
 - Capture resolver bindings and lockfiles for reproducible builds (planned in M2)
-

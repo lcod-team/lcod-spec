@@ -1,6 +1,6 @@
 # Flow Blocks
 
-Flow operators are reusable components that manipulate control flow in `compose.json`. They are versioned like any other component (e.g. `lcod://flow/if@1`) and expose slots for nested steps. This document describes the semantics of the core M1 flow blocks.
+Flow operators are reusable components that manipulate control flow in `compose.yaml`. They are versioned like any other component (e.g. `lcod://flow/if@1`) and expose slots for nested steps. This document describes the semantics of the core M1 flow blocks.
 
 ## Common behaviour
 - Flow blocks are invoked like normal steps: they accept `in`, expose outputs via `out`, and may define `collectPath` semantics.

@@ -5,6 +5,7 @@ const path = require('path');
 let TOML = null;
 let AjvFactory = null;
 let addFormats = null;
+let YAML = null;
 try { TOML = require('@iarna/toml'); }
 catch (err) {
   console.error('ERROR: Missing dependency @iarna/toml. Run `npm install` before validating.');
@@ -21,10 +22,18 @@ catch (err) {
   console.error(err.message);
   process.exit(1);
 }
+try {
+  YAML = require('yaml');
+} catch (err) {
+  console.error('ERROR: Missing dependency yaml. Run `npm install` before validating.');
+  console.error(err.message);
+  process.exit(1);
+}
 
 function read(file) { return fs.readFileSync(file, 'utf8'); }
 function exists(p) { try { fs.accessSync(p); return true; } catch { return false; } }
 function safeJsonParse(file) { try { JSON.parse(read(file)); return null; } catch (e) { return e.message; } }
+function safeYamlParse(file) { try { YAML.parse(read(file)); return null; } catch (e) { return e.message; } }
 
 function parseTomlMinimal(text) {
   const data = {}; let section = null;
@@ -114,8 +123,17 @@ function* findLcpToml(root) {
         else { const err = safeJsonParse(p); if (err) { issues.push(`ERROR: ${r}: invalid JSON: ${err}`); failed++; } }
       }
     }
-    const compose = path.join(dir, 'compose.json');
-    if (exists(compose)) { const err = safeJsonParse(compose); if (err) { issues.push(`ERROR: ${path.relative(repoRoot, compose)} invalid JSON: ${err}`); failed++; } }
+    const composeYaml = path.join(dir, 'compose.yaml');
+    if (exists(composeYaml)) {
+      const err = safeYamlParse(composeYaml);
+      if (err) { issues.push(`ERROR: ${path.relative(repoRoot, composeYaml)} invalid YAML: ${err}`); failed++; }
+    }
+    const composeJson = path.join(dir, 'compose.json');
+    if (exists(composeJson)) {
+      const err = safeJsonParse(composeJson);
+      if (err) { issues.push(`ERROR: ${path.relative(repoRoot, composeJson)} invalid JSON: ${err}`); failed++; }
+      else { issues.push(`WARN: ${path.relative(repoRoot, composeJson)} is deprecated; use compose.yaml`); }
+    }
 
     if (obj.docs) {
       if (obj.docs.readme) { const p = path.join(dir, obj.docs.readme); if (!exists(p)) { issues.push(`ERROR: ${rel}: docs.readme not found: ${path.relative(repoRoot, p)}`); failed++; } }

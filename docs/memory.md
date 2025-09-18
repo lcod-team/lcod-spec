@@ -4,7 +4,7 @@ Compose flows accumulate state in the `$` scope. By default only the values expo
 
 ## `outPolicy`
 
-Applied on individual steps within `compose.json` (usually via the flow block implementation). Supported values:
+Applied on individual steps within `compose.yaml` (usually via the flow block implementation). Supported values:
 
 | Value        | Semantics |
 |--------------|-----------|

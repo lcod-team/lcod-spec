@@ -18,7 +18,7 @@ Tickets:
 - [x] M0-11 Guide “Create a new component” (`docs/create-component.md`)
 
 ## M1 — Composition & tests
-- [x] Specify `compose.json` with slots (`children` default, named multi‑slots), scopes (`$`, `$slot`, `$env`, `$globals`, `$run`)
+- [x] Specify `compose.yaml` with slots (`children` default, named multi‑slots), scopes (`$`, `$slot`, `$env`, `$globals`, `$run`)
 - [x] Flow blocks: `flow/if@1`, `flow/foreach@1` (array/stream + `collectPath` and `else`), `flow/parallel@1`
 - [x] Errors: `flow/try@1` (children/catch/finally), `flow/throw@1`; error structure (code/message/data)
 - [x] Streaming: AsyncIterable inputs and foreach stream semantics; basic backpressure and `parallelism`

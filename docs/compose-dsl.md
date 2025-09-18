@@ -1,20 +1,17 @@
 # Compose DSL
 
-Composite LCOD components describe their control flow in `compose.json`. The file is a JSON object whose top-level `compose` field is an ordered array of **steps**. Steps run sequentially unless a flow block (e.g. foreach, if, try/catch) alters the control flow.
+Composite LCOD components describe their control flow in `compose.yaml`. The file contains a top-level `compose` array of **steps**. Steps run sequentially unless a flow block (e.g. foreach, if, try/catch) alters the control flow.
 
-```json
-{
-  "compose": [
-    {
-      "call": "lcod://contract/data/fetch@1",
-      "in": { "url": "$.endpoint" },
-      "out": { "body": "raw" }
-    }
-  ]
-}
+```yaml
+compose:
+  - call: lcod://contract/data/fetch@1
+    in:
+      url: $.endpoint
+    out:
+      body: raw
 ```
 
-Each step is an object with the fields described below.
+Each step is expressed as a YAML mapping with the fields described below.
 
 ## `call` (required)
 Canonical identifier of the component or flow block to execute. Use the same format as in `lcp.toml` (`lcod://namespace/path/name@version`). The callee can be:
@@ -35,12 +32,12 @@ Bindings are evaluated before invoking the callee; missing bindings use the call
 ## `out`
 Optional object mapping names exported to the current scope (`$`) to fields returned by the callee. Example:
 
-```json
-{
-  "call": "lcod://impl/json/parse@1",
-  "in": { "text": "$.raw" },
-  "out": { "payload": "data" }
-}
+```yaml
+call: lcod://impl/json/parse@1
+in:
+  text: $.raw
+out:
+  payload: data
 ```
 
 After the step completes, subsequent steps may read `$.payload`.
@@ -51,15 +48,19 @@ Declares nested steps for slots exposed by the callee.
 - **Single-slot shorthand** — supply an array: `"children": [ { ... }, { ... } ]`. The array is interpreted as the default slot named `children`.
 - **Named slots** — supply an object mapping slot names to arrays:
 
-```json
-{
-  "call": "lcod://flow/if@1",
-  "in": { "cond": "$.ok" },
-  "children": {
-    "then": [ { "call": "lcod://impl/send@1", "in": { "payload": "$.value" } } ],
-    "else": [ { "call": "lcod://impl/log@1", "in": { "message": "Fallback" } } ]
-  }
-}
+```yaml
+call: lcod://flow/if@1
+in:
+  cond: $.ok
+children:
+  then:
+    - call: lcod://impl/send@1
+      in:
+        payload: $.value
+  else:
+    - call: lcod://impl/log@1
+      in:
+        message: Fallback
 ```
 
 Nested children form their own lexical scope. The kernel injects slot variables under `$slot.*` (e.g. foreach provides `{ item, index }`). Implementations can also invoke child slots from native code via `ctx.runSlot(name, localState, slotVars)`.
@@ -74,24 +75,32 @@ Optional string evaluated after the step resolves. It reads from the result of t
 
 ## Example: foreach with continue/break
 
-```json
-{
-  "compose": [
-    {
-      "call": "lcod://flow/foreach@1",
-      "in": { "list": "$.numbers" },
-      "children": {
-        "body": [
-          { "call": "lcod://impl/is_even@1", "in": { "value": "$slot.item" }, "out": { "even": "ok" } },
-          { "call": "lcod://flow/if@1", "in": { "cond": "$.even" }, "children": { "then": [ { "call": "lcod://flow/continue@1" } ] } },
-          { "call": "lcod://impl/echo@1", "in": { "value": "$slot.item" }, "out": { "val": "val" } }
-        ]
-      },
-      "collectPath": "$.val",
-      "out": { "results": "selected" }
-    }
-  ]
-}
+```yaml
+compose:
+  - call: lcod://flow/foreach@1
+    in:
+      list: $.numbers
+    children:
+      body:
+        - call: lcod://impl/is_even@1
+          in:
+            value: $slot.item
+          out:
+            even: ok
+        - call: lcod://flow/if@1
+          in:
+            cond: $.even
+          children:
+            then:
+              - call: lcod://flow/continue@1
+        - call: lcod://impl/echo@1
+          in:
+            value: $slot.item
+          out:
+            val: val
+    collectPath: $.val
+    out:
+      results: selected
 ```
 
 The foreach body runs for each item, exposes `$slot.item`, and pushes each echoed value through `collectPath`. After completion, `$.selected` contains the collected list.
