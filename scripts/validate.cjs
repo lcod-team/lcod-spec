@@ -80,13 +80,17 @@ function* findLcpToml(root) {
   let failed = 0; const issues = [];
 
   const lcpSchemaPath = path.join(schemaRoot, 'lcp.schema.json');
+  const lockSchemaPath = path.join(schemaRoot, 'lcp-lock.schema.json');
   if (!exists(lcpSchemaPath)) { issues.push('ERROR: Missing schema/lcp.schema.json'); failed++; }
   else { const err = safeJsonParse(lcpSchemaPath); if (err) { issues.push('ERROR: Invalid JSON at schema/lcp.schema.json: ' + err); failed++; } }
+  if (!exists(lockSchemaPath)) { issues.push('ERROR: Missing schema/lcp-lock.schema.json'); failed++; }
+  else { const err = safeJsonParse(lockSchemaPath); if (err) { issues.push('ERROR: Invalid JSON at schema/lcp-lock.schema.json: ' + err); failed++; } }
 
-  let ajv = null; let lcpSchemaJson = null;
-  let validateLcp = null;
+  let ajv = null; let lcpSchemaJson = null; let lockSchemaJson = null;
+  let validateLcp = null; let validateLock = null;
   try {
     lcpSchemaJson = JSON.parse(read(lcpSchemaPath));
+    lockSchemaJson = JSON.parse(read(lockSchemaPath));
     ajv = new AjvFactory({
       strict: true,
       strictSchema: true,
@@ -95,6 +99,7 @@ function* findLcpToml(root) {
     });
     addFormats(ajv);
     validateLcp = ajv.compile(lcpSchemaJson);
+    validateLock = ajv.compile(lockSchemaJson);
   } catch (e) {
     issues.push('ERROR: Unable to compile LCP schema: ' + e.message);
     failed++;
@@ -143,6 +148,22 @@ function* findLcpToml(root) {
       const p = path.join(dir, obj.ui.propsSchema);
       if (!exists(p)) { issues.push(`ERROR: ${rel}: ui.propsSchema not found: ${path.relative(repoRoot, p)}`); failed++; }
       else { const err = safeJsonParse(p); if (err) { issues.push(`ERROR: ${path.relative(repoRoot, p)} invalid JSON: ${err}`); failed++; } }
+    }
+
+    const lockPath = path.join(dir, 'lcp.lock');
+    if (exists(lockPath) && validateLock) {
+      try {
+        const lockObj = TOML.parse(read(lockPath));
+        const ok = validateLock(lockObj);
+        if (!ok) {
+          failed++;
+          const errs = (validateLock.errors || []).map(e => `${e.instancePath || '/'} ${e.message}`).join('; ');
+          issues.push(`ERROR: ${path.relative(repoRoot, lockPath)} schema validation failed: ${errs}`);
+        }
+      } catch (e) {
+        issues.push(`ERROR: Cannot parse ${path.relative(repoRoot, lockPath)}: ${e.message}`);
+        failed++;
+      }
     }
   }
 

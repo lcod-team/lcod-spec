@@ -1,0 +1,85 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://lcod.team/schemas/lcp-lock.schema.json",
+  "title": "LCOD Lockfile",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "components"],
+  "properties": {
+    "schemaVersion": {
+      "type": "string",
+      "const": "1.0",
+      "description": "Lockfile schema version"
+    },
+    "resolverVersion": {
+      "type": "string",
+      "description": "Resolver implementation version"
+    },
+    "projectId": {
+      "type": "string",
+      "description": "Optional project identifier"
+    },
+    "components": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/component" }
+    }
+  },
+  "$defs": {
+    "component": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "resolved", "source"],
+      "properties": {
+        "id": { "type": "string" },
+        "resolved": { "type": "string" },
+        "integrity": { "type": "string" },
+        "source": { "$ref": "#/$defs/source" },
+        "path": { "type": "string" },
+        "bindings": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/binding" }
+        },
+        "dependencies": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/dependency" }
+        }
+      }
+    },
+    "source": {
+      "type": "object",
+      "required": ["type"],
+      "additionalProperties": true,
+      "properties": {
+        "type": { "type": "string" },
+        "url": { "type": "string" },
+        "rev": { "type": "string" },
+        "path": { "type": "string" },
+        "name": { "type": "string" },
+        "package": { "type": "string" },
+        "version": { "type": "string" },
+        "subdir": { "type": "string" }
+      }
+    },
+    "binding": {
+      "type": "object",
+      "required": ["contract", "implementation"],
+      "additionalProperties": false,
+      "properties": {
+        "contract": { "type": "string" },
+        "implementation": { "type": "string" }
+      }
+    },
+    "dependency": {
+      "type": "object",
+      "required": ["id"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string" },
+        "requested": { "type": "string" },
+        "resolved": { "type": "string" },
+        "source": { "$ref": "#/$defs/source" }
+      }
+    }
+  }
+}

@@ -92,6 +92,7 @@ function main() {
 
   // Validate top-level LCP schema is valid JSON
   const lcpSchema = path.join(schemaRoot, 'lcp.schema.json');
+  const lockSchema = path.join(schemaRoot, 'lcp-lock.schema.json');
   if (!exists(lcpSchema)) {
     issues.push(`ERROR: Missing schema/lcp.schema.json`);
     failed++;
@@ -99,17 +100,29 @@ function main() {
     const err = safeJsonParse(lcpSchema);
     if (err) { issues.push(`ERROR: Invalid JSON at schema/lcp.schema.json: ${err}`); failed++; }
   }
+  if (!exists(lockSchema)) {
+    issues.push(`ERROR: Missing schema/lcp-lock.schema.json`);
+    failed++;
+  } else {
+    const err = safeJsonParse(lockSchema);
+    if (err) { issues.push(`ERROR: Invalid JSON at schema/lcp-lock.schema.json: ${err}`); failed++; }
+  }
 
   // Prepare AJV if present
   let ajv = null;
   const lcpSchemaPath = path.join(schemaRoot, 'lcp.schema.json');
+  const lockSchemaPath = path.join(schemaRoot, 'lcp-lock.schema.json');
   let lcpSchemaJson = null;
+  let lockSchemaJson = null;
+  let validateLock = null;
   if (Ajv) {
     try {
       lcpSchemaJson = JSON.parse(read(lcpSchemaPath));
+      lockSchemaJson = JSON.parse(read(lockSchemaPath));
       ajv = new Ajv({ strict: false, allErrors: true });
       if (addFormats) addFormats(ajv);
       ajv.compile(lcpSchemaJson);
+      validateLock = ajv.compile(lockSchemaJson);
     } catch (e) {
       // fall back silently to non-Ajv mode, but record issue
       issues.push(`WARN: Ajv/TOML strict validation disabled: ${e.message}`);
@@ -182,6 +195,22 @@ function main() {
       const p = path.join(dir, obj.ui.propsSchema);
       if (!exists(p)) { issues.push(`ERROR: ${rel}: ui.propsSchema not found: ${path.relative(repoRoot, p)}`); failed++; }
       else { const err = safeJsonParse(p); if (err) { issues.push(`ERROR: ${path.relative(repoRoot, p)} invalid JSON: ${err}`); failed++; } }
+    }
+
+    const lockPath = path.join(dir, 'lcp.lock');
+    if (exists(lockPath) && validateLock) {
+      try {
+        const lockObj = TOML ? TOML.parse(read(lockPath)) : parseTomlMinimal(read(lockPath));
+        const ok = validateLock(lockObj);
+        if (!ok) {
+          failed++;
+          const errs = (validateLock.errors || []).map(e => `${e.instancePath || '/'} ${e.message}`).join('; ');
+          issues.push(`ERROR: ${path.relative(repoRoot, lockPath)} schema validation failed: ${errs}`);
+        }
+      } catch (err) {
+        issues.push(`ERROR: Cannot parse ${path.relative(repoRoot, lockPath)}: ${err.message}`);
+        failed++;
+      }
     }
   }
 
