@@ -12,22 +12,22 @@ See `OVERVIEW.md` for the ecosystem overview.
 
 Spec docs
 
-- docs/id-and-versioning.md — Identity and versioning
-- docs/namespaces.md — Namespace policy
-- docs/structure.md — Package structure conventions
-- docs/schemas.md — Tool schema best practices
-- docs/create-component.md — Create a new component
-- docs/compose-dsl.md — YAML DSL for `compose.yaml`
-- docs/flow-blocks.md — Core flow operators (`if`, `foreach`, `parallel`)
-- docs/contracts-and-impls.md — Contracts, implementations and bindings
-- docs/dsl-slots.md — Slots, scopes and children
-- docs/errors.md — try/catch/finally and throw
-- docs/streams.md — Streams and chunked processing
-- docs/memory.md — Memory and retention policies
-- docs/runtime-hints.md — Execution hints (`timeout`, `retries`, `idempotent`, `pure`)
-- docs/quickstart.md — Validate and run the demo packages locally
-- docs/tests.md — Declarative test format
-- docs/lockfile.md — Lockfile (`lcp.lock`) structure and lifecycle
+- [docs/id-and-versioning.md](docs/id-and-versioning.md) — Identity and versioning
+- [docs/namespaces.md](docs/namespaces.md) — Namespace policy
+- [docs/structure.md](docs/structure.md) — Package structure conventions
+- [docs/schemas.md](docs/schemas.md) — Tool schema best practices
+- [docs/create-component.md](docs/create-component.md) — Create a new component
+- [docs/compose-dsl.md](docs/compose-dsl.md) — YAML DSL for `compose.yaml`
+- [docs/flow-blocks.md](docs/flow-blocks.md) — Core flow operators (`if`, `foreach`, `parallel`)
+- [docs/contracts-and-impls.md](docs/contracts-and-impls.md) — Contracts, implementations and bindings
+- [docs/dsl-slots.md](docs/dsl-slots.md) — Slots, scopes and children
+- [docs/errors.md](docs/errors.md) — try/catch/finally and throw
+- [docs/streams.md](docs/streams.md) — Streams and chunked processing
+- [docs/memory.md](docs/memory.md) — Memory and retention policies
+- [docs/runtime-hints.md](docs/runtime-hints.md) — Execution hints (`timeout`, `retries`, `idempotent`, `pure`)
+- [docs/quickstart.md](docs/quickstart.md) — Validate and run the demo packages locally
+- [docs/tests.md](docs/tests.md) — Declarative test format
+- [docs/lockfile.md](docs/lockfile.md) — Lockfile (`lcp.lock`) structure and lifecycle
 
 Quick validation
 
