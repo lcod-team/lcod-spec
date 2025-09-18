@@ -17,6 +17,8 @@ This walkthrough uses the spec repository plus the TypeScript kernel to validate
 cd ~/git/lcod-spec
 npm install
 npm run validate         # strict Ajv 2020 + TOML parsing
+# Optional: generate a prototype lockfile for an example
+node scripts/create-lock.cjs examples/demo/my_weather/lcp.toml
 ```
 
 This enforces `schema/lcp.schema.json`, checks schema references, and reports missing files.
