@@ -30,7 +30,9 @@ Tickets:
  - [x] Examples: `examples/flow/foreach_demo` and `examples/flow/foreach_ctrl_demo`
 
 ## M2 — Distribution & security
-- `.lcpkg` archive format (+ integrity manifest)
-- Resolution lockfile (`lcp.lock`) including contract→impl bindings
-- Resolver config (project/org/user): mirrors, replace, rewrite, bindings
+- [ ] M2-01 Define `lcp.lock` schema + strict validation (tooling, docs)
+- [ ] M2-02 Publish resolver as composite package (uses axioms for filesystem/git/http)
+- [ ] M2-03 Resolver CLI + config (mirrors, replace, bindings)
+- [ ] M2-04 `.lcpkg` archive format (+ integrity manifest)
+- [ ] M2-05 End-to-end example: resolve → lockfile → package
 - Annexes: UI conventions (`[ui]`), AsyncAPI/CloudEvents (events)
