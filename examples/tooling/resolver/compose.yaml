@@ -1,0 +1,134 @@
+compose:
+  - call: lcod://axiom/path/join@1
+    in:
+      base: $.projectPath
+      segment: "lcp.toml"
+    out:
+      path: descriptorPath
+
+  - call: lcod://axiom/fs/read-file@1
+    in:
+      path: $.descriptorPath
+      encoding: "utf-8"
+    out:
+      data: descriptorText
+
+  - call: lcod://axiom/toml/parse@1
+    in:
+      text: $.descriptorText
+    out:
+      value: descriptor
+
+  - call: lcod://flow/if@1
+    in:
+      cond: $.configPath
+    children:
+      then:
+        - call: lcod://axiom/fs/read-file@1
+          in:
+            path: $.configPath
+            encoding: "utf-8"
+          out:
+            data: configText
+      else:
+        - call: lcod://axiom/path/join@1
+          in:
+            base: $.projectPath
+            segment: "resolve.config.json"
+          out:
+            path: defaultConfigPath
+        - call: lcod://flow/try@1
+          children:
+            children:
+              - call: lcod://axiom/fs/read-file@1
+                in:
+                  path: $.defaultConfigPath
+                  encoding: "utf-8"
+                out:
+                  data: configText
+            catch:
+              - call: lcod://axiom/json/parse@1
+                in:
+                  text: "{}"
+                out:
+                  value: emptyConfig
+              - call: lcod://axiom/toml/stringify@1
+                in:
+                  value: { sources: {} }
+                out:
+                  text: noop
+          out:
+            data: configText
+
+  - call: lcod://flow/if@1
+    in:
+      cond: $.configText
+    children:
+      then:
+        - call: lcod://axiom/json/parse@1
+          in:
+            text: $.configText
+          out:
+            value: resolverConfig
+      else:
+        - call: lcod://axiom/json/parse@1
+          in:
+            text: "{\"sources\":{}}"
+          out:
+            value: resolverConfig
+
+  - call: lcod://axiom/path/join@1
+    in:
+      base: $.projectPath
+      segment: "lcp.lock"
+    out:
+      path: lockPath
+
+  - call: lcod://flow/foreach@1
+    in:
+      list: $.descriptor.deps.requires
+    children:
+      body:
+        - call: lcod://contract/tooling/resolve-dependency@1
+          in:
+            dependency: $slot.item
+            config: $.resolverConfig
+            projectPath: $.projectPath
+          out:
+            resolved: resolved
+      else: []
+    collectPath: $.resolved
+    out:
+      resolvedDeps: resolvedDependencies
+
+  - call: lcod://axiom/toml/stringify@1
+    in:
+      value:
+        schemaVersion: "1.0"
+        resolverVersion: "0.1.0"
+        components:
+          - id: $.descriptor.id
+            resolved: $.descriptor.id
+            source:
+              type: "path"
+              path: "."
+            dependencies: $.resolvedDependencies
+    out:
+      text: lockText
+
+  - call: lcod://axiom/fs/write-file@1
+    in:
+      path: $.lockPath
+      data: $.lockText
+    out:
+      ok: wrote
+
+  - call: lcod://impl/set@1
+    in:
+      lockPath: $.lockPath
+      components: $.resolvedDependencies
+      warnings: []
+    out:
+      lockPath: lockPath
+      components: components
+      warnings: warnings

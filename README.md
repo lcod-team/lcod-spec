@@ -28,6 +28,7 @@ Spec docs
 - [docs/quickstart.md](docs/quickstart.md) — Validate and run the demo packages locally
 - [docs/tests.md](docs/tests.md) — Declarative test format
 - [docs/lockfile.md](docs/lockfile.md) — Lockfile (`lcp.lock`) structure and lifecycle
+- [docs/resolver.md](docs/resolver.md) — Resolver composite and required axioms
 
 Quick validation
 

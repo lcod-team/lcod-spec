@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["projectPath"],
+  "properties": {
+    "projectPath": {
+      "type": "string",
+      "description": "Absolute or relative path to directory containing lcp.toml"
+    },
+    "configPath": {
+      "type": "string",
+      "description": "Optional resolver config path"
+    },
+    "outputPath": {
+      "type": "string",
+      "description": "Optional output file path for lcp.lock"
+    }
+  }
+}

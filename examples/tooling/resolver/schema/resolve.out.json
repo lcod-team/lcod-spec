@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["lockPath", "components"],
+  "properties": {
+    "lockPath": {
+      "type": "string",
+      "description": "Path to generated lcp.lock"
+    },
+    "components": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "resolved"],
+        "properties": {
+          "id": { "type": "string" },
+          "resolved": { "type": "string" },
+          "source": { "type": "object" }
+        }
+      }
+    },
+    "warnings": {
+      "type": "array",
+      "items": { "type": "string" }
+    }
+  }
+}
