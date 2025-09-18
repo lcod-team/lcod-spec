@@ -1,0 +1,22 @@
+schemaVersion = "1.0"
+resolverVersion = "0.1.0"
+
+[[components]]
+id = "lcod://demo/my_weather@0.1.0"
+resolved = "lcod://demo/my_weather@0.1.0"
+
+  [components.source]
+  type = "path"
+  path = "."
+
+  [[components.dependencies]]
+  id = "lcod://core/localisation@1"
+  requested = "lcod://core/localisation@1"
+
+  [[components.dependencies]]
+  id = "lcod://core/extract_city@1"
+  requested = "lcod://core/extract_city@1"
+
+  [[components.dependencies]]
+  id = "lcod://core/weather@1"
+  requested = "lcod://core/weather@1"

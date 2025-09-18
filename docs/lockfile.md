@@ -68,6 +68,16 @@ Resolvers may add additional metadata (e.g. branch, registry endpoint). Unknown 
 3. Subsequent installs use the lockfile to fetch the exact same revisions.
 4. When dependencies change, regenerate the lock (`lcod resolve --update`).
 
+### Prototype script (spec examples)
+
+For the examples in this repository, a simple helper is available:
+
+```
+node scripts/create-lock.cjs examples/demo/my_weather/lcp.toml
+```
+
+It generates a skeleton `lcp.lock` next to the descriptor, marking dependencies as `type = "path"`. Real projects will use the resolver to populate the full metadata.
+
 ## Interaction with `lcp.toml`
 
 - `deps.requires` in `lcp.toml` lists constraints (e.g. `lcod://flow/foreach@1`).
