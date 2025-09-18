@@ -18,13 +18,13 @@ Tickets:
 - [x] M0-11 Guide “Create a new component” (`docs/create-component.md`)
 
 ## M1 — Composition & tests
-- Specify `compose.json` with slots (`children` default, named multi‑slots), scopes (`$`, `$slot`, `$env`, `$globals`, `$run`)
-- Flow blocks: `flow/if@1`, `flow/foreach@1` (array/stream + `collectPath` and `else`), `flow/parallel@1`
-- Errors: `flow/try@1` (children/catch/finally), `flow/throw@1`; error structure (code/message/data)
-- Streaming: AsyncIterable inputs and foreach stream semantics; basic backpressure and `parallelism`
-- Memory policies: `outPolicy` (`retain`/`ephemeral`), loop `releasePrevious`
-- Specify test format (inputs/expected + axiom mocks)
-- Document policies & hints (timeout, retry, idempotence)
+- [x] Specify `compose.json` with slots (`children` default, named multi‑slots), scopes (`$`, `$slot`, `$env`, `$globals`, `$run`)
+- [x] Flow blocks: `flow/if@1`, `flow/foreach@1` (array/stream + `collectPath` and `else`), `flow/parallel@1`
+- [x] Errors: `flow/try@1` (children/catch/finally), `flow/throw@1`; error structure (code/message/data)
+- [x] Streaming: AsyncIterable inputs and foreach stream semantics; basic backpressure and `parallelism`
+- [x] Memory policies: `outPolicy` (`retain`/`ephemeral`), loop `releasePrevious`
+- [x] Specify test format (inputs/expected + axiom mocks)
+- [x] Document policies & hints (timeout, retry, idempotence)
  - [x] Kernel SDK: add `ctx.runChildren()` and `ctx.runSlot(name, localState, slotVars)` to allow custom components to orchestrate their slots without special‑casing in the runner. Compose runner passes meta with `children` to implementations.
  - [x] Runtime tests: cover foreach `collectPath`, `$slot.*`, `continue`/`break`, `else`, and async streams (see `lcod-kernel-ts/test/flow.foreach.test.js`).
  - [x] Examples: `examples/flow/foreach_demo` and `examples/flow/foreach_ctrl_demo`
