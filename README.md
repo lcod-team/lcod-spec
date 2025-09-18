@@ -27,6 +27,7 @@ Spec docs
 - docs/runtime-hints.md — Execution hints (`timeout`, `retries`, `idempotent`, `pure`)
 - docs/quickstart.md — Validate and run the demo packages locally
 - docs/tests.md — Declarative test format
+- docs/lockfile.md — Lockfile (`lcp.lock`) structure and lifecycle
 
 Quick validation
 
