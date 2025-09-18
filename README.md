@@ -25,6 +25,7 @@ Spec docs
 - docs/streams.md — Streams and chunked processing
 - docs/memory.md — Memory and retention policies
 - docs/quickstart.md — Validate and run the demo packages locally
+- docs/tests.md — Declarative test format
 
 Quick validation
 
