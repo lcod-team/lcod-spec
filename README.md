@@ -18,6 +18,7 @@ Spec docs
 - docs/schemas.md — Tool schema best practices
 - docs/create-component.md — Create a new component
 - docs/compose-dsl.md — JSON DSL for `compose.json`
+- docs/flow-blocks.md — Core flow operators (`if`, `foreach`, `parallel`)
 - docs/contracts-and-impls.md — Contracts, implementations and bindings
 - docs/dsl-slots.md — Slots, scopes and children
 - docs/errors.md — try/catch/finally and throw
