@@ -3,6 +3,7 @@
 node_modules/
 .npmrc
 npm-debug.log*
+*.lcpkg
 
 # Build artifacts
 dist/

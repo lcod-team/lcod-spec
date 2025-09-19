@@ -50,3 +50,19 @@ The `--demo` flag registers built-in axioms/flow blocks so that the compose file
 - Validate with `npm run validate:lcp -- <path>`
 - Run it via `bin/run-compose.mjs`
 - Capture resolver bindings and lockfiles for reproducible builds (planned in M2)
+
+## 5. Resolve & package (prototype)
+
+Example pipeline combining the resolver CLI and packer:
+
+```
+# Generate lockfile using the Node resolver prototype
+cd ~/git/lcod-kernel-ts
+npm run resolve -- --project ../lcod-spec/examples/demo/my_weather
+
+# Package the component as .lcpkg
+cd ~/git/lcod-spec
+node scripts/pack-lcp.cjs examples/demo/my_weather
+```
+
+The resolver reads optional `resolve.config.json`; packaging emits a tar archive (`my_weather.lcpkg`). Future versions will integrate advanced fetch strategies and signing.

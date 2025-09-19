@@ -20,4 +20,4 @@ Example:
 }
 ```
 
-Resolvers load this configuration (default `resolve.config.json` at project root). Unknown keys are ignored.
+Resolvers load this configuration (default `resolve.config.json` at project root). Unknown keys are ignored. A sample file lives in `examples/tooling/resolver/resolve.config.json`.
