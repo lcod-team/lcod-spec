@@ -30,6 +30,8 @@ Spec docs
 - [docs/lockfile.md](docs/lockfile.md) — Lockfile (`lcp.lock`) structure and lifecycle
 - [docs/resolver.md](docs/resolver.md) — Resolver composite and required axioms
 - [docs/packaging.md](docs/packaging.md) — Package archive (`.lcpkg`) format
+- [docs/guide-humans.md](docs/guide-humans.md) — Quick orientation for contributors
+- [docs/guide-ai.md](docs/guide-ai.md) — Instructions for AI assistants
 
 Quick validation
 

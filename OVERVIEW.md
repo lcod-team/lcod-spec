@@ -2,7 +2,7 @@
 
 # LCOD Ecosystem Overview
 
-This document provides an overview of the **LCOD** (Low‑Code On Demand) ecosystem. It is intended as a human‑readable and machine‑parsable specification for designing, implementing, and composing low‑code components and applications. The goal of LCOD is to enable developers and AI assistants to build full‑stack applications by assembling reusable blocks rather than writing bespoke code, while still allowing native code generation and compilation when needed.
+This document provides an overview of the **LCOD** (Low‑Code On Demand) ecosystem. It is intended as a human‑readable and machine‑parsable specification for designing, cataloguing, and composing low‑code components and applications. The goal of LCOD is to enable developers and AI assistants to build full‑stack solutions by assembling reusable blocks rather than writing bespoke code, while still allowing native code generation and compilation when needed. The format is designed to stay portable across runtimes, IDEs and organisations.
 
 ## 1. Concept and Vision
 
@@ -13,7 +13,7 @@ Key ideas:
 - Design‑time vs. runtime separation – A large language model (LLM) and retrieval augmented generation (RAG) assist only during the design phase (searching for blocks, composing them, filling in parameters). At runtime, the application executes natively without incurring LLM token costs.
 - Minimal kernel – A core runtime library that understands a small DSL for composition and delegation. It can call native functions, run composite flows, and defer to platform‑specific SDKs. Everything else (HTTP servers, CLIs, code generators) is layered on top.
 - Standardized packaging – Each block lives in its own directory (component package) with a canonical descriptor file (`lcp.toml`), schemas, documentation, implementation variants and tests. Blocks are referenced via canonical URIs (`lcod://namespace/name@version`) and can be fetched from Git, HTTP or local mirrors.
-- Flexible resolution – A resolver supports mirror and replacement rules to fetch blocks from different sources (company registry, forks, offline cache) and can produce a lockfile for reproducibility.
+- Flexible resolution – A resolver supports mirror and replacement rules to fetch blocks from different sources (company registry, forks, offline cache) and can produce a lockfile for reproducibility. The resolver itself can be expressed as an LCOD composite, running on top of different kernels via a shared axiom set.
 - Agent‑assisted IDE – A graphical IDE allows humans to drag and drop blocks in a tree/flow view, while an AI assistant suggests next blocks and fills in parameters by querying the RAG index. Generated code or binaries are produced on demand.
 
 ## 2. Layered Architecture
@@ -74,7 +74,7 @@ flowchart TD
 
 **N0 (Kernel)** — provides only the ability to resolve a block by its ID, validate inputs/outputs against JSON Schemas, and execute it by delegating to either primitive `axiom` functions, `native` implementations, or composite flows defined via the compose operator. It defines the `Func` and `Registry` interfaces and is free of any I/O or networking concerns.
 
-**N1 (SDKs)** — language‑specific substrates supply primitive functions (axioms) such as `http.get`, `fs.read`, `time.now`, etc. They also allow registering native implementations of blocks when available (e.g., a Java service for `parse_city`). These SDKs handle details like asynchronous execution, concurrency, and platform‑specific dependencies.
+**N1 (SDKs)** — language‑specific substrates supply primitive functions (axioms) such as `http.get`, `fs.read`, `time.now`, etc. They also allow registering native implementations of blocks when available (e.g., a Java service for `parse_city`). These SDKs handle details like asynchronous execution, concurrency, and platform‑specific dependencies. Each substrate may ship a different axiom library, while sharing the same high-level contracts.
 
 **N2 (Composition & tooling)** — builds on the kernel to load block descriptors (`lcp.toml`), interpret the `compose` operator with slots, map inputs and outputs, bind contracts to implementations, run declarative tests with mocks and hints (timeout, retry, idempotence) and produce runtime metadata (traces, logs).
 
@@ -82,7 +82,7 @@ flowchart TD
 
 **N4 (Hosts)** — ways to run the kernel: embedded as a library in an existing program, as a sidecar process accessible via JSON‑RPC, or packaged as a standalone server. Hosts handle dependency injection, configuration and resource limits (timeouts, memory).
 
-**N5 (Tools & IDE)** — higher‑level tools for humans and AI agents: a registry to store block packages, a resolver to fetch them with mirror/replacement rules, a RAG index for semantic search, a graphical IDE for composing blocks with a tree/flow view and property inspector, and code generators to produce native code for various languages and frameworks.
+**N5 (Tools & IDE)** — higher‑level tools for humans and AI agents: a registry to store block packages, a resolver to fetch them with mirror/replacement rules, a RAG index for semantic search, a graphical IDE for composing blocks with a tree/flow view and property inspector, and code generators to produce native code for various languages and frameworks. Different IDEs can target citizen developers or expert engineers, all consuming the same LCOD catalogue.
 
 ## 3. Component Package Format (LCP)
 
@@ -288,7 +288,7 @@ export const weather: Func = async (ctx, input) => {
 
 The kernel supports concurrency and resource management based on hints (timeouts, retries, idempotence). For example, parallel execution of independent children is possible when no data dependency exists.
 
-## 7. Design‑Time Assistance with RAG
+## 7. Design‑Time Assistance with RAG & AI Collaboration
 
 An LLM can help designers search and assemble blocks at design time. To do so it queries a **RAG index** built from the registry:
 
@@ -297,9 +297,11 @@ An LLM can help designers search and assemble blocks at design time. To do so it
 3. Insertion – The LLM suggests a composition and fills in the `props` for the UI block and the `in` mappings for children. It can also create new blocks by following the spec and tests.
 4. Validation – The kernel’s schema validation and tests ensure that the proposed composition is correct. Errors and hints are returned to the LLM for self‑correction.
 
+LLMs do not need to be trained specifically on LCOD; prompts and catalogue traversal tools are enough to reason over component descriptors. This enables private/on-premise models to assemble solutions using only metadata and schema information.
+
 ## 8. IDE and Graphical Editor
 
-An IDE built on LCOD presents two synchronized views: a **tree view** showing the hierarchical slots/children and a **flow view** showing the data/trigger graph. A palette lists available blocks (filtered by compatibility) and can search with RAG. An inspector panel displays the editable properties of the selected block, generated from its input schema and hints. When a UI block implements `[ui]`, the IDE can render a live preview using the provided preview component and props schema. The IDE persists the project descriptor (`lcp.toml` + `compose.yaml`) and generates code on demand.
+An IDE built on LCOD presents two synchronized views: a **tree view** showing the hierarchical slots/children and a **flow view** showing the data/trigger graph. A palette lists available blocks (filtered by compatibility) and can search with RAG. An inspector panel displays the editable properties of the selected block, generated from its input schema and hints. When a UI block implements `[ui]`, the IDE can render a live preview using the provided preview component and props schema. The IDE persists the project descriptor (`lcp.toml` + `compose.yaml`) and generates code on demand. Multiple IDEs can coexist (technical, citizen, mobile), all interoperable thanks to the shared format.
 
 ## 9. Distribution and Extensibility
 
