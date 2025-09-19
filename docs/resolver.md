@@ -62,6 +62,7 @@ Additional documentation:
 - `docs/resolver/config/README.md` — Configuration format (sources, mirrors, bindings)
 - `docs/resolver/axioms/README.md` — List of required axioms / reference implementations
 - `docs/resolver/examples/README.md` — Placeholder for future end-to-end demos
+- `docs/resolver/contracts/README.md` — Contract `tooling/resolve-dependency@1` specification
 
 ## Next steps
 
