@@ -33,6 +33,13 @@ Tickets:
 - [x] M2-01 Define `lcp.lock` schema + strict validation (tooling, docs)
 - [x] M2-02 Publish resolver as composite package (uses axioms for filesystem/git/http)
 - [x] M2-03 Resolver CLI + config (mirrors, replace, bindings)
-- [ ] M2-04 `.lcpkg` archive format (+ integrity manifest)
-- [ ] M2-05 End-to-end example: resolve → lockfile → package
+- [x] M2-04 `.lcpkg` archive format (+ integrity manifest)
+- [x] M2-05 End-to-end example: resolve → lockfile → package
 - Annexes: UI conventions (`[ui]`), AsyncAPI/CloudEvents (events)
+
+## M3 — Runtime substrates
+- [ ] M3-01 Define standard infrastructure contracts (filesystem, HTTP, Git, hashing, TOML/JSON parsing)
+- [ ] M3-02 Provide Node.js axiom implementations for these contracts (publishable package)
+- [ ] M3-03 Integrate resolver composite with Node axioms and validate end-to-end
+- [ ] M3-04 Implement a Rust substrate for the same contract set to validate portability
+- [ ] M3-05 Cross-runtime conformance tests & documentation on axiom providers
