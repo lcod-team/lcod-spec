@@ -43,3 +43,4 @@ Tickets:
 - [ ] M3-03 Integrate resolver composite with Node axioms and validate end-to-end
 - [ ] M3-04 Implement a Rust substrate for the same contract set to validate portability
 - [ ] M3-05 Cross-runtime conformance tests & documentation on axiom providers
+- [ ] M3-06 Embedded scripting sandbox API (`$api.run`, `$api.config`) for lightweight algorithms

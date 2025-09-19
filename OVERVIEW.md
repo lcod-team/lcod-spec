@@ -246,6 +246,22 @@ out:
   results: codes
 ```
 
+### Embedded scripting (planned)
+
+Some use cases require lightweight algorithms beyond declarative wiring. LCOD plans to embed a sandboxed JavaScript subset so that components can execute concise logic while remaining portable across kernels (Node, Rust via QuickJS, Java via Graal, etc.). Example:
+
+```js
+let status = 'none';
+if ($in.type === 'google') {
+  status = await $api.run('sendGmail', { ...$in, msg: `Special for you: ${$in.msg}` });
+} else {
+  status = $api.global('sorryMessage');
+}
+return { status };
+```
+
+Scripts interact with the host via `$api` (call other components, read configuration) and receive sandboxed inputs (`$in`, `$slot`, `$state`). They complement axioms without inflating declarative flows.
+
 Tests accompany composite blocks to verify flows. A test might look like:
 
 ```json
