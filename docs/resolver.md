@@ -7,6 +7,8 @@ Goal: provide a reusable resolver expressed in the LCOD DSL, relying on pluggabl
 - `lcod://tooling/resolver@0.1.0` (workflow) — defined in `examples/tooling/resolver`
 - `lcod://contract/tooling/resolve-dependency@1` — contract for resolving a single dependency according to platform policy (fetch source, compute integrity, emit bindings).
 
+The current example focuses on local path dependencies to illustrate the flow. More advanced implementations can extend the contract to handle Git/HTTP sources and compute integrity hashes.
+
 ## Required axioms (per host)
 
 | Axiom | Purpose |
@@ -14,7 +16,7 @@ Goal: provide a reusable resolver expressed in the LCOD DSL, relying on pluggabl
 | `lcod://axiom/fs/read-file@1`, `write-file@1` | Read/write local files |
 | `lcod://axiom/path/join@1` | Path normalization |
 | `lcod://axiom/json/parse@1`, `lcod://axiom/toml/parse@1`, `lcod://axiom/toml/stringify@1` | Config and descriptor parsing |
-| `lcod://axiom/git/clone@1`, `lcod://axiom/http/download@1` | Fetch sources from Git/HTTP |
+| `lcod://axiom/git/clone@1`, `lcod://axiom/http/download@1` | Fetch sources from Git/HTTP (optional in current prototype) |
 | `lcod://axiom/hash/sha256@1` | Integrity hashing |
 
 Hosts provide implementations of these axioms appropriate for their runtime (Node.js, Rust, Java…).
@@ -55,6 +57,11 @@ Resolvers may bind contracts to implementations (
 ## Example
 
 See `examples/tooling/resolver/` for the current prototype composition, schemas, and README.
+
+Additional documentation:
+- `docs/resolver/config/README.md` — Configuration format (sources, mirrors, bindings)
+- `docs/resolver/axioms/README.md` — List of required axioms / reference implementations
+- `docs/resolver/examples/README.md` — Placeholder for future end-to-end demos
 
 ## Next steps
 
