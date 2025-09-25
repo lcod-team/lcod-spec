@@ -1,0 +1,74 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://lcod.team/schemas/contracts/core/http/request/input.json",
+  "title": "Core HTTP Request Input",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["url"],
+  "properties": {
+    "method": {
+      "type": "string",
+      "description": "HTTP method (default GET)",
+      "pattern": "^(?i)(GET|POST|PUT|PATCH|DELETE|HEAD|OPTIONS|TRACE)$"
+    },
+    "url": {
+      "type": "string",
+      "format": "uri",
+      "description": "Absolute HTTP/HTTPS URL"
+    },
+    "headers": {
+      "type": "object",
+      "additionalProperties": {
+        "oneOf": [
+          { "type": "string" },
+          {
+            "type": "array",
+            "items": { "type": "string" }
+          }
+        ]
+      },
+      "description": "Map of header names to string or array values"
+    },
+    "query": {
+      "type": "object",
+      "additionalProperties": {
+        "oneOf": [
+          { "type": "string" },
+          { "type": "number" },
+          {
+            "type": "array",
+            "items": { "type": "string" }
+          }
+        ]
+      },
+      "description": "Query string key/value pairs"
+    },
+    "body": {
+      "description": "Request payload (string or JSON-serialisable object when bodyEncoding=json)",
+      "oneOf": [
+        { "type": "string" },
+        { "type": "object" },
+        { "type": "array" },
+        { "type": "null" }
+      ]
+    },
+    "bodyEncoding": {
+      "type": "string",
+      "enum": ["none", "json", "base64", "form"],
+      "description": "Encoding applied to the request body"
+    },
+    "timeoutMs": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Override request timeout in milliseconds"
+    },
+    "followRedirects": {
+      "type": "boolean",
+      "description": "Follow HTTP redirects"
+    },
+    "expectStreaming": {
+      "type": "boolean",
+      "description": "Hint that the caller expects a streamed response"
+    }
+  }
+}

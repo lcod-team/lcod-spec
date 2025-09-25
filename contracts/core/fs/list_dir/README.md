@@ -1,0 +1,21 @@
+# Contract: core/fs/list-dir@1
+
+Lists entries in a directory and optionally returns filesystem metadata.
+
+## Input (`schema/list_dir.in.json`)
+- `path` (string) — absolute or project-relative directory path.
+- `recursive` (boolean, optional) — traverse subdirectories (defaults to `false`).
+- `maxDepth` (number, optional) — depth limit when `recursive` is `true`.
+- `includeStats` (boolean, optional) — include `size` and `mtime` for each entry.
+- `includeHidden` (boolean, optional) — include entries whose name starts with `.`.
+- `pattern` (string, optional) — glob-style filter (e.g. `**/*.json`).
+
+## Output (`schema/list_dir.out.json`)
+- `entries` (array) — each entry describes a child file/directory:
+  - `name` (string) — basename.
+  - `path` (string) — absolute or project-relative path of the entry.
+  - `type` (string) — `file`, `directory`, or `symlink`.
+  - `size` (number, optional) — size in bytes (only when `includeStats` is `true`).
+  - `mtime` (string, optional) — ISO 8601 modification time (only when `includeStats` is `true`).
+
+Implementations should return errors when the directory cannot be read (e.g. `ENOENT`, `EACCES`).

@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://lcod.team/schemas/contracts/core/fs/list_dir/output.json",
+  "title": "Filesystem List Directory Output",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["entries"],
+  "properties": {
+    "entries": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "path", "type"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Basename of the entry."
+          },
+          "path": {
+            "type": "string",
+            "description": "Absolute or project-relative path of the entry."
+          },
+          "type": {
+            "type": "string",
+            "enum": ["file", "directory", "symlink"],
+            "description": "Entry kind."
+          },
+          "size": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Size in bytes (when includeStats is true)."
+          },
+          "mtime": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Last modification timestamp (ISO 8601)."
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://lcod.team/schemas/contracts/core/fs/list_dir/input.json",
+  "title": "Filesystem List Directory Input",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["path"],
+  "properties": {
+    "path": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Absolute or project-relative directory path."
+    },
+    "recursive": {
+      "type": "boolean",
+      "description": "Recursively traverse subdirectories."
+    },
+    "maxDepth": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Maximum depth to traverse when recursive is true."
+    },
+    "includeStats": {
+      "type": "boolean",
+      "description": "Include size and mtime for each entry."
+    },
+    "includeHidden": {
+      "type": "boolean",
+      "description": "Include entries whose name starts with a dot."
+    },
+    "pattern": {
+      "type": "string",
+      "description": "Optional glob-style filter (minimatch syntax)."
+    }
+  }
+}

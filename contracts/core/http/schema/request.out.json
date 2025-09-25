@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://lcod.team/schemas/contracts/core/http/request/output.json",
+  "title": "Core HTTP Request Output",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["status", "headers"],
+  "properties": {
+    "status": {
+      "type": "integer",
+      "minimum": 100,
+      "maximum": 599,
+      "description": "HTTP status code"
+    },
+    "statusText": {
+      "type": "string",
+      "description": "Status message returned by the server"
+    },
+    "headers": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "array",
+        "items": { "type": "string" }
+      },
+      "description": "Response headers as string arrays"
+    },
+    "body": {
+      "type": ["string", "null"],
+      "description": "Response body encoded according to bodyEncoding"
+    },
+    "bodyEncoding": {
+      "type": "string",
+      "enum": ["utf-8", "base64", "json"],
+      "description": "Encoding applied to body"
+    },
+    "timings": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "start": { "type": "string", "format": "date-time" },
+        "end": { "type": "string", "format": "date-time" },
+        "durationMs": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "redirects": {
+      "type": "array",
+      "items": { "type": "string", "format": "uri" }
+    }
+  }
+}

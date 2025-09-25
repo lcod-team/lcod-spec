@@ -1,0 +1,19 @@
+schemaVersion = "1.0"
+id = "lcod://contract/core/fs/write-file@1.0.0"
+name = "write-file"
+namespace = "contract/core/fs"
+version = "1.0.0"
+kind = "contract"
+summary = "Write data to the local filesystem with optional encoding and metadata controls."
+
+[tool]
+name = "fs_write_file"
+description = "Persist data to disk, creating parent directories when requested."
+inputSchema = "schema/write_file.in.json"
+outputSchema = "schema/write_file.out.json"
+
+[hints]
+timeoutMs = 5000
+
+[docs]
+readme = "README.md"
