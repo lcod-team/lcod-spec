@@ -1,0 +1,23 @@
+schemaVersion = "1.0"
+id = "lcod://flow/foreach_stream_demo@0.1.0"
+name = "foreach_stream_demo"
+namespace = "flow"
+version = "0.1.0"
+kind = "function"
+summary = "Iterate over a stream and collect echoed values."
+
+[tool]
+name = "foreach_stream_demo"
+description = "Showcases foreach over a stream input with an else branch."
+inputSchema = "schema/foreach_stream_demo.in.json"
+outputSchema = "schema/foreach_stream_demo.out.json"
+
+[deps]
+requires = [
+  "lcod://flow/foreach@1",
+  "lcod://impl/echo@1"
+]
+
+[docs]
+readme = "README.md"
+

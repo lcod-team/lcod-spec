@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "foreach_stream_demo output",
+  "type": "object",
+  "required": ["results"],
+  "additionalProperties": false,
+  "properties": {
+    "results": {
+      "type": "array",
+      "items": {
+        "oneOf": [
+          { "type": "number" },
+          { "type": "string" }
+        ]
+      },
+      "description": "Collected chunks from the stream"
+    }
+  }
+}

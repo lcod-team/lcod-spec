@@ -1,0 +1,20 @@
+compose:
+- call: lcod://flow/foreach@1
+  in:
+    stream: $.numbers
+  children:
+    body:
+    - call: lcod://impl/echo@1
+      in:
+        value: $slot.item
+      out:
+        val: val
+    else:
+    - call: lcod://impl/echo@1
+      in:
+        value: empty
+      out:
+        val: val
+  collectPath: $.val
+  out:
+    results: results

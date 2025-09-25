@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "foreach_stream_demo input",
+  "type": "object",
+  "required": ["numbers"],
+  "additionalProperties": false,
+  "properties": {
+    "numbers": {
+      "description": "Stream handle or inline array of numbers",
+      "oneOf": [
+        {
+          "type": "array",
+          "items": { "type": "number" }
+        },
+        {
+          "type": "object",
+          "required": ["id"],
+          "properties": {
+            "id": { "type": "string" },
+            "encoding": { "type": "string" },
+            "mediaType": { "type": "string" }
+          }
+        }
+      ]
+    }
+  }
+}
