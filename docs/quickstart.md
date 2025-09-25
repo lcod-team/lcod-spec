@@ -4,11 +4,11 @@ This walkthrough uses the spec repository plus the TypeScript kernel to validate
 
 ## Prerequisites
 - Node.js 18+
-- `lcod-spec` and `lcod-kernel-ts` cloned side by side
+- `lcod-spec` and `lcod-kernel-js` cloned side by side
 
 ```
 ~/git/lcod-spec
-~/git/lcod-kernel-ts
+~/git/lcod-kernel-js
 ```
 
 ## 1. Validate the example packages
@@ -26,7 +26,7 @@ This enforces `schema/lcp.schema.json`, checks schema references, and reports mi
 ## 2. Validate from the kernel (optional per-package lint)
 
 ```
-cd ~/git/lcod-kernel-ts
+cd ~/git/lcod-kernel-js
 npm install
 npm run validate:lcp -- ../lcod-spec/examples/flow/foreach_ctrl_demo
 ```
@@ -36,7 +36,7 @@ You can pass a directory or an explicit `lcp.toml` path.
 ## 3. Run a demo composition
 
 ```
-cd ~/git/lcod-kernel-ts
+cd ~/git/lcod-kernel-js
 node bin/run-compose.mjs \
   --compose ../lcod-spec/examples/flow/foreach_ctrl_demo/compose.yaml \
   --demo \
@@ -57,7 +57,7 @@ Example pipeline combining the resolver CLI and packer:
 
 ```
 # Generate lockfile using the Node resolver prototype
-cd ~/git/lcod-kernel-ts
+cd ~/git/lcod-kernel-js
 npm run resolve -- --project ../lcod-spec/examples/demo/my_weather
 
 # Package the component as .lcpkg

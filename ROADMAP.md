@@ -26,7 +26,7 @@ Tickets:
 - [x] Specify test format (inputs/expected + axiom mocks)
 - [x] Document policies & hints (timeout, retry, idempotence)
  - [x] Kernel SDK: add `ctx.runChildren()` and `ctx.runSlot(name, localState, slotVars)` to allow custom components to orchestrate their slots without special‑casing in the runner. Compose runner passes meta with `children` to implementations.
- - [x] Runtime tests: cover foreach `collectPath`, `$slot.*`, `continue`/`break`, `else`, and async streams (see `lcod-kernel-ts/test/flow.foreach.test.js`).
+ - [x] Runtime tests: cover foreach `collectPath`, `$slot.*`, `continue`/`break`, `else`, and async streams (see `lcod-kernel-js/test/flow.foreach.test.js`).
  - [x] Examples: `examples/flow/foreach_demo` and `examples/flow/foreach_ctrl_demo`
 
 ## M2 — Distribution & security

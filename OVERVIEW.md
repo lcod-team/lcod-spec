@@ -330,7 +330,7 @@ A recommended polyrepo layout for the LCOD ecosystem:
 | Repository       | Purpose                                      |
 | ---------------- | -------------------------------------------- |
 | `lcod-spec`      | Specification, schemas, examples, docs.      |
-| `lcod-kernel-ts` | TypeScript kernel + SDK implementation.      |
+| `lcod-kernel-js` | JavaScript/TypeScript kernel + SDK implementation. |
 | `lcod-registry`  | Git registry of LCP components.              |
 | `lcod-resolver`  | CLI and library to resolve and cache blocks. |
 | `lcod-adapters`  | HTTP/JSON‑RPC/MCP adapters (optional).       |
