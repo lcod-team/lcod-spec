@@ -33,6 +33,51 @@
       "enum": ["utf-8", "base64", "json"],
       "description": "Encoding applied to body"
     },
+    "stream": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Stream handle identifier assigned by the host runtime."
+        },
+        "encoding": {
+          "type": "string",
+          "enum": ["utf-8", "base64", "json", "binary"],
+          "description": "Default encoding for chunks."
+        },
+        "mediaType": {
+          "type": "string",
+          "description": "MIME type hint for the response body."
+        },
+        "storage": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "type": "string",
+              "enum": ["memory", "file", "external"],
+              "description": "Where the stream buffers data."
+            },
+            "path": {
+              "type": "string",
+              "description": "Absolute path when kind = file."
+            },
+            "size": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Total size when known."
+            }
+          }
+        },
+        "metadata": {
+          "type": "object",
+          "description": "Implementation-defined metadata (timestamps, origin, etc.)."
+        }
+      }
+    },
     "timings": {
       "type": "object",
       "additionalProperties": false,

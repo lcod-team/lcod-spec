@@ -43,6 +43,7 @@ Tickets:
   - [x] Draft `contract/core/fs/write-file@1` (schema + README)
   - [x] Draft `contract/core/fs/list-dir@1` (schema + README)
   - [x] Draft `contract/core/http/request@1` (schema + README)
+  - [x] Draft `contract/core/stream/read@1` & `core/stream/close@1` (schema + README)
 - [ ] M3-02 Provide Node.js axiom implementations for these contracts (publishable package)
 - [ ] M3-03 Integrate resolver composite with Node axioms and validate end-to-end
 - [ ] M3-04 Implement a Rust substrate for the same contract set to validate portability

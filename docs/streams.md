@@ -1,6 +1,6 @@
 # Streams and Chunked Processing
 
-Some contracts produce or consume data incrementally. LCOD models this with AsyncIterables while keeping deterministic compose flows.
+Some contracts produce or consume data incrementally. LCOD models this with AsyncIterables while keeping deterministic compose flows. When a contract returns a reusable stream handle, see [docs/core-streams.md](core-streams.md) for the standard contracts (`core/stream/read@1`, `core/stream/close@1`).
 
 ## Source forms
 

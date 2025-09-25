@@ -1,0 +1,19 @@
+schemaVersion = "1.0"
+id = "lcod://contract/core/stream/close@1.0.0"
+name = "close"
+namespace = "contract/core/stream"
+version = "1.0.0"
+kind = "contract"
+summary = "Release resources associated with a stream handle."
+
+[tool]
+name = "core_stream_close"
+description = "Closes a stream handle and optionally deletes backing storage."
+inputSchema = "schema/close.in.json"
+outputSchema = "schema/close.out.json"
+
+[hints]
+timeoutMs = 2000
+
+[docs]
+readme = "README.md"

@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://lcod.team/schemas/contracts/core/stream/close/input.json",
+  "title": "Core Stream Close Input",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["stream"],
+  "properties": {
+    "stream": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Identifier of the stream handle to close."
+        },
+        "storage": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "type": "string",
+              "enum": ["memory", "file", "external"],
+              "description": "Where the stream buffers its data."
+            },
+            "path": {
+              "type": "string",
+              "description": "Absolute path when kind = file."
+            }
+          }
+        },
+        "metadata": {
+          "type": "object",
+          "description": "Implementation-defined metadata."
+        }
+      }
+    },
+    "deleteFile": {
+      "type": "boolean",
+      "description": "Delete the backing file if storage.kind = file."
+    }
+  }
+}

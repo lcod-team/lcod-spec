@@ -70,5 +70,11 @@
       "type": "boolean",
       "description": "Hint that the caller expects a streamed response"
     }
+    ,
+    "responseMode": {
+      "type": "string",
+      "enum": ["buffer", "stream"],
+      "description": "When 'stream', the response body is exposed as a stream handle."
+    }
   }
 }

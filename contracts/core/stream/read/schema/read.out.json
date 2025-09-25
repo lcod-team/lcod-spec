@@ -1,0 +1,78 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://lcod.team/schemas/contracts/core/stream/read/output.json",
+  "title": "Core Stream Read Output",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["done", "stream"],
+  "properties": {
+    "done": {
+      "type": "boolean",
+      "description": "True when the stream is exhausted."
+    },
+    "chunk": {
+      "type": ["string", "null"],
+      "description": "Payload chunk when done = false."
+    },
+    "encoding": {
+      "type": "string",
+      "enum": ["utf-8", "base64", "json", "binary"],
+      "description": "Encoding applied to chunk."
+    },
+    "bytes": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Number of bytes represented by the chunk."
+    },
+    "seq": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Monotonic sequence number for chunks starting at 0."
+    },
+    "stream": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Identifier of the stream handle."
+        },
+        "encoding": {
+          "type": "string",
+          "enum": ["utf-8", "base64", "json", "binary"],
+          "description": "Default encoding for remaining chunks."
+        },
+        "mediaType": {
+          "type": "string",
+          "description": "Optional MIME type hint."
+        },
+        "storage": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "type": "string",
+              "enum": ["memory", "file", "external"],
+              "description": "Where the stream buffers its data."
+            },
+            "path": {
+              "type": "string",
+              "description": "Absolute path when kind = file."
+            },
+            "size": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Total size in bytes when known."
+            }
+          }
+        },
+        "metadata": {
+          "type": "object",
+          "description": "Implementation-defined metadata."
+        }
+      }
+    }
+  }
+}

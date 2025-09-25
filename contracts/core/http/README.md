@@ -1,6 +1,6 @@
 # Contract: core/http/request@1
 
-Performs an HTTP request (client-side) and returns status, headers, and body with optional streaming metadata.
+Performs an HTTP request (client-side) and returns status, headers, and either a buffered body or a reusable stream handle.
 
 ## Input (`schema/request.in.json`)
 - `method` (string, optional) — HTTP method (default `GET`).
@@ -11,14 +11,16 @@ Performs an HTTP request (client-side) and returns status, headers, and body wit
 - `bodyEncoding` (string, optional) — `none` (default), `json`, `base64`, `form` (application/x-www-form-urlencoded).
 - `timeoutMs` (number, optional) — override request timeout in milliseconds.
 - `followRedirects` (boolean, optional) — whether to follow redirects (defaults to `true`).
-- `expectStreaming` (boolean, optional) — set `true` if the caller expects a streamed response (chunked download).
+- `expectStreaming` (boolean, optional) — hint that the caller expects a streamed response (chunked download).
+- `responseMode` (string, optional) — `buffer` (default) or `stream`. When `stream`, the response body is exposed as a handle for `core/stream/read@1`.
 
 ## Output (`schema/request.out.json`)
 - `status` (number) — HTTP status code.
 - `statusText` (string, optional) — status message (e.g. "OK").
 - `headers` (object) — response headers as string arrays.
-- `body` (string, optional) — response body. Encoding is specified by `bodyEncoding`.
+- `body` (string, optional) — response body when `responseMode = buffer`. Encoding is specified by `bodyEncoding`.
 - `bodyEncoding` (string, optional) — `utf-8`, `base64`, or `json` to indicate how `body` is encoded.
+- `stream` (object, optional) — stream handle when `responseMode = stream`; see `core/stream/read@1` for the handle shape.
 - `timings` (object, optional) — `start`, `end`, `durationMs` for diagnostics.
 - `redirects` (array, optional) — sequence of redirect URLs followed.
 

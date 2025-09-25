@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://lcod.team/schemas/contracts/core/stream/read/input.json",
+  "title": "Core Stream Read Input",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["stream"],
+  "properties": {
+    "stream": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Unique identifier assigned by the host runtime."
+        },
+        "encoding": {
+          "type": "string",
+          "enum": ["utf-8", "base64", "json", "binary"],
+          "description": "Default encoding for chunks returned by this stream."
+        },
+        "mediaType": {
+          "type": "string",
+          "description": "Optional MIME type hint."
+        },
+        "storage": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "type": "string",
+              "enum": ["memory", "file", "external"],
+              "description": "Where the stream buffers its data."
+            },
+            "path": {
+              "type": "string",
+              "description": "Absolute path when kind = file."
+            },
+            "size": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Total size in bytes when known."
+            }
+          }
+        },
+        "metadata": {
+          "type": "object",
+          "description": "Implementation-defined metadata (timestamps, origin, et cetera)."
+        }
+      }
+    },
+    "maxBytes": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Maximum number of bytes to read in a single chunk."
+    },
+    "timeoutMs": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Wait time in milliseconds when no data is immediately available."
+    },
+    "decode": {
+      "type": "string",
+      "enum": ["utf-8", "base64", "json", "binary"],
+      "description": "Requested chunk encoding in the response."
+    }
+  }
+}

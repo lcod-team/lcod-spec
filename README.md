@@ -30,6 +30,7 @@ Spec docs
 - [docs/lockfile.md](docs/lockfile.md) — Lockfile (`lcp.lock`) structure and lifecycle
 - [docs/resolver.md](docs/resolver.md) — Resolver composite and required axioms
 - [docs/core-contracts.md](docs/core-contracts.md) — Core infrastructure contracts (filesystem, HTTP, Git, parsing, hashing)
+- [docs/core-streams.md](docs/core-streams.md) — Stream handles and chunked transfer contracts
 - [docs/packaging.md](docs/packaging.md) — Package archive (`.lcpkg`) format
 - [docs/guide-humans.md](docs/guide-humans.md) — Quick orientation for contributors
 - [docs/guide-ai.md](docs/guide-ai.md) — Instructions for AI assistants
