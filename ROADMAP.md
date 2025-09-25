@@ -38,7 +38,7 @@ Tickets:
 - Annexes: UI conventions (`[ui]`), AsyncAPI/CloudEvents (events)
 
 ## M3 — Runtime substrates
-- [ ] M3-01 Define standard infrastructure contracts (filesystem, HTTP, Git, hashing, TOML/JSON parsing)
+- [x] M3-01 Define standard infrastructure contracts (filesystem, HTTP, Git, hashing, TOML/JSON parsing)
   - [x] Draft `contract/core/fs/read-file@1` (schema + README)
   - [x] Draft `contract/core/fs/write-file@1` (schema + README)
   - [x] Draft `contract/core/fs/list-dir@1` (schema + README)
