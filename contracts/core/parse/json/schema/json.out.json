@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://lcod.team/schemas/contracts/core/parse/json/output.json",
+  "title": "Core JSON Parse Output",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["value"],
+  "properties": {
+    "value": {
+      "description": "Parsed JSON value.",
+      "anyOf": [
+        { "type": "object" },
+        { "type": "array" },
+        { "type": "string" },
+        { "type": "number" },
+        { "type": "integer" },
+        { "type": "boolean" },
+        { "type": "null" }
+      ]
+    },
+    "bytes": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Bytes consumed during parsing."
+    },
+    "validated": {
+      "type": "boolean",
+      "description": "True when schema validation succeeded."
+    }
+  }
+}

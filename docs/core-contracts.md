@@ -10,10 +10,11 @@ This note tracks the core contracts that anchor the runtime substrates milestone
 | `core/http` | `lcod://contract/core/http/request@1` | Perform HTTP requests with headers, body, streaming TBD. | ✅ |
 | `core/stream` | `lcod://contract/core/stream/read@1` | Pull the next chunk from a reusable stream handle. | ✅ |
 | `core/stream` | `lcod://contract/core/stream/close@1` | Release a stream handle and optionally delete backing storage. | ✅ |
-| `core/git` | `lcod://contract/core/git/clone@1` | Fetch a Git repository (url/ref/subdir) onto local storage. | ⏳ |
-| `core/hash` | `lcod://contract/core/hash/sha256@1` | Compute SHA-256 over buffers/streams for integrity. | ⏳ |
-| `core/parse` | `lcod://contract/core/parse/json@1` | Parse JSON strings/buffers into canonical objects. | ⏳ |
-| `core/parse` | `lcod://contract/core/parse/toml@1` | Parse TOML descriptors (mirrors @iarna/toml behaviour). | ⏳ |
+| `core/git` | `lcod://contract/core/git/clone@1` | Fetch a Git repository (url/ref/subdir) onto local storage. | ✅ |
+| `core/hash` | `lcod://contract/core/hash/sha256@1` | Compute SHA-256 over buffers/streams for integrity. | ✅ |
+| `core/parse` | `lcod://contract/core/parse/json@1` | Parse JSON strings/buffers into canonical objects. | ✅ |
+| `core/parse` | `lcod://contract/core/parse/toml@1` | Parse TOML descriptors (mirrors @iarna/toml behaviour). | ✅ |
+| `core/parse` | `lcod://contract/core/parse/csv@1` | Stream CSV rows as JSON objects for foreach pipelines. | ✅ |
 
 Follow-up work will extend the list for streaming APIs (HTTP download/upload) once the first wave is stable.
 

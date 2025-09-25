@@ -1,0 +1,19 @@
+schemaVersion = "1.0"
+id = "lcod://contract/core/git/clone@1.0.0"
+name = "clone"
+namespace = "contract/core/git"
+version = "1.0.0"
+kind = "contract"
+summary = "Clone or update a Git repository according to project policy." 
+
+[tool]
+name = "core_git_clone"
+description = "Fetches a Git repository (URL/ref/subdir) into a managed workspace and returns checkout metadata."
+inputSchema = "schema/clone.in.json"
+outputSchema = "schema/clone.out.json"
+
+[hints]
+timeoutMs = 60000
+
+[docs]
+readme = "README.md"

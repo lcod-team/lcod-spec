@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://lcod.team/schemas/contracts/core/hash/sha256/output.json",
+  "title": "Core SHA-256 Output",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["hex", "base64"],
+  "properties": {
+    "hex": {
+      "type": "string",
+      "description": "Lowercase hexadecimal digest."
+    },
+    "base64": {
+      "type": "string",
+      "description": "Base64-encoded digest."
+    },
+    "bytes": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Number of bytes processed."
+    }
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://lcod.team/schemas/contracts/core/parse/toml/output.json",
+  "title": "Core TOML Parse Output",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["value"],
+  "properties": {
+    "value": {
+      "type": "object",
+      "description": "Parsed TOML expressed as a JSON-compatible object."
+    },
+    "bytes": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Bytes consumed during parsing."
+    }
+  }
+}

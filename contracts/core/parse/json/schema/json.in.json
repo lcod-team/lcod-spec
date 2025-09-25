@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://lcod.team/schemas/contracts/core/parse/json/input.json",
+  "title": "Core JSON Parse Input",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "text": {
+      "type": "string",
+      "description": "JSON text to parse."
+    },
+    "encoding": {
+      "type": "string",
+      "enum": ["utf-8", "utf-16", "latin1"],
+      "description": "Encoding for `text`."
+    },
+    "path": {
+      "type": "string",
+      "description": "Absolute path to a JSON file."
+    },
+    "stream": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "encoding": {
+          "type": "string",
+          "enum": ["utf-8", "utf-16", "latin1", "binary"],
+          "description": "Default chunk encoding."
+        }
+      }
+    },
+    "schemaPath": {
+      "type": "string",
+      "description": "JSON Schema path relative to the component for validation."
+    },
+    "allowComments": {
+      "type": "boolean",
+      "description": "Allow JSON with comments (implementation-specific)."
+    }
+  },
+  "oneOf": [
+    { "required": ["text"] },
+    { "required": ["path"] },
+    { "required": ["stream"] }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://lcod.team/schemas/contracts/core/git/clone/output.json",
+  "title": "Core Git Clone Output",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["path", "commit", "source"],
+  "properties": {
+    "path": {
+      "type": "string",
+      "description": "Absolute path to the checkout in the runtime workspace."
+    },
+    "commit": {
+      "type": "string",
+      "description": "Resolved commit SHA."
+    },
+    "ref": {
+      "type": "string",
+      "description": "Normalized ref name (refs/heads/..., refs/tags/...)."
+    },
+    "subdir": {
+      "type": "string",
+      "description": "Subdirectory path if only a subset was exposed."
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["url", "fetchedAt"],
+      "properties": {
+        "url": {
+          "type": "string",
+          "description": "Original repository URL."
+        },
+        "fetchedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp when the clone completed."
+        }
+      }
+    }
+  }
+}

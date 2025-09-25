@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://lcod.team/schemas/contracts/core/parse/csv/input.json",
+  "title": "Core CSV Parse Input",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "text": { "type": "string" },
+    "encoding": {
+      "type": "string",
+      "enum": ["utf-8", "utf-16", "latin1"],
+      "description": "Encoding for text input."
+    },
+    "path": { "type": "string" },
+    "stream": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "encoding": {
+          "type": "string",
+          "enum": ["utf-8", "latin1", "binary"],
+          "description": "Default chunk encoding."
+        }
+      }
+    },
+    "delimiter": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1
+    },
+    "quote": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1
+    },
+    "header": {
+      "oneOf": [
+        { "type": "boolean" },
+        {
+          "type": "array",
+          "items": { "type": "string" },
+          "minItems": 1
+        }
+      ],
+      "description": "Header handling; array overrides column names."
+    },
+    "trim": { "type": "boolean" },
+    "maxRows": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "streamOutput": {
+      "type": "boolean",
+      "description": "Force streaming output even for small datasets."
+    }
+  },
+  "oneOf": [
+    { "required": ["text"] },
+    { "required": ["path"] },
+    { "required": ["stream"] }
+  ]
+}

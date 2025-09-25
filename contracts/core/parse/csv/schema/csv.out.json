@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://lcod.team/schemas/contracts/core/parse/csv/output.json",
+  "title": "Core CSV Parse Output",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "rows": {
+      "type": "array",
+      "items": { "type": "object" },
+      "description": "Parsed rows when output is buffered."
+    },
+    "stream": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "encoding": {
+          "type": "string",
+          "enum": ["json", "utf-8"],
+          "description": "Encoding for each emitted chunk."
+        }
+      },
+      "description": "Stream handle yielding JSON-encoded rows."
+    },
+    "columns": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "bytes": {
+      "type": "integer",
+      "minimum": 0
+    }
+  },
+  "anyOf": [
+    { "required": ["rows"] },
+    { "required": ["stream"] }
+  ]
+}

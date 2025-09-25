@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://lcod.team/schemas/contracts/core/hash/sha256/input.json",
+  "title": "Core SHA-256 Input",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "data": {
+      "type": "string",
+      "description": "Payload to hash."
+    },
+    "encoding": {
+      "type": "string",
+      "enum": ["utf-8", "base64", "hex"],
+      "description": "Encoding for `data` when present."
+    },
+    "path": {
+      "type": "string",
+      "description": "Absolute path to a file whose contents should be hashed."
+    },
+    "stream": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "encoding": {
+          "type": "string",
+          "enum": ["utf-8", "base64", "json", "binary"],
+          "description": "Default chunk encoding."
+        }
+      },
+      "description": "Stream handle to hash via `core/stream/read@1`."
+    },
+    "chunkSize": {
+      "type": "integer",
+      "minimum": 1024,
+      "description": "Chunk size in bytes when reading from path or stream."
+    }
+  },
+  "oneOf": [
+    { "required": ["data"] },
+    { "required": ["path"] },
+    { "required": ["stream"] }
+  ]
+}

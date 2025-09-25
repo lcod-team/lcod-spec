@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://lcod.team/schemas/contracts/core/parse/toml/input.json",
+  "title": "Core TOML Parse Input",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "text": {
+      "type": "string",
+      "description": "TOML text to parse."
+    },
+    "encoding": {
+      "type": "string",
+      "enum": ["utf-8", "utf-16", "latin1"],
+      "description": "Encoding for text input."
+    },
+    "path": {
+      "type": "string",
+      "description": "Absolute path to a TOML file."
+    },
+    "stream": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "encoding": {
+          "type": "string",
+          "enum": ["utf-8", "utf-16", "latin1", "binary"],
+          "description": "Default chunk encoding."
+        }
+      }
+    },
+    "allowInlineTableMultiline": {
+      "type": "boolean",
+      "description": "Allow relaxed parsing rules for inline tables."
+    }
+  },
+  "oneOf": [
+    { "required": ["text"] },
+    { "required": ["path"] },
+    { "required": ["stream"] }
+  ]
+}
