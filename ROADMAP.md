@@ -50,5 +50,8 @@ Tickets:
 - [ ] M3-02 Provide Node.js axiom implementations for these contracts (publishable package)
 - [ ] M3-03 Integrate resolver composite with Node axioms and validate end-to-end
 - [ ] M3-04 Implement a Rust substrate for the same contract set to validate portability
+  - [x] Bootstrap `lcod-kernel-rs` compose runner, slot orchestration and streaming handles (mirrors spec foreach demos)
+  - [ ] Implement core contract bindings (filesystem, HTTP, Git, hash, parse) in Rust with parity tests vs Node
+  - [ ] Publish conformance artefacts (fixtures + diff tooling) for Node/Rust comparison
 - [ ] M3-05 Cross-runtime conformance tests & documentation on axiom providers
 - [ ] M3-06 Embedded scripting sandbox API (`$api.run`, `$api.config`) for lightweight algorithms

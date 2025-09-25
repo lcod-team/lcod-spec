@@ -6,22 +6,27 @@
   "additionalProperties": false,
   "properties": {
     "numbers": {
-      "description": "Stream handle or inline array of numbers",
-      "oneOf": [
-        {
-          "type": "array",
-          "items": { "type": "number" }
-        },
-        {
+      "type": "object",
+      "description": "Container that holds the stream handle returned by the host runtime.",
+      "required": ["stream"],
+      "additionalProperties": true,
+      "properties": {
+        "stream": {
           "type": "object",
           "required": ["id"],
+          "additionalProperties": true,
           "properties": {
             "id": { "type": "string" },
             "encoding": { "type": "string" },
             "mediaType": { "type": "string" }
           }
         }
-      ]
+      }
+    },
+    "attempts": {
+      "type": "array",
+      "description": "Iteration budget for the foreach loop; length should exceed the expected number of chunks.",
+      "items": { "type": "number" }
     }
   }
 }

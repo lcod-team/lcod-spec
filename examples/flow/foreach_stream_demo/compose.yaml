@@ -1,18 +1,31 @@
 compose:
 - call: lcod://flow/foreach@1
   in:
-    stream: $.numbers
+    list: $.attempts
   children:
     body:
-    - call: lcod://impl/echo@1
+    - call: lcod://contract/core/stream/read@1
       in:
-        value: $slot.item
+        stream: $.numbers.stream
+        decode: utf-8
+        maxBytes: 2
       out:
-        val: val
-    else:
-    - call: lcod://impl/echo@1
+        chunk: $
+    - call: lcod://flow/if@1
       in:
-        value: empty
+        cond: $.chunk.done
+      children:
+        then:
+        - call: lcod://contract/core/stream/close@1
+          in:
+            stream: $.numbers.stream
+        - call: lcod://flow/break@1
+        else:
+        - call: lcod://impl/echo@1
+          in:
+            value: $.chunk.chunk
+          out:
+            val: val
       out:
         val: val
   collectPath: $.val

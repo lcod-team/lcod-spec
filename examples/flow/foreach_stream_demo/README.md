@@ -1,22 +1,35 @@
 # flow/foreach stream demo
 
-Demonstrates iterating over a stream input with `lcod://flow/foreach@1`:
-- Items are read from the `stream` binding rather than a materialised array.
-- Each chunk is echoed back using `collectPath: "$.val"`.
-- When the stream is empty the `else` slot produces an `"empty"` marker.
+This compose iterates over a real stream handle by repeatedly invoking
+`lcod://core/stream/read@1` inside a `flow/foreach@1` loop. It illustrates how
+to pull fixed-size chunks, collect them, and release the handle via
+`core/stream/close@1` when the stream reports `done = true`.
 
-Expected behaviour (with an initial state `{ "numbers": [1,2,3] }`):
+## Expected state
+
+The host runtime must provide two fields in the initial state:
+
+- `numbers.stream` — a stream handle managed by the host. Each call to
+  `core/stream/read@1` should yield the next portion of the underlying data. In
+  the tests we feed the digits `1` through `6` and request `maxBytes = 2`, which
+  produces three chunks: `"12"`, `"34"`, and `"56"`.
+- `attempts` — an iteration budget for `flow/foreach@1`. The list length should
+  exceed the expected number of iterations so that the loop can break once the
+  stream signals completion.
+
+Running the compose with the sample stream described above returns:
 
 ```json
-{ "results": [1,2,3] }
+{ "results": ["12", "34", "56"] }
 ```
 
-With an empty stream `{ "numbers": [] }` the output becomes:
+If the stream is empty, the loop takes the `else` branch and closes the handle
+without collecting any chunks, resulting in:
 
 ```json
-{ "results": ["empty"] }
+{ "results": [] }
 ```
 
-Implementations are free to back the stream handle with a temporary file or an
-in-memory queue, but the compose contract only observes the `stream` handle and
-chunks pulled via `flow/foreach`.
+Implementations may back the stream handle with a temporary file, an in-memory
+buffer, or any other storage mechanism. The compose only interacts with the
+handle via `core/stream/read@1` and `core/stream/close@1`.
