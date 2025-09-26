@@ -2,7 +2,7 @@ compose:
 - call: lcod://tooling/test_checker@1
   in:
     composeRef:
-      path: ../../flow/foreach_stream_demo/compose.yaml
+      path: ../../../examples/flow/foreach_stream_demo/compose.yaml
     input:
       attempts: [0,1,2,3,4,5,6,7,8,9]
     expected:

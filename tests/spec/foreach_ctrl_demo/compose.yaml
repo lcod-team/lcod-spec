@@ -2,7 +2,7 @@ compose:
 - call: lcod://tooling/test_checker@1
   in:
     composeRef:
-      path: ../../flow/foreach_ctrl_demo/compose.yaml
+      path: ../../../examples/flow/foreach_ctrl_demo/compose.yaml
     input:
       numbers: [1, 2, 3, 8, 9]
     expected:

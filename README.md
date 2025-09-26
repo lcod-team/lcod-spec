@@ -10,6 +10,8 @@ Specification for **LCOD Component Package (LCP)** and implementation convention
 
 See [OVERVIEW.md](OVERVIEW.md) for the ecosystem overview.
 
+Shared specification fixtures live under `tests/spec`. They are portable compose-based tests executed by each kernel via the built-in runners (`npm run test:spec`, `cargo run --bin test_specs`).
+
 Spec docs
 
 - [docs/id-and-versioning.md](docs/id-and-versioning.md) — Identity and versioning

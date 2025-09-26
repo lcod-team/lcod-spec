@@ -329,7 +329,7 @@ A recommended polyrepo layout for the LCOD ecosystem:
 
 | Repository       | Purpose                                      |
 | ---------------- | -------------------------------------------- |
-| `lcod-spec`      | Specification, schemas, examples, docs.      |
+| `lcod-spec`      | Specification, schemas, docs and shared test fixtures (`tests/spec`). |
 | `lcod-kernel-js` | JavaScript/TypeScript kernel + SDK implementation. |
 | `lcod-registry`  | Git registry of LCP components.              |
 | `lcod-resolver`  | CLI and library to resolve and cache blocks. |
@@ -337,6 +337,10 @@ A recommended polyrepo layout for the LCOD ecosystem:
 | `lcod-ide`       | Graphical IDE (future work).                 |
 
 It is useful to place a high‑level overview like this document in the root of the organization (e.g. `lcod-team/README.md`) so that contributors and agents have immediate context. More detailed specs and API references can reside in `lcod-spec/docs/`.
+
+### Shared Spec Fixtures
+
+Portable conformance tests live under `lcod-spec/tests/spec`. Each fixture is an LCOD compose packaged as a test harness via `tooling/test_checker@1`. Kernels can execute the entire suite with the standard runners (`npm run test:spec` on Node, `cargo run --bin test_specs` on Rust). When adding new fixtures, reference them from the roadmap and ensure every kernel consumes them through the shared runners. This keeps substrates lightweight while centralising behavioural coverage in the specification repository.
 
 ## 11. Conclusion
 
