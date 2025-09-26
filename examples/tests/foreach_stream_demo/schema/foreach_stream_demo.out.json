@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "foreach_stream_demo test output",
+  "type": "object",
+  "required": ["report"],
+  "additionalProperties": false,
+  "properties": {
+    "report": {
+      "type": "object",
+      "description": "Result returned by tooling/test_checker@1"
+    }
+  }
+}

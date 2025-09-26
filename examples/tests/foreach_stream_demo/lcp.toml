@@ -1,0 +1,27 @@
+schemaVersion = "1.0"
+id = "lcod://tests/foreach_stream_demo@0.1.0"
+name = "foreach_stream_demo"
+namespace = "tests"
+version = "0.1.0"
+kind = "function"
+summary = "Validate the foreach_stream_demo compose using tooling/test_checker."
+
+[tool]
+name = "foreach_stream_demo"
+description = "Asserts that foreach_stream_demo consumes the provided stream chunks"
+inputSchema = "schema/foreach_stream_demo.in.json"
+outputSchema = "schema/foreach_stream_demo.out.json"
+
+[deps]
+requires = [
+  "lcod://tooling/test_checker@1",
+  "lcod://flow/foreach@1",
+  "lcod://flow/if@1",
+  "lcod://flow/break@1",
+  "lcod://contract/core/stream/read@1",
+  "lcod://contract/core/stream/close@1",
+  "lcod://impl/echo@1"
+]
+
+[docs]
+readme = "README.md"

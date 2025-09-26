@@ -45,6 +45,32 @@
     "metadata": {
       "type": "object",
       "description": "Arbitrary metadata forwarded to the checker implementation."
+    },
+    "streams": {
+      "type": "array",
+      "description": "Stream handles to create prior to execution.",
+      "items": {
+        "type": "object",
+        "required": ["target", "chunks"],
+        "additionalProperties": false,
+        "properties": {
+          "target": {
+            "type": "string",
+            "description": "Dot path (e.g. numbers.stream) where the created handle is injected in the input state."
+          },
+          "encoding": {
+            "type": "string",
+            "enum": ["utf-8", "utf8", "base64", "hex"],
+            "default": "utf-8",
+            "description": "Encoding to decode chunk strings before registering the stream."
+          },
+          "chunks": {
+            "type": "array",
+            "description": "Sequence of chunk strings that will be emitted by the stream in order.",
+            "items": { "type": "string" }
+          }
+        }
+      }
     }
   },
   "oneOf": [

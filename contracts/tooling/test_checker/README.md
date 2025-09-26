@@ -22,6 +22,9 @@ structured report.
 
 - `bindings`, `axioms` and `overrides` fields allow the caller to tweak the
   registry or provide mock implementations before executing the compose.
+- `streams` lets callers describe synthetic stream handles (chunks + encoding)
+  that the runtime should register and inject at specific paths in the initial
+  state before execution.
 - When `failFast` is `false`, implementations may collect multiple assertion
   failures and return them in the `messages` array.
 - Runtimes are encouraged to attach metadata such as execution time or kernel
