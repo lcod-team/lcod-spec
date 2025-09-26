@@ -8,4 +8,4 @@ compose:
     expected:
       results: [1, 3]
   out:
-    report: report
+    report: $
