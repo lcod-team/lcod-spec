@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "foreach_ctrl_demo test output",
+  "type": "object",
+  "required": ["report"],
+  "additionalProperties": false,
+  "properties": {
+    "report": {
+      "description": "Result produced by tooling/test_checker@1.",
+      "type": "object"
+    }
+  }
+}

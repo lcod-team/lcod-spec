@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "tooling/test_checker@1 input",
+  "type": "object",
+  "required": ["expected"],
+  "additionalProperties": false,
+  "properties": {
+    "compose": {
+      "description": "Inline compose definition to evaluate.",
+      "type": "array",
+      "items": { "type": "object" }
+    },
+    "composeRef": {
+      "description": "Reference to a compose file on disk.",
+      "type": "object",
+      "required": ["path"],
+      "additionalProperties": false,
+      "properties": {
+        "path": { "type": "string", "description": "Path to a compose.yaml (relative or absolute)." }
+      }
+    },
+    "input": {
+      "description": "Initial state supplied to the compose under test.",
+      "type": ["object", "array", "string", "number", "boolean", "null"]
+    },
+    "expected": {
+      "description": "Expected output state after the compose completes.",
+      "type": ["object", "array", "string", "number", "boolean", "null"]
+    },
+    "bindings": {
+      "description": "Optional contract bindings to inject before execution.",
+      "type": "array",
+      "items": { "type": "object" }
+    },
+    "axioms": {
+      "description": "Optional axiom implementations or overrides required by the compose.",
+      "type": "array",
+      "items": { "type": "object" }
+    },
+    "failFast": {
+      "type": "boolean",
+      "default": true,
+      "description": "Stop on first mismatch instead of collecting all diffs."
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Arbitrary metadata forwarded to the checker implementation."
+    }
+  },
+  "oneOf": [
+    { "required": ["compose"] },
+    { "required": ["composeRef"] }
+  ]
+}

@@ -1,0 +1,14 @@
+schemaVersion = "1.0"
+id = "lcod://contract/tooling/test_checker@1.0.0"
+name = "test_checker"
+namespace = "tooling"
+version = "1.0.0"
+kind = "contract"
+summary = "Execute a compose with an input and validate the output against an expected value."
+
+[contract]
+inputSchema = "schema/test_checker.in.json"
+outputSchema = "schema/test_checker.out.json"
+
+[docs]
+readme = "README.md"

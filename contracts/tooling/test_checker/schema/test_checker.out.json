@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "tooling/test_checker@1 output",
+  "type": "object",
+  "required": ["success"],
+  "additionalProperties": false,
+  "properties": {
+    "success": {
+      "type": "boolean",
+      "description": "True when the compose output matches the expected value."
+    },
+    "actual": {
+      "description": "Actual output produced by the compose.",
+      "type": ["object", "array", "string", "number", "boolean", "null"]
+    },
+    "expected": {
+      "description": "Expected output echoed back for convenience.",
+      "type": ["object", "array", "string", "number", "boolean", "null"]
+    },
+    "diffs": {
+      "description": "Optional list of human-readable differences between expected and actual outputs.",
+      "type": "array",
+      "items": { "type": "object" }
+    },
+    "messages": {
+      "description": "Diagnostic messages gathered during validation.",
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "durationMs": {
+      "type": "number",
+      "description": "Execution time of the compose in milliseconds."
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Implementation-specific metadata (kernel version, environment, etc.)."
+    }
+  }
+}
