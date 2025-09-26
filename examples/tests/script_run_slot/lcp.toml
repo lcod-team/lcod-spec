@@ -1,0 +1,23 @@
+schemaVersion = "1.0"
+id = "lcod://tests/script_run_slot@0.1.0"
+name = "script_run_slot"
+namespace = "tests"
+version = "0.1.0"
+kind = "function"
+summary = "Validate that tooling/script@1 can call slots and record logs."
+
+[tool]
+name = "script_run_slot"
+description = "Checks script runSlot + log behaviour via tooling/test_checker."
+inputSchema = "schema/script_run_slot.in.json"
+outputSchema = "schema/script_run_slot.out.json"
+
+[deps]
+requires = [
+  "lcod://tooling/test_checker@1",
+  "lcod://tooling/script@1",
+  "lcod://impl/echo@1"
+]
+
+[docs]
+readme = "README.md"

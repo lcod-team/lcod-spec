@@ -54,6 +54,6 @@ Tickets:
   - [ ] Implement core contract bindings (filesystem, HTTP, Git, hash, parse) in Rust with parity tests vs Node
   - [ ] Publish conformance artefacts (fixtures + diff tooling) for Node/Rust comparison
 - [ ] M3-05 Cross-runtime conformance tests & documentation on axiom providers
-  - [x] Define `tooling/test_checker@1` contract and shared spec fixtures for compose-based tests (foreach demos, script_range)
+  - [x] Define `tooling/test_checker@1` contract and shared spec fixtures for compose-based tests (foreach demos, script_range, script_run_slot)
 - [ ] M3-06 Embedded scripting sandbox API (`$api.run`, `$api.config`) for lightweight algorithms
   - [x] Publish `tooling/script@1` contract (docs + schemas) and seed fixtures under `examples/tests`
