@@ -1,0 +1,87 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "tooling/script@1 input",
+  "type": "object",
+  "required": ["source"],
+  "additionalProperties": false,
+  "properties": {
+    "language": {
+      "type": "string",
+      "enum": ["javascript"],
+      "default": "javascript",
+      "description": "Scripting language to execute. Currently only JavaScript is supported."
+    },
+    "source": {
+      "type": "string",
+      "description": "Function or expression wrapped as (<source>) and invoked with ({ input, state, meta }, api)."
+    },
+    "input": {
+      "description": "Initial state injected as scope.state. Defaults to an empty object.",
+      "type": ["object", "array", "string", "number", "boolean", "null"]
+    },
+    "bindings": {
+      "type": "object",
+      "description": "Bindings injected into the script function.",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "JSON-path-like string resolved against the contract input. Supports syntax like $.foo.bar or foo.bar."
+          },
+          "value": {
+            "description": "Literal value to inject when path is omitted.",
+            "type": ["object", "array", "string", "number", "boolean", "null"]
+          },
+          "default": {
+            "description": "Fallback value used when the path does not resolve to anything.",
+            "type": ["object", "array", "string", "number", "boolean", "null"]
+          }
+        },
+        "oneOf": [
+          { "required": ["path"] },
+          { "required": ["value"] }
+        ]
+      }
+    },
+    "meta": {
+      "type": "object",
+      "description": "Opaque metadata forwarded to the script as scope.meta."
+    },
+    "streams": {
+      "type": "array",
+      "description": "Synthetic stream handles injected into the initial state before execution.",
+      "items": {
+        "type": "object",
+        "required": ["target", "chunks"],
+        "additionalProperties": false,
+        "properties": {
+          "target": {
+            "type": "string",
+            "description": "Target path (e.g. $.numbers.stream) that receives the registered stream handle."
+          },
+          "encoding": {
+            "type": "string",
+            "enum": ["utf-8", "utf8", "base64", "hex"],
+            "default": "utf-8",
+            "description": "Encoding used to decode the chunks before registering the stream."
+          },
+          "chunks": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string"
+            },
+            "description": "Ordered list of chunks composing the synthetic stream."
+          }
+        }
+      }
+    },
+    "timeoutMs": {
+      "type": "number",
+      "default": 1000,
+      "description": "Maximum execution time for the script before it is aborted."
+    }
+  }
+}

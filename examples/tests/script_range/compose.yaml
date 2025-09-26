@@ -1,0 +1,24 @@
+compose:
+- call: lcod://tooling/test_checker@1
+  in:
+    compose:
+      - call: lcod://tooling/script@1
+        in:
+          source: |
+            ({ input }) => {
+              const ok = input.value > 2 && input.value < 7;
+              return ok ? { success: true, result: input.value } : { success: false };
+            }
+          bindings:
+            value:
+              path: $.value
+          input:
+            value: 5
+        out:
+          report: $
+    expected:
+      report:
+        success: true
+        result: 5
+  out:
+    report: $

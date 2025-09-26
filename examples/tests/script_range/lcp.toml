@@ -1,0 +1,22 @@
+schemaVersion = "1.0"
+id = "lcod://tests/script_range@0.1.0"
+name = "script_range"
+namespace = "tests"
+version = "0.1.0"
+kind = "function"
+summary = "Check that tooling/script@1 evaluates range predicates."
+
+[tool]
+name = "script_range"
+description = "Asserts that a value between 2 and 7 is reported as success."
+inputSchema = "schema/script_range.in.json"
+outputSchema = "schema/script_range.out.json"
+
+[deps]
+requires = [
+  "lcod://tooling/test_checker@1",
+  "lcod://tooling/script@1"
+]
+
+[docs]
+readme = "README.md"

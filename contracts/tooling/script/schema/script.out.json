@@ -1,0 +1,6 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "tooling/script@1 output",
+  "type": ["object", "array", "string", "number", "boolean", "null"],
+  "description": "Arbitrary JSON value returned by the script function."
+}

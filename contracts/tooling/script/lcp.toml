@@ -1,0 +1,14 @@
+schemaVersion = "1.0"
+id = "lcod://contract/tooling/script@1.0.0"
+name = "script"
+namespace = "tooling"
+version = "1.0.0"
+kind = "contract"
+summary = "Execute sandboxed JavaScript snippets and return their result."
+
+[contract]
+inputSchema = "schema/script.in.json"
+outputSchema = "schema/script.out.json"
+
+[docs]
+readme = "README.md"
