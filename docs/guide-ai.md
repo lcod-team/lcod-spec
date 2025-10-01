@@ -10,6 +10,7 @@
 - Follow the structure described in [docs/compose-dsl.md](compose-dsl.md) when generating flows.
 - When resolving dependencies, call the resolver composite or the CLI (`npm run resolve`).
 - For packaging, run `node scripts/pack-lcp.cjs <component>`.
+- To verify cross-kernel behaviour, trigger the shared fixtures under `lcod-spec/tests/spec` via `npm run test:spec` (Node) or `cargo run --bin test_specs` (Rust).
 
 ## Best practices
 - Prefer existing components before inventing new ones. Check index via search.

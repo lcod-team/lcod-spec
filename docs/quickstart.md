@@ -49,6 +49,7 @@ The `--demo` flag registers built-in axioms/flow blocks so that the compose file
 - Create your own package following `docs/create-component.md`
 - Validate with `npm run validate:lcp -- <path>`
 - Run it via `bin/run-compose.mjs`
+- Execute the shared spec fixtures: `npm run test:spec` (Node kernel) or `cargo run --bin test_specs` (Rust kernel) to ensure behaviour parity
 - Capture resolver bindings and lockfiles for reproducible builds (planned in M2)
 
 ## 5. Resolve & package (prototype)

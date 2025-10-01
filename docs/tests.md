@@ -46,6 +46,8 @@ my_component/
 
 Tests should ship alongside fixtures referenced by `mocks` (e.g. JSON files under `tests/fixtures/`).
 
+For repository-wide conformance, reusable compose-based fixtures are maintained under `lcod-spec/tests/spec`. Kernels run these via their spec harness (`npm run test:spec`, `cargo run --bin test_specs`) to guarantee consistent behaviour across substrates.
+
 ## Harness responsibilities
 
 1. Validate `input` and `expect` against the component’s schemas.

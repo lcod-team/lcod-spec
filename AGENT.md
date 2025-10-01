@@ -12,3 +12,4 @@ Write the LCP specification (descriptor, schemas, conventions) with runnable exa
 - `schema/lcp.schema.json` validated
 - Documentation in `docs/` + top-level README
 - Valid examples in `examples/`
+- Shared fixtures in `tests/spec` kept up to date and runnable by each kernel
