@@ -11,7 +11,7 @@ lcod-kernel-rs/
 │   ├── core/               # Contract bindings
 │   │   ├── fs.rs           # filesystem contracts (read/write/list)
 │   │   ├── hash.rs         # hashing (`core/hash/sha256@1`)
-│   │   ├── http.rs         # placeholder for HTTP client (not yet implemented)
+│   │   ├── http.rs         # HTTP client based on libcurl (buffered + stream modes)
 │   │   ├── parse.rs        # JSON/TOML/CSV parsing helpers
 │   │   └── streams.rs      # Async stream handles (`core/stream/*`)
 │   ├── flow/               # Flow operator implementations
@@ -38,11 +38,11 @@ lcod-kernel-rs/
 | Hashing (`core/hash/sha256@1`) | ✅ implemented | Supports string, base64, and file inputs |
 | Parsing (`core/parse/{json,toml,csv}@1`) | ✅ implemented | Uses `serde_json`, `toml`, and `csv` crates |
 | Streams (`core/stream/read@1`, `core/stream/close@1`) | ✅ implemented | In-memory chunk registry matching the JS substrate semantics |
-| HTTP (`core/http/request@1`) | 🚧 stub | Contract is registered but currently returns `NotImplemented` (`src/core/http.rs`). The blueprint describes expected semantics and the stub keeps call-sites compiling until a client is wired. |
-| Git (`core/git/clone@1`) | 🚧 stub | Similar to HTTP: the contract is registered to unblock aliasing while the actual clone logic is pending implementation. |
-| Resolver axioms (`axiom/path/join@1`, `axiom/json/parse@1`, …) | ✅ alias helpers | `register_resolver_axioms` exposes the aliases required by the resolver example. HTTP/Git related axioms still bubble the stub error. |
+| HTTP (`core/http/request@1`) | ✅ implemented | Uses the `curl` crate to issue requests, honours headers/query/body encodings, and supports buffered or streamed responses. |
+| Git (`core/git/clone@1`) | ✅ implemented | Backed by `git2`/libgit2 with support for `ref`, `depth`, `subdir` and deterministic destinations. |
+| Resolver axioms (`axiom/path/join@1`, `axiom/json/parse@1`, …) | ✅ alias helpers | Includes a real `axiom/http/download@1` that streams via the core HTTP contract before persisting to disk. |
 
-The stubs allow downstream compositions to detect missing features explicitly rather than failing with “function not found”. Once the native bindings are ready we can replace the stub bodies in place without changing call-sites.
+All core infrastructure contracts are now available behind `register_core`, which means resolver-style composites can run end-to-end without hitting “function not found” placeholders.
 
 ## Using the crate locally
 
@@ -62,15 +62,12 @@ Located in `src/tooling/resolver.rs`, the helper registers:
 
 - aliases for core contracts under their `axiom://` identifiers (filesystem, parsing, hashing);
 - a small `path/join` helper used by the resolver compose;
-- a stubbed `axiom/http/download@1` that currently reports “not yet implemented”.
+- a streaming `axiom/http/download@1` implementation that proxies requests through the core HTTP contract and writes to disk (`fs/write-file@1`).
 
-This is enough for the resolver example in `lcod-spec/examples/tooling/resolver/compose.yaml` to execute until it reaches the HTTP/Git boundary.
+With these bindings in place the resolver example in `lcod-spec/examples/tooling/resolver/compose.yaml` now runs entirely on the Rust substrate.
 
 ## Next steps (tracked on the roadmap)
 
-1. **Wire native HTTP client bindings** — decide on the networking stack (`curl` via libgit2, `reqwest` behind an optional feature, or a pure-Rust client compatible with the current toolchain) and return buffered or streamed responses matching the contract.
-2. **Implement Git clone support** — reuse libgit2 via `git2` crate or spawn `git` as a subprocess; handle `ref`, `depth`, and `subdir` inputs.
-3. **Expose resolver download helpers** — once HTTP and Git are implemented, promote `axiom/http/download@1` to a real implementation and feed it into the resolver compose.
-4. **Packaging** — split reusable bindings into a crate analogous to the Node `@lcod/core-node-axioms` bundle so host applications can depend on the Rust substrate without pulling the demo harness.
-
-Until these steps are completed, the stubs keep the API surface stable and make it clear which contracts still require work.
+1. **Conformance harness** — extend `cargo run --bin test_specs` to diff traces against the Node substrate (M3-05).
+2. **Contract packaging** — split the reusable bindings into a crate analogous to `@lcod/core-node-axioms` so hosts can depend on a stable set of Rust axioms (M3-04b follow-up).
+3. **Auth and advanced transports** — layer optional credential helpers for Git/HTTP once the core scenarios are validated.

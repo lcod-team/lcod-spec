@@ -52,7 +52,7 @@ Tickets:
 - [x] M3-03 Integrate resolver composite with Node axioms and validate end-to-end
 - [ ] M3-04 Implement a Rust substrate for the same contract set to validate portability
   - [x] Bootstrap `lcod-kernel-rs` compose runner, slot orchestration and streaming handles (mirrors spec foreach demos)
-  - [ ] Implement core contract bindings (filesystem, HTTP, Git, hash, parse) in Rust using a declarative dependency model (npm/cargo/maven captured in `impl/<lang>/meta.toml` and resolved via the resolver) so the kernel stays minimal
+- [x] Implement core contract bindings (filesystem, HTTP, Git, hash, parse) in Rust using a declarative dependency model (npm/cargo/maven captured in `impl/<lang>/meta.toml` and resolved via the resolver) so the kernel stays minimal
   - [x] Document Rust substrate blueprint and resolver alias helper (`docs/runtime-rust.md`)
   - [ ] Publish conformance artefacts (fixtures + diff tooling) for Node/Rust comparison
 - [ ] M3-05 Cross-runtime conformance tests & documentation on axiom providers
