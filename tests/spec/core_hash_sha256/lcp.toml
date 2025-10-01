@@ -1,0 +1,23 @@
+schemaVersion = "1.0"
+id = "lcod://tests/core_hash_sha256@0.1.0"
+name = "core_hash_sha256"
+namespace = "tests"
+version = "0.1.0"
+kind = "function"
+summary = "Check core/hash/sha256 outputs for a known payload."
+
+[tool]
+name = "core_hash_sha256"
+description = "Hashes \"hello world\" and validates hex/base64 outputs."
+inputSchema = "schema/core_hash_sha256.in.json"
+outputSchema = "schema/core_hash_sha256.out.json"
+
+[deps]
+requires = [
+  "lcod://tooling/test_checker@1",
+  "lcod://tooling/script@1",
+  "lcod://contract/core/hash/sha256@1"
+]
+
+[docs]
+readme = "README.md"

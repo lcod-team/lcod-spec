@@ -1,0 +1,31 @@
+compose:
+- call: lcod://tooling/test_checker@1
+  in:
+    compose:
+      - call: lcod://tooling/script@1
+        in:
+          source: |
+            async (_scope, api) => {
+              const res = await api.call('lcod://contract/core/hash/sha256@1', {
+                data: 'hello world',
+                encoding: 'utf-8'
+              });
+              const ok = res.hex === 'b94d27b9934d3e08a52e52d7da7dabfac484efe37a5380ee9088f7ace2efcde9'
+                && res.base64 === 'uU0nuZNNPgilLlLX2n2r+sSE7+N6U4DukIj3rOLvzek='
+                && res.bytes === 11;
+              return {
+                success: ok,
+                result: res
+              };
+            }
+        out:
+          report: $
+    expected:
+      report:
+        success: true
+        result:
+          hex: b94d27b9934d3e08a52e52d7da7dabfac484efe37a5380ee9088f7ace2efcde9
+          base64: uU0nuZNNPgilLlLX2n2r+sSE7+N6U4DukIj3rOLvzek=
+          bytes: 11
+  out:
+    report: $

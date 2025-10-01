@@ -1,0 +1,63 @@
+compose:
+- call: lcod://tooling/test_checker@1
+  in:
+    compose:
+      - call: lcod://tooling/script@1
+        in:
+          source: |
+            async (_scope, api) => {
+              const jsonRes = await api.call('lcod://contract/core/parse/json@1', {
+                text: '{"flag":true,"items":[1,2,3]}',
+                encoding: 'utf-8'
+              });
+              const tomlRes = await api.call('lcod://contract/core/parse/toml@1', {
+                text: 'title = "demo"\n[owner]\nname = "Alice"',
+                encoding: 'utf-8'
+              });
+              const csvRes = await api.call('lcod://contract/core/parse/csv@1', {
+                text: 'name,age\nBob,30\nAna,28',
+                delimiter: ',',
+                header: true
+              });
+
+              const ok = jsonRes.value?.flag === true
+                && Array.isArray(jsonRes.value?.items)
+                && jsonRes.value.items.length === 3
+                && tomlRes.value?.owner?.name === 'Alice'
+                && Array.isArray(csvRes.rows)
+                && csvRes.rows.length === 2
+                && csvRes.rows[0].name === 'Bob'
+                && csvRes.rows[1].age === '28';
+
+              return {
+                success: ok,
+                json: jsonRes,
+                toml: tomlRes,
+                csv: csvRes
+              };
+            }
+        out:
+          report: $
+    expected:
+      report:
+        success: true
+        json:
+          value:
+            flag: true
+            items:
+              - 1
+              - 2
+              - 3
+        toml:
+          value:
+            title: demo
+            owner:
+              name: Alice
+        csv:
+          rows:
+            - name: Bob
+              age: '30'
+            - name: Ana
+              age: '28'
+  out:
+    report: $
