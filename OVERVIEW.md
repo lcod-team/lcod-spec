@@ -74,7 +74,7 @@ flowchart TD
 
 **N0 (Kernel)** — provides only the ability to resolve a block by its ID, validate inputs/outputs against JSON Schemas, and execute it by delegating to either primitive `axiom` functions, `native` implementations, or composite flows defined via the compose operator. It defines the `Func` and `Registry` interfaces and is free of any I/O or networking concerns.
 
-**N1 (SDKs)** — language‑specific substrates supply primitive functions (axioms) such as `http.get`, `fs.read`, `time.now`, etc. They also allow registering native implementations of blocks when available (e.g., une implémentation `smtp` Node.js ou Rust). Les dépendances externes sont déclarées dans l’impl (npm, Cargo, Maven, …) puis résolues/packagées par le resolver : le noyau reste immutable et charge dynamiquement ces plugins.
+**N1 (SDKs)** — language‑specific substrates supply primitive functions (axioms) such as `http.get`, `fs.read`, `time.now`, etc. They also allow registering native implementations of blocks when available (e.g., a `smtp` implementation for Node.js or Rust). External dependencies are declared by the implementation (npm, Cargo, Maven, …) and resolved/packaged by the resolver, so the kernel itself remains immutable and only loads these plugins dynamically.
 
 **N2 (Composition & tooling)** — builds on the kernel to load block descriptors (`lcp.toml`), interpret the `compose` operator with slots, map inputs and outputs, bind contracts to implementations, run declarative tests with mocks and hints (timeout, retry, idempotence) and produce runtime metadata (traces, logs).
 
