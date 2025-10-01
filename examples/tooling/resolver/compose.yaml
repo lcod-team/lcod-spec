@@ -4,20 +4,20 @@ compose:
       base: $.projectPath
       segment: "lcp.toml"
     out:
-      path: descriptorPath
+      descriptorPath: path
 
   - call: lcod://axiom/fs/read-file@1
     in:
       path: $.descriptorPath
       encoding: "utf-8"
     out:
-      data: descriptorText
+      descriptorText: data
 
   - call: lcod://axiom/toml/parse@1
     in:
       text: $.descriptorText
     out:
-      value: descriptor
+      descriptor: value
 
   - call: lcod://flow/if@1
     in:
@@ -29,14 +29,14 @@ compose:
             path: $.configPath
             encoding: "utf-8"
           out:
-            data: configText
+            configText: data
       else:
         - call: lcod://axiom/path/join@1
           in:
             base: $.projectPath
             segment: "resolve.config.json"
           out:
-            path: defaultConfigPath
+            defaultConfigPath: path
         - call: lcod://flow/try@1
           children:
             children:
@@ -45,20 +45,20 @@ compose:
                   path: $.defaultConfigPath
                   encoding: "utf-8"
                 out:
-                  data: configText
+                  configText: data
             catch:
               - call: lcod://axiom/json/parse@1
                 in:
                   text: "{}"
                 out:
-                  value: emptyConfig
+                  emptyConfig: value
               - call: lcod://axiom/toml/stringify@1
                 in:
                   value: { sources: {} }
                 out:
-                  text: noop
+                  noop: text
           out:
-            data: configText
+            configText: data
 
   - call: lcod://flow/if@1
     in:
@@ -69,20 +69,33 @@ compose:
           in:
             text: $.configText
           out:
-            value: resolverConfig
+            resolverConfig: value
       else:
         - call: lcod://axiom/json/parse@1
           in:
             text: "{\"sources\":{}}"
           out:
-            value: resolverConfig
+            resolverConfig: value
 
-  - call: lcod://axiom/path/join@1
+  - call: lcod://flow/if@1
     in:
-      base: $.projectPath
-      segment: "lcp.lock"
+      cond: $.outputPath
+    children:
+      then:
+        - call: lcod://impl/set@1
+          in:
+            lockPath: $.outputPath
+          out:
+            lockPath: lockPath
+      else:
+        - call: lcod://axiom/path/join@1
+          in:
+            base: $.projectPath
+            segment: "lcp.lock"
+          out:
+            lockPath: path
     out:
-      path: lockPath
+      lockPath: lockPath
 
   - call: lcod://flow/foreach@1
     in:
@@ -99,7 +112,7 @@ compose:
       else: []
     collectPath: $.resolved
     out:
-      resolvedDeps: resolvedDependencies
+      resolvedDependencies: results
 
   - call: lcod://axiom/toml/stringify@1
     in:
@@ -114,7 +127,7 @@ compose:
               path: "."
             dependencies: $.resolvedDependencies
     out:
-      text: lockText
+      lockText: text
 
   - call: lcod://axiom/fs/write-file@1
     in:

@@ -1,0 +1,28 @@
+schemaVersion = "1.0"
+resolverVersion = "0.1.0"
+
+[[components]]
+id = "lcod://tooling/resolver@0.1.0"
+resolved = "lcod://tooling/resolver@0.1.0"
+
+  [components.source]
+  type = "path"
+  path = "."
+
+  [[components.dependencies]]
+  id = "lcod://axiom/fs/read-file@1"
+
+    [components.dependencies.source]
+    type = "npm"
+    package = "@lcod/core-node-axioms"
+    version = "0.1.0"
+
+  [[components.dependencies]]
+  id = "lcod://axiom/toml/parse@1"
+
+    [components.dependencies.source]
+    type = "npm"
+    package = "@lcod/core-node-axioms"
+    version = "0.1.0"
+
+warnings = []
