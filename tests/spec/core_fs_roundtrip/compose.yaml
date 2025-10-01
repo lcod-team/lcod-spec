@@ -1,0 +1,38 @@
+compose:
+- call: lcod://tooling/test_checker@1
+  in:
+    compose:
+      - call: lcod://contract/core/fs/write-file@1
+        in:
+          path: ./tmp/fs_roundtrip.txt
+          data: hello world
+          createParents: true
+        out:
+          write: $
+      - call: lcod://tooling/script@1
+        in:
+          source: |
+            async (_scope, api) => {
+              const path = './tmp/fs_roundtrip.txt';
+              const read = await api.call('lcod://contract/core/fs/read-file@1', { path });
+              const listing = await api.call('lcod://contract/core/fs/list-dir@1', { path: './tmp' });
+              const readData = read?.data ?? null;
+              const entries = Array.isArray(listing?.entries)
+                ? listing.entries
+                    .filter(entry => entry?.name && entry.name.startsWith('fs_roundtrip'))
+                    .map(entry => entry.name)
+                    .sort()
+                : [];
+              const success = readData === 'hello world' && entries.includes('fs_roundtrip.txt');
+              return { success, readData, entries };
+            }
+        out:
+          report: $
+    expected:
+      report:
+        success: true
+        readData: hello world
+        entries:
+          - fs_roundtrip.txt
+  out:
+    report: $

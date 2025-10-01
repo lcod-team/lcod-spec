@@ -1,0 +1,25 @@
+schemaVersion = "1.0"
+id = "lcod://tests/core_fs_roundtrip@0.1.0"
+name = "core_fs_roundtrip"
+namespace = "tests"
+version = "0.1.0"
+kind = "function"
+summary = "Validate core/fs read, write and list contracts end-to-end."
+
+[tool]
+name = "core_fs_roundtrip"
+description = "Writes a temporary file, reads it back and checks directory listing."
+inputSchema = "schema/core_fs_roundtrip.in.json"
+outputSchema = "schema/core_fs_roundtrip.out.json"
+
+[deps]
+requires = [
+  "lcod://tooling/test_checker@1",
+  "lcod://tooling/script@1",
+  "lcod://contract/core/fs/write-file@1",
+  "lcod://contract/core/fs/read-file@1",
+  "lcod://contract/core/fs/list-dir@1"
+]
+
+[docs]
+readme = "README.md"

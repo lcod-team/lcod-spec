@@ -54,6 +54,6 @@ Tickets:
   - [ ] Implement core contract bindings (filesystem, HTTP, Git, hash, parse) in Rust using a declarative dependency model (npm/cargo/maven captured in `impl/<lang>/meta.toml` and resolved via the resolver) so the kernel stays minimal
   - [ ] Publish conformance artefacts (fixtures + diff tooling) for Node/Rust comparison
 - [ ] M3-05 Cross-runtime conformance tests & documentation on axiom providers
-  - [x] Define `tooling/test_checker@1` contract and shared spec fixtures for compose-based tests (foreach demos, script_range, script_run_slot)
+  - [x] Define `tooling/test_checker@1` contract and shared spec fixtures for compose-based tests (foreach demos, script_range, script_run_slot, core_fs_roundtrip)
 - [ ] M3-06 Embedded scripting sandbox API (`$api.run`, `$api.config`) for lightweight algorithms
   - [x] Publish `tooling/script@1` contract (docs + schemas) and seed fixtures under `tests/spec`
