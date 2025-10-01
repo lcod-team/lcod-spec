@@ -48,6 +48,7 @@ Tickets:
   - [x] Draft `contract/core/hash/sha256@1` (schema + README)
   - [x] Draft `contract/core/parse/{json,toml,csv}@1` (schema + README)
 - [ ] M3-02 Provide Node.js axiom implementations for these contracts (publishable package)
+  - [x] Publishable npm bundle `@lcod/core-node-axioms` exposing `registerNodeCore`
 - [ ] M3-03 Integrate resolver composite with Node axioms and validate end-to-end
 - [ ] M3-04 Implement a Rust substrate for the same contract set to validate portability
   - [x] Bootstrap `lcod-kernel-rs` compose runner, slot orchestration and streaming handles (mirrors spec foreach demos)
