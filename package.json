@@ -5,7 +5,8 @@
   "type": "module",
   "license": "UNLICENSED",
   "scripts": {
-    "validate": "node scripts/validate.cjs"
+    "validate": "node scripts/validate.cjs",
+    "test:conformance": "node scripts/run-conformance.mjs"
   },
   "devDependencies": {
     "@iarna/toml": "^3.0.0",
