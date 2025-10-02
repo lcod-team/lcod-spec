@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "script_tools output",
+  "type": "object",
+  "required": ["report"],
+  "additionalProperties": false,
+  "properties": {
+    "report": {
+      "type": "object",
+      "required": ["success"],
+      "additionalProperties": true,
+      "properties": {
+        "success": { "type": "boolean" }
+      }
+    }
+  }
+}

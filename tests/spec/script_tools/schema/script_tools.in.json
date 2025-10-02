@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "script_tools input",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["payload"],
+  "properties": {
+    "payload": {
+      "type": "number",
+      "description": "Value forwarded to the sandbox helpers."
+    }
+  }
+}

@@ -2,8 +2,9 @@
 
 Executes a short piece of JavaScript inside a sandboxed runtime. The contract
 injects selected bindings from the input state and exposes a restricted `api`
-object that allows the script to invoke other contracts (`api.call`) or
-optionally run child slots (`api.runSlot`).
+object that allows the script to invoke other contracts (`api.call`),
+optionally run child slots (`api.runSlot`), look up configuration values
+(`api.config`), and execute pre-registered helpers (`api.run`).
 
 The script must export a function. When evaluated, the runtime wraps the source
 code as `(<source>)` and invokes it with two arguments:
@@ -22,12 +23,17 @@ contract output (typically an object that includes `success`, `result`,
 `messages`, …). Throwing an error produces a failed execution with the error
 message captured in `messages`.
 
-## Initial state
+## Initial state and config
 
 The optional `input` field is deep-cloned and passed to the script as
 `scope.state`. Kernels may extend the state before execution (for example by
 injecting synthetic stream handles). Arbitrary metadata can be provided through
 `meta`; it becomes `scope.meta` inside the script.
+
+An optional `config` object can be supplied at the top level. Scripts read
+values through `api.config(path?, default?)`. When `path` is omitted the entire
+config object is returned (deep-cloned). Paths use the same dotted syntax as
+`bindings` (e.g. `feature.flags.experiment` or `$.feature.flags.experiment`).
 
 ## Bindings
 
@@ -57,6 +63,13 @@ recordings.
 - `api.runSlot(name, state)` — runs a named slot declared on the compose step.
   When the compose doesn’t provide any children, calling `runSlot` throws.
 - `api.log(...values)` — appends values to the result’s `messages` array.
+- `api.config(path?, defaultValue?)` — reads from the configuration object. When
+  `path` is omitted the full config is returned. If the path does not resolve,
+  the optional `defaultValue` is returned instead of `undefined`.
+- `api.run(name, payload)` — executes a helper declared under `tools`. The
+  helper receives `(payload, api)` and runs with the same sandbox guarantees as
+  the main script. Helpers may call `api.call`, `api.config`, `api.log`, or even
+  `api.run` recursively.
 
 Host runtimes MUST enforce a timeout (`timeoutMs`, default 1000ms) and memory
 limits to avoid runaway scripts.
@@ -70,13 +83,21 @@ limits to avoid runaway scripts.
       async ({ input, api }) => {
         if (input.value > 2 && input.value < 7) {
           const echoed = await api.call('lcod://impl/echo@1', { value: input.value });
-          return { success: true, result: echoed.val };
+          const doubled = await api.run('double', { value: echoed.val });
+          const flag = api.config('feature.enabled', false);
+          return { success: flag, result: doubled.value };
         }
         return { success: false, messages: ['value out of range'] };
       }
     bindings:
       input:
         path: $.value
+    config:
+      feature:
+        enabled: true
+    tools:
+      - name: double
+        source: ({ value }) => ({ success: true, value: value * 2 })
   out:
     report: $
 ```

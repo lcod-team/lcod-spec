@@ -1,0 +1,63 @@
+compose:
+- call: lcod://tooling/test_checker@1
+  in:
+    compose:
+      - call: lcod://tooling/script@1
+        in:
+          source: |
+            async ({ input }, api) => {
+              const doubled = await api.run('double', { value: input.value });
+              const guarded = await api.run('guard', doubled);
+              const config = api.config();
+              if (!guarded.success) {
+                return { success: false, messages: [guarded.message ?? 'guard failed'] };
+              }
+              return {
+                success: config.feature.enabled === true,
+                report: {
+                  doubled: guarded.value,
+                  config
+                }
+              };
+            }
+          bindings:
+            value:
+              value: 6
+          config:
+            feature:
+              enabled: true
+            thresholds:
+              double: 2
+          tools:
+            - name: double
+              source: |
+                ({ value }, api) => {
+                  api.log('tool.double', value);
+                  return { success: true, value: value * 2 };
+                }
+            - name: guard
+              source: |
+                ({ value }, api) => {
+                  const min = api.config('thresholds.double', 1);
+                  if (value < min) {
+                    return { success: false, message: `value ${value} below min ${min}` };
+                  }
+                  api.log('guard.ok', value);
+                  return { success: true, value };
+                }
+          timeoutMs: 500
+        out:
+          report: $
+    input: {}
+    expected:
+      report:
+        success: true
+        report:
+          doubled: 12
+          config:
+            feature:
+              enabled: true
+            thresholds:
+              double: 2
+  out:
+    report: $

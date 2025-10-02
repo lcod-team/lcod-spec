@@ -78,6 +78,33 @@
         }
       }
     },
+    "config": {
+      "type": "object",
+      "description": "Opaque configuration object exposed via api.config(path?, default?)."
+    },
+    "tools": {
+      "type": "array",
+      "description": "Helper functions callable through api.run(name, payload).",
+      "items": {
+        "type": "object",
+        "required": ["name", "source"],
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Identifier used when invoking the helper (api.run)."
+          },
+          "source": {
+            "type": "string",
+            "description": "Function body evaluated as (<source>) and invoked with (payload, api)."
+          },
+          "timeoutMs": {
+            "type": "number",
+            "description": "Optional timeout override for this helper."
+          }
+        }
+      }
+    },
     "timeoutMs": {
       "type": "number",
       "default": 1000,
