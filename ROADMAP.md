@@ -59,3 +59,13 @@ Tickets:
   - [x] Define `tooling/test_checker@1` contract and shared spec fixtures for compose-based tests (foreach demos, script_range, script_run_slot, core_fs_roundtrip, core_hash_sha256, core_parse_roundtrip)
 - [x] M3-06 Embedded scripting sandbox API (`$api.run`, `$api.config`) for lightweight algorithms
   - [x] Publish `tooling/script@1` contract (docs + schemas) and seed fixtures under `tests/spec`
+
+## M4 — Observability & debugging
+- [ ] M4-01 Trace events: emit structured step/slot logs with optional scope snapshot IDs in both kernels
+- [ ] M4-02 CLI trace mode (`--trace`) to stream compose execution and inspect scope mutations
+- [ ] M4-03 Document trace schema & debugging guidelines (`docs/runtime-tracing.md`)
+- [ ] M4-04 Prototype Debug Adapter (DAP) for compose files (breakpoints, step-in/out)
+
+## M5 — Packaging & distribution
+- [ ] Package the Rust runtime as a reusable crate and binary (`lcod-kernel-rs-cli`).
+- [ ] Document release process, versioning and contract compatibility matrix.
