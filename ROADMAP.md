@@ -57,5 +57,5 @@ Tickets:
   - [ ] Publish conformance artefacts (fixtures + diff tooling) for Node/Rust comparison
 - [ ] M3-05 Cross-runtime conformance tests & documentation on axiom providers
   - [x] Define `tooling/test_checker@1` contract and shared spec fixtures for compose-based tests (foreach demos, script_range, script_run_slot, core_fs_roundtrip, core_hash_sha256, core_parse_roundtrip)
-- [ ] M3-06 Embedded scripting sandbox API (`$api.run`, `$api.config`) for lightweight algorithms
+- [x] M3-06 Embedded scripting sandbox API (`$api.run`, `$api.config`) for lightweight algorithms
   - [x] Publish `tooling/script@1` contract (docs + schemas) and seed fixtures under `tests/spec`
