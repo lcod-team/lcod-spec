@@ -18,24 +18,49 @@ compose:
                 in:
                   source: |
                     async () => ({
-                      success: true,
-                      data: [
-                        { id: 1, name: 'Keyboard' },
-                        { id: 2, name: 'Mouse' }
+                      sequences: [
+                        {
+                          id: 'catalog.listItems',
+                          handler: {
+                            type: 'script',
+                            source: `async () => ({ status: 200, body: [\n  { id: 1, name: 'Keyboard' },\n  { id: 2, name: 'Mouse' }\n] })`
+                          }
+                        }
                       ]
                     })
-                  bindings: {}
-                  timeoutMs: 200
                 out:
-                  sequence: $
+                  sequences: sequences
             apis:
-              - call: lcod://http/api_route@0.1.0
+              - call: lcod://tooling/script@1
                 in:
-                  method: "GET"
-                  path: "/items"
-                  sequenceId: "catalog.listItems"
-                  description: "List catalog items"
+                  source: |
+                    async () => ({
+                      routes: [
+                        {
+                          method: 'GET',
+                          path: '/items',
+                          sequenceId: 'catalog.listItems',
+                          description: 'List catalog items'
+                        }
+                      ]
+                    })
                 out:
-                  route: $
+                  rawRoutes: routes
+              - call: lcod://flow/foreach@1
+                in:
+                  list: $.routes
+                children:
+                  body:
+                    - call: lcod://http/api_route@0.1.0
+                      in:
+                        method: $slot.item.method
+                        path: $slot.item.path
+                        sequenceId: $slot.item.sequenceId
+                        description: $slot.item.description
+                      out:
+                        route: route
+                collectPath: $.route
+                out:
+                  routes: routes
     out:
       server: $
