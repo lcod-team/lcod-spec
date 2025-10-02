@@ -69,3 +69,11 @@ Tickets:
 ## M5 — Packaging & distribution
 - [ ] Package the Rust runtime as a reusable crate and binary (`lcod-kernel-rs-cli`).
 - [ ] Document release process, versioning and contract compatibility matrix.
+
+## M6 — End-to-end service demo
+- [ ] M6-01 Spec: define HTTP environment/project components (slots for sequences & routes)
+- [ ] M6-02 Node demo service: compose a simple HTTP endpoint backed by LCOD sequences
+- [ ] M6-03 Rust demo service: mirror the HTTP demo using the Rust kernel
+- [ ] M6-04 lc0d-resolver rewrite: express the resolver pipeline as LCOD compose
+- [ ] M6-05 Populate `lcod-registry` with sample functional components
+- [ ] M6-06 Evaluate lightweight models for component authoring
