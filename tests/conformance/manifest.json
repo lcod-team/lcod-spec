@@ -1,0 +1,9 @@
+[
+  { "name": "core_fs_roundtrip", "compose": "tests/spec/core_fs_roundtrip/compose.yaml" },
+  { "name": "core_hash_sha256", "compose": "tests/spec/core_hash_sha256/compose.yaml" },
+  { "name": "core_parse_roundtrip", "compose": "tests/spec/core_parse_roundtrip/compose.yaml" },
+  { "name": "foreach_ctrl_demo", "compose": "tests/spec/foreach_ctrl_demo/compose.yaml" },
+  { "name": "foreach_stream_demo", "compose": "tests/spec/foreach_stream_demo/compose.yaml" },
+  { "name": "script_range", "compose": "tests/spec/script_range/compose.yaml" },
+  { "name": "script_run_slot", "compose": "tests/spec/script_run_slot/compose.yaml" }
+]

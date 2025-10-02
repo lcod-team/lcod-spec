@@ -46,7 +46,22 @@ my_component/
 
 Tests should ship alongside fixtures referenced by `mocks` (e.g. JSON files under `tests/fixtures/`).
 
-For repository-wide conformance, reusable compose-based fixtures are maintained under `lcod-spec/tests/spec`. Kernels run these via their spec harness (`npm run test:spec`, `cargo run --bin test_specs`) to guarantee consistent behaviour across substrates.
+For repository-wide conformance, reusable compose-based fixtures are maintained under
+`lcod-spec/tests/spec`. Kernels run these via their spec harness (`npm run test:spec`,
+`cargo run --bin test_specs`) to guarantee consistent behaviour across substrates.
+
+## Cross-runtime conformance suite
+
+The list of canonical fixtures is captured in `tests/conformance/manifest.json`. Each entry
+references the underlying compose file under `tests/spec/`. The following commands consume
+this manifest and compare runtimes:
+
+- Node kernel: `npm run test:conformance` (in `lcod-kernel-js/`)
+- Rust kernel: `cargo run --bin test_specs -- --manifest tests/conformance/manifest.json`
+- Combined report: `node scripts/run-conformance.mjs` (from `lcod-spec/`)
+
+The combined script executes both kernels with `--json` output and fails if the resulting
+payloads differ, providing a concise diff when inconsistencies appear.
 
 ## Harness responsibilities
 
