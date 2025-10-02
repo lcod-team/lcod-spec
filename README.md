@@ -7,6 +7,9 @@ Specification for **LCOD Component Package (LCP)** and implementation convention
 - Composition: explicit `compose` operator (bindings `in`/`out`)
 - Declarative unit tests (JSON) with axiom mocks
 - Component folder layout (impl/*, tests/*, assets/*)
+- Documentation is written for humans (IDE inspectors) **and** machines (RAG index).
+  Keep parameter descriptions concise and reference the JSON schemas to avoid
+  duplication.
 
 See [OVERVIEW.md](OVERVIEW.md) for the ecosystem overview.
 
