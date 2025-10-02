@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "project/http_app@0.1.0 output",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["routes", "sequences"],
+  "properties": {
+    "project": {
+      "type": "object",
+      "description": "Resolved project metadata (name, basePath, tags, ...)."
+    },
+    "routes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "method": { "type": "string" },
+          "path": { "type": "string" },
+          "sequenceId": { "type": "string" }
+        },
+        "required": ["method", "path", "sequenceId"],
+        "additionalProperties": true
+      }
+    },
+    "sequences": {
+      "type": "array",
+      "description": "Sequence descriptors referenced by routes.",
+      "items": { "type": "object" }
+    }
+  }
+}

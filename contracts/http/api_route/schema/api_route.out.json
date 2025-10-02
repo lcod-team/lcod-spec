@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "http/api_route@0.1.0 output",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["route"],
+  "properties": {
+    "route": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "method": { "type": "string" },
+        "path": { "type": "string" },
+        "sequenceId": { "type": "string" },
+        "description": { "type": "string" }
+      },
+      "required": ["method", "path", "sequenceId"]
+    }
+  }
+}

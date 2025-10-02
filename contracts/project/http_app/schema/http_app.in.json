@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "project/http_app@0.1.0 input",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["name", "basePath"],
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Unique project identifier."
+    },
+    "basePath": {
+      "type": "string",
+      "description": "URL prefix under which the project is exposed (e.g. /catalog)."
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Additional project configuration forwarded to routes/sequences."
+    }
+  }
+}

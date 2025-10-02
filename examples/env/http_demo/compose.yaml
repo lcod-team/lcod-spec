@@ -1,0 +1,41 @@
+compose:
+  - call: lcod://env/http_host@0.1.0
+    in:
+      host: "0.0.0.0"
+      port: 8080
+      basePath: "/api"
+    children:
+      projects:
+        - call: lcod://project/http_app@0.1.0
+          in:
+            name: "catalog"
+            basePath: "/catalog"
+            metadata:
+              version: "0.1.0"
+          children:
+            sequences:
+              - call: lcod://tooling/script@1
+                in:
+                  source: |
+                    async () => ({
+                      success: true,
+                      data: [
+                        { id: 1, name: 'Keyboard' },
+                        { id: 2, name: 'Mouse' }
+                      ]
+                    })
+                  bindings: {}
+                  timeoutMs: 200
+                out:
+                  sequence: $
+            apis:
+              - call: lcod://http/api_route@0.1.0
+                in:
+                  method: "GET"
+                  path: "/items"
+                  sequenceId: "catalog.listItems"
+                  description: "List catalog items"
+                out:
+                  route: $
+    out:
+      server: $

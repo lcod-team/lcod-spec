@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "http/api_route@0.1.0 input",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["method", "path", "sequenceId"],
+  "properties": {
+    "method": {
+      "type": "string",
+      "description": "HTTP method (e.g. GET, POST, PUT).",
+      "pattern": "^(GET|POST|PUT|PATCH|DELETE|OPTIONS|HEAD)$"
+    },
+    "path": {
+      "type": "string",
+      "description": "Route path relative to the project base path (e.g. /items)."
+    },
+    "sequenceId": {
+      "type": "string",
+      "description": "Identifier of the sequence handler to invoke."
+    },
+    "description": {
+      "type": "string",
+      "description": "Human-readable route summary."
+    },
+    "middlewares": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Optional middleware identifiers applied before the handler."
+    }
+  }
+}

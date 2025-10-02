@@ -10,6 +10,9 @@ Specification for **LCOD Component Package (LCP)** and implementation convention
 - Documentation is written for humans (IDE inspectors) **and** machines (RAG index).
   Keep parameter descriptions concise and reference the JSON schemas to avoid
   duplication.
+- HTTP hosting contracts (`env/http_host`, `project/http_app`, `http/api_route`)
+  are documented in `docs/http-hosting.md` with a reference example under
+  `examples/env/http_demo`.
 
 See [OVERVIEW.md](OVERVIEW.md) for the ecosystem overview.
 

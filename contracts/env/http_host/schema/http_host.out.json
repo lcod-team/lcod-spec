@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "env/http_host@0.1.0 output",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["url", "routes"],
+  "properties": {
+    "url": {
+      "type": "string",
+      "description": "Base URL of the running HTTP host."
+    },
+    "routes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "description": "Route descriptor returned by child projects.",
+        "properties": {
+          "method": { "type": "string" },
+          "path": { "type": "string" },
+          "handlerId": { "type": "string" }
+        },
+        "required": ["method", "path"],
+        "additionalProperties": true
+      }
+    },
+    "projects": {
+      "type": "array",
+      "description": "Resolved project descriptors (for tooling).",
+      "items": { "type": "object" }
+    }
+  }
+}

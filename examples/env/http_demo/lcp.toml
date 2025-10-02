@@ -1,0 +1,18 @@
+schemaVersion = "1.0"
+id = "lcod://examples/env/http_demo@0.1.0"
+name = "http_demo"
+namespace = "examples/env"
+version = "0.1.0"
+kind = "workflow"
+summary = "Example HTTP environment illustrating env/http_host and project/http_app contracts."
+
+[deps]
+requires = [
+  "lcod://env/http_host@0.1.0",
+  "lcod://project/http_app@0.1.0",
+  "lcod://http/api_route@0.1.0",
+  "lcod://tooling/script@1"
+]
+
+[docs]
+readme = "README.md"

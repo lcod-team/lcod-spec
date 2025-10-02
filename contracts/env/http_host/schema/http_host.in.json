@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "env/http_host@0.1.0 input",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["host", "port"],
+  "properties": {
+    "host": {
+      "type": "string",
+      "default": "0.0.0.0",
+      "description": "Network interface to bind the HTTP server to."
+    },
+    "port": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 65535,
+      "description": "TCP port exposed by the HTTP host."
+    },
+    "basePath": {
+      "type": "string",
+      "description": "Optional prefix applied to all routes (e.g. /api)."
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Opaque data forwarded to child projects during registration."
+    }
+  }
+}

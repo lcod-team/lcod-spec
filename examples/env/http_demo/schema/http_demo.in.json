@@ -1,0 +1,7 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "env/http_demo input",
+  "type": "object",
+  "description": "No runtime inputs required for the reference compose.",
+  "additionalProperties": true
+}
