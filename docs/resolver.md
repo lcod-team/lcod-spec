@@ -7,7 +7,7 @@ Goal: provide a reusable resolver expressed in the LCOD DSL, relying on pluggabl
 - `lcod://tooling/resolver@0.1.0` (workflow) — defined in `examples/tooling/resolver`
 - `lcod://contract/tooling/resolve-dependency@1` — contract for resolving a single dependency according to platform policy (fetch source, compute integrity, emit bindings).
 
-The current example focuses on local path dependencies to illustrate the flow. More advanced implementations can extend the contract to handle Git/HTTP sources and compute integrity hashes.
+The composite now resolves local paths, Git repositories and HTTP archives, computes a SHA-256 integrity for each `lcp.toml`, and aggregates warnings in the generated lockfile.
 
 ## Required axioms (per host)
 
@@ -23,9 +23,9 @@ Hosts provide implementations of these axioms appropriate for their runtime (Nod
 
 ## Flow overview
 
-1. Locate `lcp.toml` under `projectPath` and parse it.
+1. Locate `lcp.toml` under `projectPath`, compute its integrity hash, and parse it.
 2. Load optional `resolve.config.json` with mirror/replace rules.
-3. Iterate over `deps.requires`, delegating to `tooling/resolve-dependency@1` to resolve each dependency.
+3. Iterate over `deps.requires`, delegating to `tooling/resolve-dependency@1` to resolve each dependency (paths, Git, HTTP). The contract reuses cached artifacts under `./.lcod/cache` (or `$LCOD_CACHE_DIR`, then `~/.cache/lcod`) before fetching new data.
 4. Assemble the lockfile object (schemaVersion, resolverVersion, components) and persist it via `fs/write-file`.
 
 The contract `tooling/resolve-dependency@1` receives:
@@ -63,6 +63,10 @@ Additional documentation:
 - `docs/resolver/axioms/README.md` — List of required axioms / reference implementations
 - `docs/resolver/examples/README.md` — Placeholder for future end-to-end demos
 - `docs/resolver/contracts/README.md` — Contract `tooling/resolve-dependency@1` specification
+
+## Cache policy
+
+By default the resolver writes fetched artifacts to `./.lcod/cache`. Runtimes can override the location with the `LCOD_CACHE_DIR` environment variable; if neither is available the resolver falls back to `~/.cache/lcod`. Cache entries are grouped by source type (`git/<hash>`, `http/<hash>`), enabling reuse across repeated runs while keeping project-local workflows hermetic.
 
 ## Next steps
 
