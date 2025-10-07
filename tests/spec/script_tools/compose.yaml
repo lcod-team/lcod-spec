@@ -5,7 +5,8 @@ compose:
       - call: lcod://tooling/script@1
         in:
           source: |
-            async ({ input }, api) => {
+            async ({ input, imports }, api) => {
+              const hash = await imports.hash({ data: String(input.value), encoding: 'utf-8' });
               const doubled = await api.run('double', { value: input.value });
               const guarded = await api.run('guard', doubled);
               const config = api.config();
@@ -16,13 +17,16 @@ compose:
                 success: config.feature.enabled === true,
                 report: {
                   doubled: guarded.value,
-                  config
+                  config,
+                  hashHex: hash.hex
                 }
               };
             }
           bindings:
             value:
               value: 6
+          imports:
+            hash: lcod://contract/core/hash/sha256@1
           config:
             feature:
               enabled: true
@@ -50,14 +54,15 @@ compose:
           report: $
     input: {}
     expected:
-      report:
-        success: true
         report:
-          doubled: 12
-          config:
-            feature:
-              enabled: true
-            thresholds:
-              double: 2
+          success: true
+          report:
+            doubled: 12
+            config:
+              feature:
+                enabled: true
+              thresholds:
+                double: 2
+            hashHex: e7f6c011776e8db7cd330b54174fd76f7d0216b612387a5ffcfb81e6f0919683
   out:
     report: $

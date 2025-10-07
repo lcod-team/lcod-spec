@@ -8,6 +8,10 @@ Validates the extended sandbox API of `tooling/script@1`:
   compose lightweight logic without leaving the sandbox.
 - Helper scripts can log via `api.log`, reuse `api.config`, and return rich
   payloads.
+- Import aliases expose frequently used components (e.g. hashing) as
+  `imports.<alias>()` helpers while keeping FQDN calls available through
+  `api.call`.
 
 The main script doubles an input value through a helper, checks it with another
-helper that consults the config, and returns the aggregated result.
+helper that consults the config, computes a SHA-256 digest via an import alias,
+and returns the aggregated result.

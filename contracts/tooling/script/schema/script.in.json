@@ -45,6 +45,14 @@
         ]
       }
     },
+    "imports": {
+      "type": "object",
+      "description": "Alias map exposing components as helpers. Each entry becomes an async function available on scope.imports.<alias> and api.imports.<alias>.",
+      "additionalProperties": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
     "meta": {
       "type": "object",
       "description": "Opaque metadata forwarded to the script as scope.meta."

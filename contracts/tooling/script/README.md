@@ -70,6 +70,10 @@ recordings.
   helper receives `(payload, api)` and runs with the same sandbox guarantees as
   the main script. Helpers may call `api.call`, `api.config`, `api.log`, or even
   `api.run` recursively.
+- `imports` map — when provided in the contract input, each entry creates an
+  async helper available as `imports.<alias>(payload)` and `api.imports.<alias>`.
+  These helpers simply forward to `api.call` using the configured component ID,
+  reducing verbosity while keeping explicit FQDN calls available.
 
 Host runtimes MUST enforce a timeout (`timeoutMs`, default 1000ms) and memory
 limits to avoid runaway scripts.
@@ -80,11 +84,12 @@ limits to avoid runaway scripts.
 - call: lcod://tooling/script@1
   in:
     source: |
-      async ({ input, api }) => {
+      async ({ input, imports }, api) => {
         if (input.value > 2 && input.value < 7) {
-          const echoed = await api.call('lcod://impl/echo@1', { value: input.value });
+          const echoed = await imports.echo({ value: input.value });
           const doubled = await api.run('double', { value: echoed.val });
           const flag = api.config('feature.enabled', false);
+          const verify = await api.call('lcod://impl/echo@1', { value: doubled.value });
           return { success: flag, result: doubled.value };
         }
         return { success: false, messages: ['value out of range'] };
@@ -92,6 +97,8 @@ limits to avoid runaway scripts.
     bindings:
       input:
         path: $.value
+    imports:
+      echo: lcod://impl/echo@1
     config:
       feature:
         enabled: true
