@@ -6,6 +6,12 @@ version = "0.1.0"
 kind = "workflow"
 summary = "Example HTTP environment illustrating env/http_host and project/http_app contracts."
 
+[tool]
+name = "http_demo"
+description = "Reference compose describing an HTTP host with a catalog project."
+inputSchema = "schema/http_demo.in.json"
+outputSchema = "schema/http_demo.out.json"
+
 [deps]
 requires = [
   "lcod://env/http_host@0.1.0",

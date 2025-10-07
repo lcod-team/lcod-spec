@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "env/http_host@0.1.0 output",
   "type": "object",
-  "additionalProperties": false,
+  "additionalProperties": true,
   "required": ["url", "routes"],
   "properties": {
     "url": {

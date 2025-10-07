@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "project/http_app@0.1.0 output",
   "type": "object",
-  "additionalProperties": false,
+  "additionalProperties": true,
   "required": ["routes", "sequences"],
   "properties": {
     "project": {

@@ -12,6 +12,8 @@ compose:
             basePath: "/catalog"
             metadata:
               version: "0.1.0"
+          out:
+            project: $
           children:
             sequences:
               - call: lcod://tooling/script@1
@@ -45,7 +47,7 @@ compose:
                       ]
                     })
                 out:
-                  rawRoutes: routes
+                  routes: routes
               - call: lcod://flow/foreach@1
                 in:
                   list: $.routes
@@ -61,6 +63,6 @@ compose:
                         route: route
                 collectPath: $.route
                 out:
-                  routes: routes
+                  routes: results
     out:
-      server: $
+      host: $
