@@ -323,6 +323,20 @@ An IDE built on LCOD presents two synchronized views: a **tree view** showing th
 
 LCOD supports packaging flows as libraries for different languages, as full applications or as microservices. The resolver and kernel allow replacing blocks with internal versions (for enterprise use), mirroring registries and verifying integrity. Blocks can declare UI metadata (`[ui]`) and events (AsyncAPI/CloudEvents) for reactive architectures. Additional layers (HTTP, gRPC, GraphQL, CLI) can be built as adapters without modifying the core. Future extensions might include support for WebAssembly for sandboxed execution, type guards for generics, and multi‑agent coordination.
 
+### Packaging pipeline roadmap
+
+The distribution story deliberately scales in tiers so teams can pick the right level of integration:
+
+- **Assemble** — bundle a resolved compose together with its `lcp.lock` and the referenced components inside a self-contained `lcod_modules/` directory. This produces a portable artefact for CI/CD or offline review.
+- **Ship** — add a target kernel (Node, Rust, JVM, …) and a thin launcher so the package can run without separate tooling. Variants may include “core only” (expecting an external kernel) or fully embedded runtimes.
+- **Build** — for ecosystems that support it (e.g. GraalVM, Rust static builds, Java fat JAR), turn the shipment into a final executable or container image.
+
+Each tier builds on the previous one, keeping the door open for richer delivery formats without locking LCOD into a single runtime.
+
+### Compose authoring ergonomics
+
+While the canonical compose format stays explicit (each `in`/`out` mapping resolved to a concrete path), the tooling roadmap now includes a sugar layer: authors can write shortened constructs (`foo: -`, spreads such as `...: $.lock`) that a shared `tooling/compose/normalize@1` component expands into the normalized form before execution. This keeps kernels simple and consistent, while making large compositions (like the resolver) easier to read and maintain.
+
 ## 10. Repository Organization
 
 A recommended polyrepo layout for the LCOD ecosystem:

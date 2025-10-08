@@ -35,7 +35,7 @@ Tickets:
 - [x] M2-03 Resolver CLI + config (mirrors, replace, bindings)
 - [x] M2-04 `.lcpkg` archive format (+ integrity manifest)
 - [x] M2-05 End-to-end example: resolve → lockfile → package
-- [ ] M2-06 Compose-first resolver pipeline (move recursion/caching to `lcod-resolver`, propose missing axioms for kernels)
+- [x] M2-06 Compose-first resolver pipeline (move recursion/caching to `lcod-resolver`, propose missing axioms for kernels)
 - Annexes: UI conventions (`[ui]`), AsyncAPI/CloudEvents (events)
 
 ## M3 — Runtime substrates
@@ -69,8 +69,13 @@ Tickets:
 - [ ] M4-04 Prototype Debug Adapter (DAP) for compose files (breakpoints, step-in/out)
 
 ## M5 — Packaging & distribution
-- [ ] Package the Rust runtime as a reusable crate and binary (`lcod-kernel-rs-cli`).
-- [ ] Document release process, versioning and contract compatibility matrix.
+- [ ] M5-01 Specify the assemble/ship/build pipeline (artefact format, metadata, CLI contract).
+  - [ ] Define the `assemble` bundle structure (`lcp.lock` + `lcod_modules/` + manifest).
+  - [ ] Describe optional `ship` layers (runtime inclusion, launch scripts, metadata).
+  - [ ] Capture `build` targets per ecosystem (Node pkg/GraalVM, Rust binary, JVM fat JAR).
+- [ ] M5-02 Document release process, versioning and contract compatibility matrix.
+- [ ] M5-03 Coordinate runtime deliverables (Node/Rust/others) against the packaging tiers.
+- [ ] M5-04 Introduce compose sugar -> canonical normalization (shared loader component) so large composes stay readable without impacting kernel runtimes.
 
 ## M6 — End-to-end service demo
 - [x] M6-01 Spec: define HTTP environment/project components (slots for sequences & routes)

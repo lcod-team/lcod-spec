@@ -20,7 +20,11 @@ Example:
 }
 ```
 
-Resolvers load this configuration (default `resolve.config.json` at project root). Unknown keys are ignored. A sample file lives in `examples/tooling/resolver/resolve.config.json`.
+Resolvers load this configuration (explicit `configPath` or the default `resolve.config.json` at project root). Unknown keys are ignored. If no configuration file can be read the resolver falls back to an empty `sources` map and records a warning in the lockfile so hosts can surface the issue. A sample file lives in `examples/tooling/resolver/resolve.config.json`.
+
+The resolver compose writes fetched artifacts to the directory returned by
+`lcod://tooling/resolver/cache-dir@1` (project `.lcod/cache` by default, overridable via
+`LCOD_CACHE_DIR` or falling back to `~/.cache/lcod`).
 
 ## Source types
 

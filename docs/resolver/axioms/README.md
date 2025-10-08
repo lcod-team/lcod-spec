@@ -9,7 +9,8 @@ This directory documents the axioms required by the resolver composite. Each run
 - JSON/TOML: `lcod://axiom/json/parse@1`, `lcod://axiom/toml/parse@1`, `lcod://axiom/toml/stringify@1`
 - Network/SCM: `lcod://axiom/git/clone@1`, `lcod://axiom/http/download@1`
 - Hashing: `lcod://axiom/hash/sha256@1`
+- Resolver cache: `lcod://tooling/resolver/cache-dir@1`
 - Utility: `lcod://impl/set@1`
-- Contract: `lcod://contract/tooling/resolve-dependency@1`
+- Contract (legacy): `lcod://contract/tooling/resolve-dependency@1`
 
-Providers must document argument structure, return values, and error handling.
+Providers must document argument structure, return values, and error handling. The legacy contract is kept as a stub for compatibility, but the resolver compose now resolves dependencies internally using the axioms above.
