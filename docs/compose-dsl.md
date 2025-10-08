@@ -29,6 +29,15 @@ Optional object mapping callee parameters to **bindings**. A binding can be:
 
 Bindings are evaluated before invoking the callee; missing bindings use the callee’s default input schema semantics.
 
+### Sugar shortcuts
+To keep large compositions readable, the DSL accepts a few shortcuts that expand to the equivalent explicit bindings:
+
+- **Identity** — use `=` to forward the homonymous key from the current scope. Example: `in: { payload: '=' }` is shorthand for `in: { payload: $.payload }`.
+- **Optional keys** — append `?` to a top-level key to mark it optional. If the referenced value is absent, the entry is omitted instead of passing `null`.
+- **Spreads** — prefix a key with `...` to spread another object into the binding. For instance, `in: { ...params: $.request }` copies every property from `$.request` into the step input. Spreads can target arrays too when the callee expects a list of mappings.
+
+These sugars are purely syntactic; engines expand them before running the compose file. Authors can mix sugars with explicit bindings in the same mapping.
+
 ## `out`
 Optional object mapping names exported to the current scope (`$`) to fields returned by the callee. Example:
 
