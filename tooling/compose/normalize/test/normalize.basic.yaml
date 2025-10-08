@@ -7,11 +7,11 @@ compose:
         compose:
           - call: lcod://impl/echo@1
             in:
-              foo: "-"
+              foo: "="
               nested:
                 value: "stay"
             out:
-              bar: "-"
+              bar: "="
       expected:
         compose:
           - call: lcod://impl/echo@1

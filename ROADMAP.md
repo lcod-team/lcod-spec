@@ -75,7 +75,7 @@ Tickets:
   - [ ] Capture `build` targets per ecosystem (Node pkg/GraalVM, Rust binary, JVM fat JAR).
 - [ ] M5-02 Document release process, versioning and contract compatibility matrix.
 - [ ] M5-03 Coordinate runtime deliverables (Node/Rust/others) against the packaging tiers.
-- [ ] M5-04 Introduce compose sugar -> canonical normalization (shared loader component) so large composes stay readable without impacting kernel runtimes.
+- [x] M5-04 Introduce compose sugar -> canonical normalization (shared loader component) so large composes stay readable without impacting kernel runtimes.
 
 ## M6 — End-to-end service demo
 - [x] M6-01 Spec: define HTTP environment/project components (slots for sequences & routes)

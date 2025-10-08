@@ -7,14 +7,14 @@ compose:
         compose:
           - call: lcod://flow/if@1
             in:
-              cond: "-"
+              cond: "="
             children:
               then:
                 - call: lcod://impl/echo@1
                   in:
-                    value: "-"
+                    value: "="
                   out:
-                    result: "-"
+                    result: "="
       expected:
         compose:
           - call: lcod://flow/if@1

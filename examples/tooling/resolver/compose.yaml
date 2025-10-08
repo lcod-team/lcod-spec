@@ -112,7 +112,7 @@ compose:
       else: []
     collectPath: $.resolved
     out:
-      resolvedDependencies: results
+      components: results
 
   - call: lcod://axiom/toml/stringify@1
     in:
@@ -125,7 +125,7 @@ compose:
             source:
               type: "path"
               path: "."
-            dependencies: $.resolvedDependencies
+            dependencies: $.components
     out:
       lockText: text
 
@@ -138,10 +138,9 @@ compose:
 
   - call: lcod://impl/set@1
     in:
-      lockPath: $.lockPath
-      components: $.resolvedDependencies
+      '...': { pick: ["lockPath", "components"] }
       warnings: []
     out:
-      lockPath: lockPath
-      components: components
-      warnings: warnings
+      lockPath: '='
+      components: '='
+      warnings: '='
