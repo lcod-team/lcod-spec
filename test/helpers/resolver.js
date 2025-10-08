@@ -11,6 +11,28 @@ function buildCandidates() {
   if (process.env.LCOD_RESOLVER_COMPOSE) {
     list.push(path.resolve(process.env.LCOD_RESOLVER_COMPOSE));
   }
+  if (process.env.SPEC_REPO_PATH) {
+    list.push(
+      path.resolve(
+        process.env.SPEC_REPO_PATH,
+        'resources',
+        'compose',
+        'resolver',
+        'compose.yaml'
+      )
+    );
+  }
+  if (process.env.LCOD_SPEC_PATH) {
+    list.push(
+      path.resolve(
+        process.env.LCOD_SPEC_PATH,
+        'resources',
+        'compose',
+        'resolver',
+        'compose.yaml'
+      )
+    );
+  }
   list.push(
     path.resolve(repoRoot, '..', 'lcod-resolver', 'compose.yaml'),
     path.resolve(repoRoot, '..', 'lcod-spec', 'resources', 'compose', 'resolver', 'compose.yaml')
