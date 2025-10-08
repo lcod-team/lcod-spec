@@ -1,0 +1,73 @@
+compose:
+  - call: lcod://tooling/script@1
+    in:
+      source: |
+        async ({ input }) => {
+          const isPlainObject = (value) => value && typeof value === 'object' && !Array.isArray(value);
+
+          const MAPPING_TYPES = { INPUT: 'input', OUTPUT: 'output' };
+
+          const normalizeValue = (value, key, kind, depth) => {
+            if (typeof value === 'string') {
+              if (value === '-' && depth === 0) {
+                return kind === MAPPING_TYPES.INPUT ? `$.${key}` : key;
+              }
+              return value;
+            }
+
+            if (Array.isArray(value)) {
+              return value.map((item) => (isPlainObject(item) ? normalizeMap(item, kind, depth + 1) : item));
+            }
+
+            if (isPlainObject(value)) {
+              return normalizeMap(value, kind, depth + 1);
+            }
+
+            return value;
+          };
+
+          const normalizeMap = (map, kind, depth) => {
+            const normalized = {};
+            for (const [key, value] of Object.entries(map)) {
+              normalized[key] = normalizeValue(value, key, kind, depth);
+            }
+            return normalized;
+          };
+
+          const normalizeStep = (step) => {
+            const next = structuredClone(step);
+            if (isPlainObject(next.in)) {
+              next.in = normalizeMap(next.in, MAPPING_TYPES.INPUT, 0);
+            }
+            if (isPlainObject(next.out)) {
+              next.out = normalizeMap(next.out, MAPPING_TYPES.OUTPUT, 0);
+            }
+            if (Array.isArray(next.children)) {
+              next.children = next.children.map(normalizeStep);
+            } else if (isPlainObject(next.children)) {
+              const children = {};
+              for (const [slot, value] of Object.entries(next.children)) {
+                children[slot] = Array.isArray(value) ? value.map(normalizeStep) : value;
+              }
+              next.children = children;
+            }
+            return next;
+          };
+
+          return {
+            compose: Array.isArray(input.compose)
+              ? input.compose.map(normalizeStep)
+              : []
+          };
+        }
+      bindings:
+        compose:
+          path: $.compose
+    out:
+      normalized: compose
+
+  - call: lcod://impl/set@1
+    in:
+      compose: $.normalized
+    out:
+      compose: compose
