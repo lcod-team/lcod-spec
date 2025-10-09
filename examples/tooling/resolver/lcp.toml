@@ -14,22 +14,14 @@ outputSchema = "schema/resolve.out.json"
 
 [deps]
 requires = [
-  "lcod://axiom/fs/read-file@1",
   "lcod://axiom/fs/write-file@1",
-  "lcod://axiom/path/join@1",
-  "lcod://axiom/json/parse@1",
-  "lcod://axiom/toml/parse@1",
-  "lcod://axiom/toml/stringify@1",
-  "lcod://axiom/git/clone@1",
-  "lcod://axiom/http/download@1",
-  "lcod://axiom/hash/sha256@1",
   "lcod://flow/foreach@1",
-  "lcod://flow/if@1",
-  "lcod://flow/parallel@1",
-  "lcod://flow/try@1",
-  "lcod://flow/throw@1",
   "lcod://contract/tooling/resolve-dependency@1",
-  "lcod://impl/set@1"
+  "lcod://impl/set@1",
+  "lcod://resolver/internal/load-descriptor@1",
+  "lcod://resolver/internal/load-config@1",
+  "lcod://resolver/internal/lock-path@1",
+  "lcod://resolver/internal/build-lock@1"
 ]
 
 [docs]

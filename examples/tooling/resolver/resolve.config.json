@@ -1,6 +1,10 @@
 {
   "sources": {
-    "lcod://tooling/resolver@0.1.0": { "type": "path", "path": "." }
+    "lcod://tooling/resolver@0.1.0": { "type": "path", "path": "." },
+    "lcod://resolver/internal/load-descriptor@1": { "type": "path", "path": "../lcod-resolver/components/internal/load_descriptor" },
+    "lcod://resolver/internal/load-config@1": { "type": "path", "path": "../lcod-resolver/components/internal/load_config" },
+    "lcod://resolver/internal/lock-path@1": { "type": "path", "path": "../lcod-resolver/components/internal/lock_path" },
+    "lcod://resolver/internal/build-lock@1": { "type": "path", "path": "../lcod-resolver/components/internal/build_lock" }
   },
   "replace": {},
   "bindings": {}

@@ -22,6 +22,38 @@ lockfiles are discovered.
 The two components remain separable: CI/CD pipelines can run the resolver
 explicitly, while end users can trigger it implicitly via the kernel CLI.
 
+## Shared Components
+
+Reusable building blocks published in `lcod-spec/tooling/resolver` keep resolver
+composes small and consistent:
+
+- `load-descriptor@1` — locate and parse `lcp.toml` from a project directory.
+- `load-config@1` — fetch `resolve.config.json`, apply defaults, emit warnings.
+- `lock-path@1` — derive the destination of `lcp.lock` from project/output hints.
+- `build-lock@1` — assemble the final lock payload and its TOML representation.
+
+Both the specification example (`examples/tooling/resolver`) and the production
+resolver compose import these helpers, demonstrating cross-repo reuse of
+standard components. In standalone packages, the helpers live next to the
+primary compose and are registered in the resolver scope at runtime. Kernels
+stay minimal: they load project-local components first (lockfile/cache), only
+falling back to the shared registry or resolver when nothing is found.
+
+## Registry scopes and lazy resolution
+
+- **Nested scopes** — every execution opens a child registry (compose → project
+  → platform). Internal helpers cannot override another project's components,
+  while hot reload stays local.
+- **Lazy resolution** — when a `call` references an ID, the kernel checks
+  already-registered components in the current scope, then the associated
+  lockfile/cache. Only if the ID is still missing does it invoke the resolver.
+- **Visibility** — a component can flag helpers as `public` (catalogue) or
+  `internal` (project-only). Internal helpers stay confined to the project
+  scope; only public components get promoted to shared registries.
+- **Resolver helpers** — kernels look for helper components in `LCOD_RESOLVER_COMPONENTS_PATH`
+  or `LCOD_RESOLVER_PATH` before falling back to packaged catalogues. Set these env vars when
+  running the resolver in-tree to avoid hitting the global registry.
+
 ## CLI Conventions
 
 ### Resolver

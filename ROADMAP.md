@@ -61,6 +61,8 @@ Tickets:
 - [x] M3-06 Embedded scripting sandbox API (`$api.run`, `$api.config`) for lightweight algorithms
   - [x] Publish `tooling/script@1` contract (docs + schemas) and seed fixtures under `tests/spec`
 - [x] M3-07 Add `tooling/script` import aliases to simplify compose authoring (named helpers instead of full FQDN)
+- [ ] M3-08 Document component scopes & registry isolation (#37)
+  - Define metadata for public/internal helpers and describe registry chaining (compose → project → platform)
 
 ## M4 — Observability & debugging
 - [ ] M4-01 Trace events: emit structured step/slot logs with optional scope snapshot IDs in both kernels
@@ -82,6 +84,7 @@ Tickets:
 - [ ] M6-02 Node demo service: compose a simple HTTP endpoint backed by LCOD sequences
 - [ ] M6-02a (stretch) Hot reload support for `env/http_host` so projects can be reloaded without downtime
 - [ ] M6-03 Rust demo service: mirror the HTTP demo using the Rust kernel
-- [ ] M6-04 lc0d-resolver rewrite: express the resolver pipeline as LCOD compose
+- [x] M6-04 lc0d-resolver rewrite: express the resolver pipeline as LCOD compose (#36)
+  - Shared resolver helpers (`load-descriptor`, `load-config`, `lock-path`, `build-lock`) published in `lcod-spec` and consumed by `lcod-resolver`.
 - [ ] M6-05 Populate `lcod-registry` with sample functional components
 - [ ] M6-06 Evaluate lightweight models for component authoring

@@ -10,19 +10,57 @@ resolved = "lcod://tooling/resolver@0.1.0"
   path = "."
 
   [[components.dependencies]]
-  id = "lcod://axiom/fs/read-file@1"
+  id = "lcod://axiom/fs/write-file@1"
 
     [components.dependencies.source]
-    type = "npm"
-    package = "@lcod/core-node-axioms"
-    version = "0.1.0"
+    type = "registry"
+    reference = "lcod://axiom/fs/write-file@1"
 
   [[components.dependencies]]
-  id = "lcod://axiom/toml/parse@1"
+  id = "lcod://flow/foreach@1"
 
     [components.dependencies.source]
-    type = "npm"
-    package = "@lcod/core-node-axioms"
-    version = "0.1.0"
+    type = "registry"
+    reference = "lcod://flow/foreach@1"
 
-warnings = []
+  [[components.dependencies]]
+  id = "lcod://contract/tooling/resolve-dependency@1"
+
+    [components.dependencies.source]
+    type = "registry"
+    reference = "lcod://contract/tooling/resolve-dependency@1"
+
+  [[components.dependencies]]
+  id = "lcod://impl/set@1"
+
+    [components.dependencies.source]
+    type = "registry"
+    reference = "lcod://impl/set@1"
+
+  [[components.dependencies]]
+  id = "lcod://resolver/internal/load-descriptor@1"
+
+    [components.dependencies.source]
+    type = "registry"
+    reference = "lcod://resolver/internal/load-descriptor@1"
+
+  [[components.dependencies]]
+  id = "lcod://resolver/internal/load-config@1"
+
+    [components.dependencies.source]
+    type = "registry"
+    reference = "lcod://resolver/internal/load-config@1"
+
+  [[components.dependencies]]
+  id = "lcod://resolver/internal/lock-path@1"
+
+    [components.dependencies.source]
+    type = "registry"
+    reference = "lcod://resolver/internal/lock-path@1"
+
+  [[components.dependencies]]
+  id = "lcod://resolver/internal/build-lock@1"
+
+    [components.dependencies.source]
+    type = "registry"
+    reference = "lcod://resolver/internal/build-lock@1"

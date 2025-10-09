@@ -321,7 +321,13 @@ An IDE built on LCOD presents two synchronized views: a **tree view** showing th
 
 ## 9. Distribution and Extensibility
 
-LCOD supports packaging flows as libraries for different languages, as full applications or as microservices. The resolver and kernel allow replacing blocks with internal versions (for enterprise use), mirroring registries and verifying integrity. Blocks can declare UI metadata (`[ui]`) and events (AsyncAPI/CloudEvents) for reactive architectures. Additional layers (HTTP, gRPC, GraphQL, CLI) can be built as adapters without modifying the core. Future extensions might include support for WebAssembly for sandboxed execution, type guards for generics, and multi‑agent coordination.
+LCOD supports packaging flows as libraries for different languages, as full applications or as microservices. The resolver and kernel allow replacing blocks with internal versions (for enterprise use), mirroring registries and verifying integrity. Blocks can declare UI metadata (`[ui]`) and events (AsyncAPI/CloudEvents) for reactive architectures. Additional layers (HTTP, gRPC, GraphQL, CLI) can be built as adapters without modifying the core. Future extensions might include support for WebAssembly for sandboxed execution, type guards for generics, and multi-agent coordination.
+
+### Component scopes & registry isolation
+
+LCOD repositories can ship more than one component. Each subcomponent has its own `lcp.toml` and may be flagged as **public** (exposed to catalogues) or **internal** (consumed only inside the project). When a compose executes, the kernel spins up a child registry chained to its parent (`platform → project → compose`). Internal helpers are resolved from the local project first; only missing IDs fall back to the global registry or resolver. This prevents cross-project overrides while keeping hot reload and allowing selected helpers to be promoted to shared catalogues.
+
+This hierarchy keeps the kernel tiny: it only knows how to stack registries and run LCOD components. Everything else—including repo-specific helpers—is bootstrapped from components, paving the way for vertical products (IDE, orchestrators) built on top of the same primitives.
 
 ### Packaging pipeline roadmap
 

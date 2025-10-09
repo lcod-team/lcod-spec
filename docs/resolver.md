@@ -56,3 +56,5 @@ By default the resolver writes fetched artifacts to `./.lcod/cache`. Runtimes ca
 - Provide implementations for `tooling/resolve-dependency@1` tailored to different backends.
 - Package the resolver composite as a sharable component in the registry.
 - Integrate with `.lcpkg` packaging for source distribution.
+- Finalise registry scope chaining (compose → project → platform) so helper components stay local by default.
+- Add metadata to distinguish public catalogue components from internal helpers when publishing the resolver bundle.

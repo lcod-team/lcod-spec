@@ -71,3 +71,4 @@ With these bindings in place the resolver example in `lcod-spec/examples/tooling
 1. **Conformance harness** — extend `cargo run --bin test_specs` to diff traces against the Node substrate (M3-05).
 2. **Contract packaging** — split the reusable bindings into a crate analogous to `@lcod/core-node-axioms` so hosts can depend on a stable set of Rust axioms (M3-04b follow-up).
 3. **Auth and advanced transports** — layer optional credential helpers for Git/HTTP once the core scenarios are validated.
+4. **Scoped registries** — introduce child registry contexts (compose → project → platform) so helper components are loaded lazily from the project before falling back to the global catalogue.

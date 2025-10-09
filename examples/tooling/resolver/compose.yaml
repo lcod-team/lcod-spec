@@ -1,99 +1,25 @@
 compose:
-  - call: lcod://axiom/path/join@1
+  - call: lcod://resolver/internal/load-descriptor@1
     in:
-      base: $.projectPath
-      segment: "lcp.toml"
+      projectPath: $.projectPath
     out:
-      descriptorPath: path
+      descriptor: descriptor
+      descriptorText: descriptorText
+      descriptorPath: descriptorPath
 
-  - call: lcod://axiom/fs/read-file@1
+  - call: lcod://resolver/internal/load-config@1
     in:
-      path: $.descriptorPath
-      encoding: "utf-8"
+      projectPath: $.projectPath
+      configPath: $.configPath
     out:
-      descriptorText: data
+      config: resolverConfig
+      configPath: resolvedConfigPath
+      warnings: configWarnings
 
-  - call: lcod://axiom/toml/parse@1
+  - call: lcod://resolver/internal/lock-path@1
     in:
-      text: $.descriptorText
-    out:
-      descriptor: value
-
-  - call: lcod://flow/if@1
-    in:
-      cond: $.configPath
-    children:
-      then:
-        - call: lcod://axiom/fs/read-file@1
-          in:
-            path: $.configPath
-            encoding: "utf-8"
-          out:
-            configText: data
-      else:
-        - call: lcod://axiom/path/join@1
-          in:
-            base: $.projectPath
-            segment: "resolve.config.json"
-          out:
-            defaultConfigPath: path
-        - call: lcod://flow/try@1
-          children:
-            children:
-              - call: lcod://axiom/fs/read-file@1
-                in:
-                  path: $.defaultConfigPath
-                  encoding: "utf-8"
-                out:
-                  configText: data
-            catch:
-              - call: lcod://axiom/json/parse@1
-                in:
-                  text: "{}"
-                out:
-                  emptyConfig: value
-              - call: lcod://axiom/toml/stringify@1
-                in:
-                  value: { sources: {} }
-                out:
-                  noop: text
-          out:
-            configText: data
-
-  - call: lcod://flow/if@1
-    in:
-      cond: $.configText
-    children:
-      then:
-        - call: lcod://axiom/json/parse@1
-          in:
-            text: $.configText
-          out:
-            resolverConfig: value
-      else:
-        - call: lcod://axiom/json/parse@1
-          in:
-            text: "{\"sources\":{}}"
-          out:
-            resolverConfig: value
-
-  - call: lcod://flow/if@1
-    in:
-      cond: $.outputPath
-    children:
-      then:
-        - call: lcod://impl/set@1
-          in:
-            lockPath: $.outputPath
-          out:
-            lockPath: lockPath
-      else:
-        - call: lcod://axiom/path/join@1
-          in:
-            base: $.projectPath
-            segment: "lcp.lock"
-          out:
-            lockPath: path
+      projectPath: $.projectPath
+      outputPath: $.outputPath
     out:
       lockPath: lockPath
 
@@ -114,20 +40,25 @@ compose:
     out:
       components: results
 
-  - call: lcod://axiom/toml/stringify@1
+  - call: lcod://impl/set@1
     in:
-      value:
-        schemaVersion: "1.0"
-        resolverVersion: "0.1.0"
-        components:
-          - id: $.descriptor.id
-            resolved: $.descriptor.id
-            source:
-              type: "path"
-              path: "."
-            dependencies: $.components
+      dependencyGraph: $.components
+      rootIntegrity: null
+      aggregatedWarnings: $.configWarnings
     out:
-      lockText: text
+      dependencyGraph: dependencyGraph
+      rootIntegrity: rootIntegrity
+      aggregatedWarnings: aggregatedWarnings
+
+  - call: lcod://resolver/internal/build-lock@1
+    in:
+      descriptor: $.descriptor
+      dependencyGraph: $.dependencyGraph
+      warnings: $.aggregatedWarnings
+      rootIntegrity: $.rootIntegrity
+    out:
+      lockDocument: lockDocument
+      lockText: lockText
 
   - call: lcod://axiom/fs/write-file@1
     in:
@@ -136,11 +67,21 @@ compose:
     out:
       ok: wrote
 
-  - call: lcod://impl/set@1
+  - call: lcod://tooling/script@1
     in:
-      '...': { pick: ["lockPath", "components"] }
-      warnings: []
+      source: |
+        async ({ state }) => ({
+          lockPath: state.lockPath,
+          components: Array.isArray(state.components) ? state.components : [],
+          warnings: Array.isArray(state.warnings) && state.warnings.length > 0
+            ? state.warnings
+            : undefined
+        })
+      input:
+        lockPath: $.lockPath
+        components: $.lockDocument.components
+        warnings: $.warnings
     out:
-      lockPath: '='
-      components: '='
-      warnings: '='
+      lockPath: lockPath
+      components: components
+      warnings: warnings
