@@ -25,6 +25,12 @@ LCOD components use canonical identifiers that are independent from their physic
 - Resolver configuration supplies the mirrors/replacements.
 - `lcp.lock` (planned for M2) records the exact source, commit hash, integrity, and chosen implementations for each dependency.
 
+## Workspace-scoped components
+
+- Packages can declare helper components with `scope = "workspace"`. They inherit the package version and remain private unless marked `public = true`.
+- Within the same package, composes may reference these helpers using short IDs (e.g. `internal/lock-path`). During resolution the package ID prefixes the reference (`lcod://tooling/resolver/internal/lock-path@0.1.0`).
+- A repository-level `workspace.lcp.toml` can define scope aliases and the list of packages so that renaming or forking updates happen in one place.
+
 ## Compatibility policy
 
 - Follow SemVer for components and contracts.

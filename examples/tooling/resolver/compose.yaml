@@ -1,5 +1,5 @@
 compose:
-  - call: lcod://resolver/internal/load-descriptor@1
+  - call: lcod://tooling/resolver/internal/load-descriptor@0.1.0
     in:
       projectPath: $.projectPath
     out:
@@ -7,7 +7,7 @@ compose:
       descriptorText: descriptorText
       descriptorPath: descriptorPath
 
-  - call: lcod://resolver/internal/load-config@1
+  - call: lcod://tooling/resolver/internal/load-config@0.1.0
     in:
       projectPath: $.projectPath
       configPath: $.configPath
@@ -16,7 +16,7 @@ compose:
       configPath: resolvedConfigPath
       warnings: configWarnings
 
-  - call: lcod://resolver/internal/lock-path@1
+  - call: lcod://tooling/resolver/internal/lock-path@0.1.0
     in:
       projectPath: $.projectPath
       outputPath: $.outputPath
@@ -50,7 +50,7 @@ compose:
       rootIntegrity: rootIntegrity
       aggregatedWarnings: aggregatedWarnings
 
-  - call: lcod://resolver/internal/build-lock@1
+  - call: lcod://tooling/resolver/internal/build-lock@0.1.0
     in:
       descriptor: $.descriptor
       dependencyGraph: $.dependencyGraph

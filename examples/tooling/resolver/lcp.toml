@@ -18,14 +18,14 @@ requires = [
   "lcod://flow/foreach@1",
   "lcod://contract/tooling/resolve-dependency@1",
   "lcod://impl/set@1",
-  "lcod://resolver/internal/load-descriptor@1",
-  "lcod://resolver/internal/load-config@1",
-  "lcod://resolver/internal/lock-path@1",
-  "lcod://resolver/internal/prepare-config@1",
-  "lcod://resolver/internal/prepare-cache@1",
-  "lcod://resolver/internal/resolve-dependencies@1",
-  "lcod://resolver/internal/summarize-result@1",
-  "lcod://resolver/internal/build-lock@1"
+  "lcod://tooling/resolver/internal/load-descriptor@0.1.0",
+  "lcod://tooling/resolver/internal/load-config@0.1.0",
+  "lcod://tooling/resolver/internal/lock-path@0.1.0",
+  "lcod://tooling/resolver/internal/prepare-config@0.1.0",
+  "lcod://tooling/resolver/internal/prepare-cache@0.1.0",
+  "lcod://tooling/resolver/internal/resolve-dependencies@0.1.0",
+  "lcod://tooling/resolver/internal/summarize-result@0.1.0",
+  "lcod://tooling/resolver/internal/build-lock@0.1.0"
 ]
 
 [docs]

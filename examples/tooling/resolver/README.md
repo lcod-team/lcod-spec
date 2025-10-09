@@ -1,20 +1,20 @@
 # tooling/resolver
 
-Prototype composite that resolves dependencies declared in `lcp.toml` and emits an `lcp.lock`. It reuses the resolver helper components (`lcod://resolver/internal/load-descriptor@1`, `load-config`, `lock-path`, `build-lock`) shipped alongside the `lcod-resolver` project.
+Prototype composite that resolves dependencies declared in `lcp.toml` and emits an `lcp.lock`. It reuses the resolver helper components (`lcod://tooling/resolver/internal/load-descriptor@0.1.0`, `load-config`, `lock-path`, `build-lock`) shipped alongside the `lcod-resolver` project.
 
 > To run the example locally, point the resolver config to the helper components in the neighbouring repo, for instance:
 >
 > ```json
 > {
 >   "sources": {
->     "lcod://resolver/internal/load-descriptor@1":     { "type": "path", "path": "../lcod-resolver/components/internal/load_descriptor" },
->     "lcod://resolver/internal/load-config@1":         { "type": "path", "path": "../lcod-resolver/components/internal/load_config" },
->     "lcod://resolver/internal/lock-path@1":           { "type": "path", "path": "../lcod-resolver/components/internal/lock_path" },
->     "lcod://resolver/internal/build-lock@1":          { "type": "path", "path": "../lcod-resolver/components/internal/build_lock" },
->     "lcod://resolver/internal/prepare-config@1":      { "type": "path", "path": "../lcod-resolver/components/internal/prepare_config" },
->     "lcod://resolver/internal/prepare-cache@1":       { "type": "path", "path": "../lcod-resolver/components/internal/prepare_cache" },
->     "lcod://resolver/internal/resolve-dependencies@1":{ "type": "path", "path": "../lcod-resolver/components/internal/resolve_dependencies" },
->     "lcod://resolver/internal/summarize-result@1":    { "type": "path", "path": "../lcod-resolver/components/internal/summarize_result" }
+>     "lcod://tooling/resolver/internal/load-descriptor@0.1.0":     { "type": "path", "path": "../../../../lcod-resolver/packages/resolver/components/internal/load_descriptor" },
+>     "lcod://tooling/resolver/internal/load-config@0.1.0":         { "type": "path", "path": "../../../../lcod-resolver/packages/resolver/components/internal/load_config" },
+>     "lcod://tooling/resolver/internal/lock-path@0.1.0":           { "type": "path", "path": "../../../../lcod-resolver/packages/resolver/components/internal/lock_path" },
+>     "lcod://tooling/resolver/internal/build-lock@0.1.0":          { "type": "path", "path": "../../../../lcod-resolver/packages/resolver/components/internal/build_lock" },
+>     "lcod://tooling/resolver/internal/prepare-config@0.1.0":      { "type": "path", "path": "../../../../lcod-resolver/packages/resolver/components/internal/prepare_config" },
+>     "lcod://tooling/resolver/internal/prepare-cache@0.1.0":       { "type": "path", "path": "../../../../lcod-resolver/packages/resolver/components/internal/prepare_cache" },
+>     "lcod://tooling/resolver/internal/resolve-dependencies@0.1.0":{ "type": "path", "path": "../../../../lcod-resolver/packages/resolver/components/internal/resolve_dependencies" },
+>     "lcod://tooling/resolver/internal/summarize-result@0.1.0":    { "type": "path", "path": "../../../../lcod-resolver/packages/resolver/components/internal/summarize_result" }
 >   }
 > }
 > ```

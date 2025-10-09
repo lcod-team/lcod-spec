@@ -38,57 +38,57 @@ resolved = "lcod://tooling/resolver@0.1.0"
     reference = "lcod://impl/set@1"
 
   [[components.dependencies]]
-  id = "lcod://resolver/internal/load-descriptor@1"
+  id = "lcod://tooling/resolver/internal/load-descriptor@0.1.0"
 
     [components.dependencies.source]
     type = "registry"
-    reference = "lcod://resolver/internal/load-descriptor@1"
+    reference = "lcod://tooling/resolver/internal/load-descriptor@0.1.0"
 
   [[components.dependencies]]
-  id = "lcod://resolver/internal/load-config@1"
+  id = "lcod://tooling/resolver/internal/load-config@0.1.0"
 
     [components.dependencies.source]
     type = "registry"
-    reference = "lcod://resolver/internal/load-config@1"
+    reference = "lcod://tooling/resolver/internal/load-config@0.1.0"
 
   [[components.dependencies]]
-  id = "lcod://resolver/internal/lock-path@1"
+  id = "lcod://tooling/resolver/internal/lock-path@0.1.0"
 
     [components.dependencies.source]
     type = "registry"
-    reference = "lcod://resolver/internal/lock-path@1"
+    reference = "lcod://tooling/resolver/internal/lock-path@0.1.0"
 
   [[components.dependencies]]
-  id = "lcod://resolver/internal/prepare-config@1"
+  id = "lcod://tooling/resolver/internal/prepare-config@0.1.0"
 
     [components.dependencies.source]
     type = "registry"
-    reference = "lcod://resolver/internal/prepare-config@1"
+    reference = "lcod://tooling/resolver/internal/prepare-config@0.1.0"
 
   [[components.dependencies]]
-  id = "lcod://resolver/internal/prepare-cache@1"
+  id = "lcod://tooling/resolver/internal/prepare-cache@0.1.0"
 
     [components.dependencies.source]
     type = "registry"
-    reference = "lcod://resolver/internal/prepare-cache@1"
+    reference = "lcod://tooling/resolver/internal/prepare-cache@0.1.0"
 
   [[components.dependencies]]
-  id = "lcod://resolver/internal/resolve-dependencies@1"
+  id = "lcod://tooling/resolver/internal/resolve-dependencies@0.1.0"
 
     [components.dependencies.source]
     type = "registry"
-    reference = "lcod://resolver/internal/resolve-dependencies@1"
+    reference = "lcod://tooling/resolver/internal/resolve-dependencies@0.1.0"
 
   [[components.dependencies]]
-  id = "lcod://resolver/internal/summarize-result@1"
+  id = "lcod://tooling/resolver/internal/summarize-result@0.1.0"
 
     [components.dependencies.source]
     type = "registry"
-    reference = "lcod://resolver/internal/summarize-result@1"
+    reference = "lcod://tooling/resolver/internal/summarize-result@0.1.0"
 
   [[components.dependencies]]
-  id = "lcod://resolver/internal/build-lock@1"
+  id = "lcod://tooling/resolver/internal/build-lock@0.1.0"
 
     [components.dependencies.source]
     type = "registry"
-    reference = "lcod://resolver/internal/build-lock@1"
+    reference = "lcod://tooling/resolver/internal/build-lock@0.1.0"

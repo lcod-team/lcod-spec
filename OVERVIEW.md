@@ -325,9 +325,9 @@ LCOD supports packaging flows as libraries for different languages, as full appl
 
 ### Component scopes & registry isolation
 
-LCOD repositories can ship more than one component. Each subcomponent has its own `lcp.toml` and may be flagged as **public** (exposed to catalogues) or **internal** (consumed only inside the project). When a compose executes, the kernel spins up a child registry chained to its parent (`platform → project → compose`). Internal helpers are resolved from the local project first; only missing IDs fall back to the global registry or resolver. This prevents cross-project overrides while keeping hot reload and allowing selected helpers to be promoted to shared catalogues.
+LCOD packages can expose several components that evolve together. Inside a repository, a lightweight `workspace.lcp.toml` declares shared metadata (namespace defaults, package list, scope aliases). Each package then lives under `packages/<package>/lcp.toml`, which defines the canonical ID (`lcod://namespace/name@version`) and lists additional components under an **internal workspace scope**. Workspace components inherit the package version automatically (`scope = "workspace"`), and composes can reference them with short identifiers such as `internal/load-config`. During resolution the resolver prefixes those IDs with the package coordinates, so renaming or forking a package only requires updating the manifest once. Components marked as `public` remain visible to registries; workspace components stay private unless explicitly exported.
 
-This hierarchy keeps the kernel tiny: it only knows how to stack registries and run LCOD components. Everything else—including repo-specific helpers—is bootstrapped from components, paving the way for vertical products (IDE, orchestrators) built on top of the same primitives.
+When a compose executes, the kernel stacks registries (`platform → project → compose`) and registers workspace components before consulting shared catalogues. This keeps helper blocks local to their package, avoids accidental overrides across projects, and still allows selected helpers to be promoted to organisation-wide registries. The kernel itself stays minimal: it only knows how to mount registries and run LCOD components, while repo-specific helpers are bootstrapped by the package at runtime.
 
 ### Packaging pipeline roadmap
 

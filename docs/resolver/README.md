@@ -25,25 +25,36 @@ explicitly, while end users can trigger it implicitly via the kernel CLI.
 ## Shared Components
 
 Reusable building blocks published in `lcod-spec/tooling/resolver` keep resolver
-composes small and consistent:
+composes small and consistent. A resolver package exposes them as **workspace
+components** so they share the package version and can be referenced with short
+IDs:
 
-- `load-descriptor@1` — locate and parse `lcp.toml` from a project directory.
-- `load-config@1` — fetch `resolve.config.json`, apply defaults, emit warnings.
-- `lock-path@1` — derive the destination of `lcp.lock` from project/output hints.
-- `build-lock@1` — assemble the final lock payload and its TOML representation.
+- `internal/load-descriptor` — locate and parse `lcp.toml` from a project directory.
+- `internal/load-config` — fetch `resolve.config.json`, apply defaults, emit warnings.
+- `internal/lock-path` — derive the destination of `lcp.lock` from project/output hints.
+- `internal/build-lock` — assemble the final lock payload and its TOML representation.
 
 Both the specification example (`examples/tooling/resolver`) and the production
 resolver compose import these helpers, demonstrating cross-repo reuse of
 standard components. In standalone packages, the helpers live next to the
-primary compose and are registered in the resolver scope at runtime. Kernels
-stay minimal: they load project-local components first (lockfile/cache), only
-falling back to the shared registry or resolver when nothing is found.
+primary compose with `scope = "workspace"` in `packages/resolver/lcp.toml`, and
+the repository root provides a `workspace.lcp.toml` describing the package list
+and default scope aliases. The resolver expands relative IDs (e.g.
+`internal/load-config`) to the package prefix
+(`lcod://tooling/resolver/internal/load-config@0.1.0`) before producing the
+lockfile. Kernels stay minimal: they load project-local components first
+(lockfile/cache), only falling back to the shared registry or resolver when
+nothing is found.
 
 ## Registry scopes and lazy resolution
 
 - **Nested scopes** — every execution opens a child registry (compose → project
   → platform). Internal helpers cannot override another project's components,
   while hot reload stays local.
+- **Workspace scope** — components declared with `scope = "workspace"` inherit
+  the package version and are registered automatically when the package loads.
+  Renaming or forking a package only requires updating the manifest; relative
+  identifiers in composes continue to resolve.
 - **Lazy resolution** — when a `call` references an ID, the kernel checks
   already-registered components in the current scope, then the associated
   lockfile/cache. Only if the ID is still missing does it invoke the resolver.
