@@ -94,7 +94,7 @@ Any component or binding registered inside the scope is available to child steps
 - Provide a native implementation of `tooling/registry/scope@1` that pushes/pops a registry layer even if `components`/`bindings` are empty.
 - Guard against unbalanced scopes: the implementation must always pop in a `finally` block to prevent leaks.
 - Ignore `components`/`bindings` fields that the kernel does not yet support, but emit a warning so hosts can detect missing functionality.
-- Propagate the optional `id` (or a generated token) to structured logs once `lcod://tooling/log@1` is available.
+- Propagate the optional `id` (or a generated token) to structured logs via `lcod://contract/tooling/log@1` once an implementation is bound.
 
 ## Hierarchical scopes example
 

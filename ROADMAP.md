@@ -55,6 +55,7 @@ Next:
 
 ## M4 — Observability & debugging
 - [ ] M4-00 Define structured logging contract (`lcod://tooling/log@1`) for components and kernels (levels, context propagation).
+  - Document `lcod://contract/tooling/log@1` payload schema and scope-aware context (`docs/tooling-log.md`).
 - [ ] M4-01 Trace events: emit structured step/slot logs with optional scope snapshot IDs in both kernels
 - [ ] M4-02 CLI trace mode (`--trace`) to stream compose execution and inspect scope mutations
 - [ ] M4-03 Document trace schema & debugging guidelines (`docs/runtime-tracing.md`)

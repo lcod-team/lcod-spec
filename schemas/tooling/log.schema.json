@@ -1,0 +1,43 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "tooling/log@1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["level", "message"],
+  "properties": {
+    "level": {
+      "type": "string",
+      "enum": ["trace", "debug", "info", "warn", "error", "fatal"]
+    },
+    "message": {
+      "type": "string",
+      "minLength": 1
+    },
+    "data": {
+      "type": "object",
+      "description": "Structured payload attached to the log entry"
+    },
+    "error": {
+      "type": "object",
+      "description": "Optional error information",
+      "properties": {
+        "message": { "type": "string" },
+        "stack": { "type": "string" },
+        "type": { "type": "string" }
+      },
+      "additionalProperties": true
+    },
+    "tags": {
+      "type": "object",
+      "description": "Flat metadata used for routing/filtering",
+      "additionalProperties": {
+        "type": ["string", "number", "boolean"]
+      }
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Optional event timestamp supplied by the caller"
+    }
+  }
+}
