@@ -45,13 +45,10 @@ Delivered:
 - [x] Standard infrastructure contracts (filesystem, HTTP, Git, hashing, parsing) with documentation.
 - [x] Node.js axiom package `@lcod/core-node-axioms` and resolver integration.
 - [x] Rust kernel bootstrap (compose runner, slots, streaming) plus scripting support and workspace-aware helpers (`docs/runtime-rust.md`).
+- [x] Rust substrate parity (M3-04): resolver CLI (`cargo run --bin run_compose`) now runs the workspace helpers end-to-end using native filesystem/network bindings; `docs/runtime-rust.md` documents the package manifest loading and alias handling.
+- [x] Cross-runtime conformance suite (M3-05): shared manifest `tests/conformance/manifest.json`, per-runtime runners, and the diff harness `scripts/run-conformance.mjs` comparing Node vs Rust outputs.
 - [x] Shared spec fixtures with `tooling/test_checker@1` and `tooling/script@1` for compose-based testing.
 - [x] Workspace/resolver isolation captured in `docs/workspaces.md`.
-
-Outstanding:
-- [ ] M3-04 Rust substrate parity: complete filesystem/network bindings, package manifest loading, and ship the resolver CLI with the Rust toolchain.
-  - Deliverable: runnable `cargo run --bin run_compose` covering the resolver and shared fixtures using only Rust axioms.
-- [ ] M3-05 Cross-runtime conformance suite: publish fixtures & diff tooling comparing Node/Rust outputs (lockfiles, traces) and document how axiom providers plug in.
 
 ## M4 — Observability & debugging
 - [ ] M4-00 Define structured logging contract (`lcod://tooling/log@1`) for components and kernels (levels, context propagation).

@@ -66,9 +66,23 @@ Located in `src/tooling/resolver.rs`, the helper registers:
 
 With these bindings in place the resolver example in `lcod-spec/examples/tooling/resolver/compose.yaml` now runs entirely on the Rust substrate.
 
+## Cross-runtime conformance
+
+Parity with the Node substrate is exercised via the shared conformance manifest
+(`lcod-spec/tests/conformance/manifest.json`). Run the harness from the spec repository:
+
+```bash
+NODE_KERNEL_PATH=/path/to/lcod-kernel-js \
+RUST_KERNEL_PATH=/path/to/lcod-kernel-rs \
+node scripts/run-conformance.mjs
+```
+
+The script executes both runtimes with JSON output, normalises the results
+stream/metadata differences, and fails if payloads diverge. This anchors the
+Rust substrate in the same behavioural envelope as the JavaScript implementation.
+
 ## Next steps (tracked on the roadmap)
 
-1. **Conformance harness** — extend `cargo run --bin test_specs` to diff traces against the Node substrate (M3-05).
-2. **Contract packaging** — split the reusable bindings into a crate analogous to `@lcod/core-node-axioms` so hosts can depend on a stable set of Rust axioms (M3-04b follow-up).
-3. **Auth and advanced transports** — layer optional credential helpers for Git/HTTP once the core scenarios are validated.
-4. **Scoped registries** — introduce child registry contexts (compose → project → platform) so helper components are loaded lazily from the project before falling back to the global catalogue.
+1. **Contract packaging** — split the reusable bindings into a crate analogous to `@lcod/core-node-axioms` so hosts can depend on a stable set of Rust axioms.
+2. **Auth and advanced transports** — layer optional credential helpers for Git/HTTP once the core scenarios are validated.
+3. **Scoped registries** — introduce child registry contexts (compose → project → platform) so helper components are loaded lazily from the project before falling back to the global catalogue.
