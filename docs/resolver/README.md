@@ -42,15 +42,13 @@ the repository root provides a `workspace.lcp.toml` describing the package list
 and default scope aliases. The resolver expands relative IDs (e.g.
 `internal/load-config`) to the package prefix
 (`lcod://tooling/resolver/internal/load-config@0.1.0`) before producing the
-lockfile. Kernels stay minimal: they load project-local components first
+lockfile. Kernels stay minimal: they load workspace-local components first
 (lockfile/cache), only falling back to the shared registry or resolver when
 nothing is found.
 
 ## Registry scopes and lazy resolution
 
-- **Nested scopes** — every execution opens a child registry (compose → project
-  → platform). Internal helpers cannot override another project's components,
-  while hot reload stays local.
+- **Nested scopes** — every execution wraps helper registration in a child registry scope (via `tooling/registry/scope@1`). Helpers declared inside the scope cannot override components owned by the parent catalogue, while hot reload stays local to the execution.
 - **Workspace scope** — components declared with `scope = "workspace"` inherit
   the package version and are registered automatically when the package loads.
   Renaming or forking a package only requires updating the manifest; relative
@@ -59,8 +57,7 @@ nothing is found.
   already-registered components in the current scope, then the associated
   lockfile/cache. Only if the ID is still missing does it invoke the resolver.
 - **Visibility** — a component can flag helpers as `public` (catalogue) or
-  `internal` (project-only). Internal helpers stay confined to the project
-  scope; only public components get promoted to shared registries.
+  `internal` (local-only). Internal helpers stay confined to their scoped registry; only public components get promoted to shared registries.
 - **Resolver helpers** — kernels look for helper components in `LCOD_RESOLVER_COMPONENTS_PATH`
   or `LCOD_RESOLVER_PATH` before falling back to packaged catalogues. Set these env vars when
   running the resolver in-tree to avoid hitting the global registry. Once `tooling/registry/scope@1`

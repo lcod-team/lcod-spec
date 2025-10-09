@@ -1,10 +1,10 @@
 # Registry Scope Tooling (`tooling/registry/scope@1`)
 
-`tooling/registry/scope@1` provides a portable way to open an isolated component registry for the duration of a compose block. It mirrors the JVM classloader pattern: pushes a child registry, runs the requested steps, then restores the parent registry automatically. This prevents unrelated projects (or untrusted helpers) from overriding shared components while still enabling hot reload and local overrides.
+`tooling/registry/scope@1` provides a portable way to open an isolated component registry for the duration of a compose block. It mirrors the JVM classloader pattern: pushes a child registry, runs the requested steps, then restores the parent registry automatically. This prevents sibling compositions (or untrusted helpers) from overriding shared components while still enabling hot reload and local overrides.
 
 ## Motivation
 
-- **Isolation** – keep project-scoped helpers private without affecting the platform catalogue.
+- **Isolation** – keep flow-scoped helpers private without affecting the platform catalogue.
 - **Hot reload** – allow temporary overrides during development without polluting the global registry.
 - **Portability** – define the behaviour once in the spec so every kernel replicates the same semantics.
 
@@ -78,15 +78,15 @@ Any components registered inside the child scope disappear once it is popped.
 compose:
   - call: tooling/registry/scope@1
     in:
-      id: "project-alpha"
+      id: "flow-alpha"
       components:
-        - id: lcod://project-alpha/internal/cache@0.1.0
+        - id: lcod://flow-alpha/internal/cache@0.1.0
           compose:
             - call: lcod://axiom/fs/read-file@1
               in:
                 path: $.cachePath
     children:
-      - call: project-alpha/internal/cache@1
+      - call: flow-alpha/internal/cache@1
 ```
 
 Any component or binding registered inside the scope is available to child steps, but not to the parent scope.

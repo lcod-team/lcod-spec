@@ -51,7 +51,7 @@ Delivered:
 - [x] Workspace/resolver isolation captured in `docs/workspaces.md`.
 
 Next:
-- [ ] M3-06 Registry scope chaining: implement stacked registries (`compose → project → platform`) in both kernels and expose project-level registration hooks.
+- [x] M3-06 Registry scope tooling: ensure `tooling/registry/scope@1` isolates child compose registry state in both kernels (scoped bindings/helpers cleaned up afterward).
 
 ## M4 — Observability & debugging
 - [ ] M4-00 Define structured logging contract (`lcod://tooling/log@1`) for components and kernels (levels, context propagation).

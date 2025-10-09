@@ -85,4 +85,4 @@ Rust substrate in the same behavioural envelope as the JavaScript implementation
 
 1. **Contract packaging** — split the reusable bindings into a crate analogous to `@lcod/core-node-axioms` so hosts can depend on a stable set of Rust axioms.
 2. **Auth and advanced transports** — layer optional credential helpers for Git/HTTP once the core scenarios are validated.
-3. **Scoped registries** — introduce child registry contexts (compose → project → platform) so helper components are loaded lazily from the project before falling back to the global catalogue.
+3. **Scoped registries** — rely on `tooling/registry/scope@1` to open child registry contexts so compose executions can register helpers locally before falling back to the parent catalogue.

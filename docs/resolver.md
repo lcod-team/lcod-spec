@@ -57,5 +57,5 @@ By default the resolver writes fetched artifacts to `./.lcod/cache`. Runtimes ca
 - Package the resolver composite as a sharable component in the registry.
 - Integrate with `.lcpkg` packaging for source distribution.
 - Implement workspace-scoped helper registration so relative IDs expand automatically while keeping helpers local.
-- Finalise registry scope chaining (compose → project → platform) once workspace scope support lands in kernels.
+- Finalise registry scope tooling (`tooling/registry/scope@1`) so the resolver can isolate its helper registrations without leaking to the parent scope.
 - Add metadata to distinguish public catalogue components from internal helpers when publishing the resolver bundle.
