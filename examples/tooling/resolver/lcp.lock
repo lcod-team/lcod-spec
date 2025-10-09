@@ -59,6 +59,34 @@ resolved = "lcod://tooling/resolver@0.1.0"
     reference = "lcod://resolver/internal/lock-path@1"
 
   [[components.dependencies]]
+  id = "lcod://resolver/internal/prepare-config@1"
+
+    [components.dependencies.source]
+    type = "registry"
+    reference = "lcod://resolver/internal/prepare-config@1"
+
+  [[components.dependencies]]
+  id = "lcod://resolver/internal/prepare-cache@1"
+
+    [components.dependencies.source]
+    type = "registry"
+    reference = "lcod://resolver/internal/prepare-cache@1"
+
+  [[components.dependencies]]
+  id = "lcod://resolver/internal/resolve-dependencies@1"
+
+    [components.dependencies.source]
+    type = "registry"
+    reference = "lcod://resolver/internal/resolve-dependencies@1"
+
+  [[components.dependencies]]
+  id = "lcod://resolver/internal/summarize-result@1"
+
+    [components.dependencies.source]
+    type = "registry"
+    reference = "lcod://resolver/internal/summarize-result@1"
+
+  [[components.dependencies]]
   id = "lcod://resolver/internal/build-lock@1"
 
     [components.dependencies.source]

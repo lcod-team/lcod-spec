@@ -21,6 +21,10 @@ requires = [
   "lcod://resolver/internal/load-descriptor@1",
   "lcod://resolver/internal/load-config@1",
   "lcod://resolver/internal/lock-path@1",
+  "lcod://resolver/internal/prepare-config@1",
+  "lcod://resolver/internal/prepare-cache@1",
+  "lcod://resolver/internal/resolve-dependencies@1",
+  "lcod://resolver/internal/summarize-result@1",
   "lcod://resolver/internal/build-lock@1"
 ]
 

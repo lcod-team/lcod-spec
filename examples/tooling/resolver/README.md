@@ -7,10 +7,14 @@ Prototype composite that resolves dependencies declared in `lcp.toml` and emits 
 > ```json
 > {
 >   "sources": {
->     "lcod://resolver/internal/load-descriptor@1": { "type": "path", "path": "../lcod-resolver/components/internal/load_descriptor" },
->     "lcod://resolver/internal/load-config@1":     { "type": "path", "path": "../lcod-resolver/components/internal/load_config" },
->     "lcod://resolver/internal/lock-path@1":       { "type": "path", "path": "../lcod-resolver/components/internal/lock_path" },
->     "lcod://resolver/internal/build-lock@1":      { "type": "path", "path": "../lcod-resolver/components/internal/build_lock" }
+>     "lcod://resolver/internal/load-descriptor@1":     { "type": "path", "path": "../lcod-resolver/components/internal/load_descriptor" },
+>     "lcod://resolver/internal/load-config@1":         { "type": "path", "path": "../lcod-resolver/components/internal/load_config" },
+>     "lcod://resolver/internal/lock-path@1":           { "type": "path", "path": "../lcod-resolver/components/internal/lock_path" },
+>     "lcod://resolver/internal/build-lock@1":          { "type": "path", "path": "../lcod-resolver/components/internal/build_lock" },
+>     "lcod://resolver/internal/prepare-config@1":      { "type": "path", "path": "../lcod-resolver/components/internal/prepare_config" },
+>     "lcod://resolver/internal/prepare-cache@1":       { "type": "path", "path": "../lcod-resolver/components/internal/prepare_cache" },
+>     "lcod://resolver/internal/resolve-dependencies@1":{ "type": "path", "path": "../lcod-resolver/components/internal/resolve_dependencies" },
+>     "lcod://resolver/internal/summarize-result@1":    { "type": "path", "path": "../lcod-resolver/components/internal/summarize_result" }
 >   }
 > }
 > ```
