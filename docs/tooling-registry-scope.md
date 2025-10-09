@@ -23,6 +23,8 @@ child scope → parent scope → ... → platform scope
 
 Any components registered inside the child scope disappear once it is popped.
 
+> **Current status (Oct 2025):** The Node and Rust kernels support scoped contract bindings via this tooling component. Inline component registration (`components`) is ignored for now with a warning; future milestones will extend the scope to handle ephemeral helper registration.
+
 ## Input schema (`tooling/registry/scope@1`)
 
 ```json
