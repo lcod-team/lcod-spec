@@ -23,8 +23,6 @@ child scope → parent scope → ... → platform scope
 
 Any components registered inside the child scope disappear once it is popped.
 
-> **Current status (Oct 2025):** The Node and Rust kernels support scoped contract bindings via this tooling component. Inline component registration (`components`) is ignored for now with a warning; future milestones will extend the scope to handle ephemeral helper registration.
-
 ## Input schema (`tooling/registry/scope@1`)
 
 ```json
@@ -68,7 +66,7 @@ Any components registered inside the child scope disappear once it is popped.
 }
 ```
 
-- If `components` is provided, kernels should register each helper under `scope="ephemeral"` (private to this scope). Implementations may materialise the helpers via inline compose or manifest fragments.
+- If `components` is provided, kernels register each helper under an ephemeral scope. Inline `compose` entries are supported today; kernels treat each snippet as a miniature component and execute it when called. Inline `manifest` fragments remain a future extension.
 - `bindings` applies only within the scope; the mapping is discarded when leaving it.
 - Omitting both `components` and `bindings` simply isolates the scope while running the children.
 
