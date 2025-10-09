@@ -50,6 +50,9 @@ Delivered:
 - [x] Shared spec fixtures with `tooling/test_checker@1` and `tooling/script@1` for compose-based testing.
 - [x] Workspace/resolver isolation captured in `docs/workspaces.md`.
 
+Next:
+- [ ] M3-06 Registry scope chaining: implement stacked registries (`compose → project → platform`) in both kernels and expose project-level registration hooks.
+
 ## M4 — Observability & debugging
 - [ ] M4-00 Define structured logging contract (`lcod://tooling/log@1`) for components and kernels (levels, context propagation).
 - [ ] M4-01 Trace events: emit structured step/slot logs with optional scope snapshot IDs in both kernels

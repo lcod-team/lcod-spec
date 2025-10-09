@@ -327,7 +327,13 @@ LCOD supports packaging flows as libraries for different languages, as full appl
 
 LCOD packages can expose several components that evolve together. Inside a repository, a lightweight `workspace.lcp.toml` declares shared metadata (namespace defaults, package list, scope aliases). Each package then lives under `packages/<package>/lcp.toml`, which defines the canonical ID (`lcod://namespace/name@version`) and lists additional components under an **internal workspace scope**. Workspace components inherit the package version automatically (`scope = "workspace"`), and composes can reference them with short identifiers such as `internal/load-config`. During resolution the resolver prefixes those IDs with the package coordinates, so renaming or forking a package only requires updating the manifest once. Components marked as `public` remain visible to registries; workspace components stay private unless explicitly exported.
 
-When a compose executes, the kernel stacks registries (`platform → project → compose`) and registers workspace components before consulting shared catalogues. This keeps helper blocks local to their package, avoids accidental overrides across projects, and still allows selected helpers to be promoted to organisation-wide registries. The kernel itself stays minimal: it only knows how to mount registries and run LCOD components, while repo-specific helpers are bootstrapped by the package at runtime.
+When a compose executes, the **intended** lookup order is `compose → project → platform`:
+
+1. register workspace helpers local to the project,
+2. fallback to components declared in the lockfile/cache,
+3. defer to organisation-wide catalogues last.
+
+This keeps helper blocks local to their package, avoids accidental overrides across projects, and still allows selected helpers to be promoted to shared registries. The current kernels already normalise workspace IDs and load resolver helpers from sibling checkouts; the stacked registry model is being implemented as part of the observability/runtime roadmap so hosts can plug project registries without recompiling the runtime.
 
 ### Packaging pipeline roadmap
 
