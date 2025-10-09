@@ -23,6 +23,7 @@ Spec docs
 - [docs/id-and-versioning.md](docs/id-and-versioning.md) — Identity and versioning
 - [docs/namespaces.md](docs/namespaces.md) — Namespace policy
 - [docs/structure.md](docs/structure.md) — Package structure conventions
+- [docs/workspaces.md](docs/workspaces.md) — Workspace layout, scope aliases and helper registration
 - [docs/schemas.md](docs/schemas.md) — Tool schema best practices
 - [docs/create-component.md](docs/create-component.md) — Create a new component
 - [docs/compose-dsl.md](docs/compose-dsl.md) — YAML DSL for `compose.yaml`

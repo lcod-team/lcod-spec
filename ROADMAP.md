@@ -61,8 +61,8 @@ Tickets:
 - [x] M3-06 Embedded scripting sandbox API (`$api.run`, `$api.config`) for lightweight algorithms
   - [x] Publish `tooling/script@1` contract (docs + schemas) and seed fixtures under `tests/spec`
 - [x] M3-07 Add `tooling/script` import aliases to simplify compose authoring (named helpers instead of full FQDN)
-- [ ] M3-08 Document component scopes & registry isolation (#37)
-  - Capture workspace-scoped helpers, relative component identifiers, and registry chaining (compose → project → platform)
+- [x] M3-08 Document component scopes & registry isolation (#37)
+  - Capture workspace-scoped helpers, relative component identifiers, and registry chaining (compose → project → platform) — see `docs/workspaces.md`
 
 ## M4 — Observability & debugging
 - [ ] M4-01 Trace events: emit structured step/slot logs with optional scope snapshot IDs in both kernels
