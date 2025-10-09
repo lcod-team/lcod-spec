@@ -96,6 +96,47 @@ Any component or binding registered inside the scope is available to child steps
 - Ignore `components`/`bindings` fields that the kernel does not yet support, but emit a warning so hosts can detect missing functionality.
 - Propagate the optional `id` (or a generated token) to structured logs once `lcod://tooling/log@1` is available.
 
+## Hierarchical scopes example
+
+`tooling/registry/scope@1` can be nested to model higher-level concepts (servers, environments, projects) without hard-coding them in the kernel. A simplified layout:
+
+```yaml
+compose:
+  - call: tooling/registry/scope@1  # server scope
+    in:
+      id: server
+    children:
+      - call: tooling/registry/scope@1  # environment: dev
+        in:
+          id: env-dev
+        children:
+          - call: tooling/registry/scope@1  # project A (dev bindings)
+            in:
+              id: projectA-dev
+              bindings:
+                lcod://contract/http/handler@1: lcod://impl/projectA/dev/http@1
+            children:
+              - call: projectA/http_app@1
+          - call: tooling/registry/scope@1  # project B (dev bindings)
+            in:
+              id: projectB-dev
+            children:
+              - call: projectB/http_app@1
+      - call: tooling/registry/scope@1  # environment: prod
+        in:
+          id: env-prod
+        children:
+          - call: tooling/registry/scope@1
+            in:
+              id: projectA-prod
+              bindings:
+                lcod://contract/http/handler@1: lcod://impl/projectA/prod/http@1
+            children:
+              - call: projectA/http_app@1
+```
+
+Each scope inherits registered helpers and bindings from its parent, so hosts can layer overrides cleanly (`project → environment → server`) while keeping the kernel ignorant of those semantics.
+
 ## Test plan (shared fixtures à venir)
 
 1. Inline helper registered inside the scope is visible to children but missing outside.

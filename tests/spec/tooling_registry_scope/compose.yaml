@@ -1,0 +1,68 @@
+compose:
+- call: lcod://tooling/test_checker@1
+  in:
+    compose:
+      - call: lcod://tooling/registry/scope@1
+        in:
+          bindings:
+            lcod://contract/core/hash/sha256@1: lcod://impl/testing/inline-hash@1
+          components:
+            - id: lcod://impl/testing/inline-hash@1
+              compose:
+                - call: lcod://tooling/script@1
+                  in:
+                    source: |
+                      async (_scope) => {
+                        const data = typeof _scope?.input?.data === 'string'
+                          ? _scope.input.data
+                          : '';
+                        return { digest: `inline:${data}` };
+                      }
+                  out:
+                    result: $
+            - id: lcod://helper/testing/echo@1
+              compose:
+                - call: lcod://tooling/script@1
+                  in:
+                    source: |
+                      async (_scope) => {
+                        return { echoed: _scope?.input?.value ?? null };
+                      }
+                  out:
+                    result: $
+        children:
+          - call: lcod://contract/core/hash/sha256@1
+            in:
+              data: hello
+            out:
+              scopedDigest: digest
+          - call: lcod://helper/testing/echo@1
+            in:
+              value: inside scope
+            out:
+              echoResult: result
+      - call: lcod://tooling/script@1
+        in:
+          source: |
+            async (_scope, api) => {
+              const postHash = await api.call('lcod://contract/core/hash/sha256@1', { data: 'hello' });
+              let inlineAvailable = true;
+              try {
+                await api.call('lcod://helper/testing/echo@1', { value: 'outside scope' });
+              } catch (_err) {
+                inlineAvailable = false;
+              }
+              return { postHash, inlineAvailable };
+            }
+        out:
+          postScope: $
+    expected:
+      scopedDigest: inline:hello
+      echoResult:
+        echoed: inside scope
+      postScope:
+        inlineAvailable: false
+        postHash:
+          digest: 2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824
+  out:
+    report: $
