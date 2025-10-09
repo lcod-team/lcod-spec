@@ -36,55 +36,56 @@ Tickets:
 - [x] M2-04 `.lcpkg` archive format (+ integrity manifest)
 - [x] M2-05 End-to-end example: resolve → lockfile → package
 - [x] M2-06 Compose-first resolver pipeline (move recursion/caching to `lcod-resolver`, propose missing axioms for kernels)
-- Annexes: UI conventions (`[ui]`), AsyncAPI/CloudEvents (events)
 
-## M3 — Runtime substrates
-- [x] M3-01 Define standard infrastructure contracts (filesystem, HTTP, Git, hashing, TOML/JSON parsing)
-  - [x] Draft `contract/core/fs/read-file@1` (schema + README)
-  - [x] Draft `contract/core/fs/write-file@1` (schema + README)
-  - [x] Draft `contract/core/fs/list-dir@1` (schema + README)
-  - [x] Draft `contract/core/http/request@1` (schema + README)
-  - [x] Draft `contract/core/stream/read@1` & `core/stream/close@1` (schema + README)
-  - [x] Draft `contract/core/git/clone@1` (schema + README)
-  - [x] Draft `contract/core/hash/sha256@1` (schema + README)
-  - [x] Draft `contract/core/parse/{json,toml,csv}@1` (schema + README)
-- [x] M3-02 Provide Node.js axiom implementations for these contracts (publishable package)
-  - [x] Publishable npm bundle `@lcod/core-node-axioms` exposing `registerNodeCore`
-- [x] M3-03 Integrate resolver composite with Node axioms and validate end-to-end
-- [ ] M3-04 Implement a Rust substrate for the same contract set to validate portability
-  - [x] Bootstrap `lcod-kernel-rs` compose runner, slot orchestration and streaming handles (mirrors spec foreach demos)
-- [x] Implement core contract bindings (filesystem, HTTP, Git, hash, parse) in Rust using a declarative dependency model (npm/cargo/maven captured in `impl/<lang>/meta.toml` and resolved via the resolver) so the kernel stays minimal
-  - [x] Document Rust substrate blueprint and resolver alias helper (`docs/runtime-rust.md`)
-  - [ ] Publish conformance artefacts (fixtures + diff tooling) for Node/Rust comparison
-- [ ] M3-05 Cross-runtime conformance tests & documentation on axiom providers
-  - [x] Define `tooling/test_checker@1` contract and shared spec fixtures for compose-based tests (foreach demos, script_range, script_run_slot, core_fs_roundtrip, core_hash_sha256, core_parse_roundtrip)
-- [x] M3-06 Embedded scripting sandbox API (`$api.run`, `$api.config`) for lightweight algorithms
-  - [x] Publish `tooling/script@1` contract (docs + schemas) and seed fixtures under `tests/spec`
-- [x] M3-07 Add `tooling/script` import aliases to simplify compose authoring (named helpers instead of full FQDN)
-- [x] M3-08 Document component scopes & registry isolation (#37)
-  - Capture workspace-scoped helpers, relative component identifiers, and registry chaining (compose → project → platform) — see `docs/workspaces.md`
+## M3 — Runtime parity
+
+Goal: bring Node and Rust substrates to feature parity and validate behaviour across kernels.
+
+Delivered:
+- [x] Standard infrastructure contracts (filesystem, HTTP, Git, hashing, parsing) with documentation.
+- [x] Node.js axiom package `@lcod/core-node-axioms` and resolver integration.
+- [x] Rust kernel bootstrap (compose runner, slots, streaming) plus scripting support and workspace-aware helpers (`docs/runtime-rust.md`).
+- [x] Shared spec fixtures with `tooling/test_checker@1` and `tooling/script@1` for compose-based testing.
+- [x] Workspace/resolver isolation captured in `docs/workspaces.md`.
+
+Outstanding:
+- [ ] M3-04 Rust substrate parity: complete filesystem/network bindings, package manifest loading, and ship the resolver CLI with the Rust toolchain.
+  - Deliverable: runnable `cargo run --bin run_compose` covering the resolver and shared fixtures using only Rust axioms.
+- [ ] M3-05 Cross-runtime conformance suite: publish fixtures & diff tooling comparing Node/Rust outputs (lockfiles, traces) and document how axiom providers plug in.
 
 ## M4 — Observability & debugging
+- [ ] M4-00 Define structured logging contract (`lcod://tooling/log@1`) for components and kernels (levels, context propagation).
 - [ ] M4-01 Trace events: emit structured step/slot logs with optional scope snapshot IDs in both kernels
 - [ ] M4-02 CLI trace mode (`--trace`) to stream compose execution and inspect scope mutations
 - [ ] M4-03 Document trace schema & debugging guidelines (`docs/runtime-tracing.md`)
 - [ ] M4-04 Prototype Debug Adapter (DAP) for compose files (breakpoints, step-in/out)
 
-## M5 — Packaging & distribution
-- [ ] M5-01 Specify the assemble/ship/build pipeline (artefact format, metadata, CLI contract).
+## M5 — Registry & release pipeline
+
+Goal: prepare public releases once workspace/package layout is stable.
+
+- [ ] M5-01 Define the registry contract (publish/list/authentication, mirror support) and document how repositories map to packages.
+- [ ] M5-02 Describe the release workflow: version bump policy, compatibility matrix, and how kernels/resolver consume published artefacts.
+- [ ] M5-03 Specify the assemble/ship/build pipeline (bundle format, runtime layers, per-ecosystem targets).
   - [ ] Define the `assemble` bundle structure (`lcp.lock` + `lcod_modules/` + manifest).
   - [ ] Describe optional `ship` layers (runtime inclusion, launch scripts, metadata).
   - [ ] Capture `build` targets per ecosystem (Node pkg/GraalVM, Rust binary, JVM fat JAR).
-- [ ] M5-02 Document release process, versioning and contract compatibility matrix.
-- [ ] M5-03 Coordinate runtime deliverables (Node/Rust/others) against the packaging tiers.
-- [x] M5-04 Introduce compose sugar -> canonical normalization (shared loader component) so large composes stay readable without impacting kernel runtimes.
+- [x] Pre-req satisfied: compose normalization helpers are in place (shared loader component).
 
-## M6 — End-to-end service demo
+## M6 — Backend service POC
+
+Goal: deliver a runnable HTTP backend that exercises advanced composes and prepares deployment scenarios.
+
 - [x] M6-01 Spec: define HTTP environment/project components (slots for sequences & routes)
-- [ ] M6-02 Node demo service: compose a simple HTTP endpoint backed by LCOD sequences
+- [ ] M6-02 Node backend POC: compose an HTTP endpoint backed by LCOD sequences, integrate the logging contract, and make it deployable from the CLI.
 - [ ] M6-02a (stretch) Hot reload support for `env/http_host` so projects can be reloaded without downtime
-- [ ] M6-03 Rust demo service: mirror the HTTP demo using the Rust kernel
+- [ ] M6-03 Rust backend parity: mirror the Node backend path with the Rust kernel once M3 parity is complete.
 - [x] M6-04 lc0d-resolver rewrite: express the resolver pipeline as LCOD compose (#36)
   - Shared resolver helpers (`load-descriptor`, `load-config`, `lock-path`, `build-lock`) published in `lcod-spec` and consumed by `lcod-resolver`.
 - [ ] M6-05 Populate `lcod-registry` with sample functional components
 - [ ] M6-06 Evaluate lightweight models for component authoring
+
+## Future — UI & eventing
+
+- [ ] Define UI component conventions (`[ui]` annex) once backend patterns stabilise.
+- [ ] Document AsyncAPI/CloudEvents integration after the registry and backend pipelines are finalised.
