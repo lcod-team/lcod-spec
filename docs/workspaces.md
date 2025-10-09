@@ -78,7 +78,7 @@ The discovery order is:
 
 1. `LCOD_RESOLVER_COMPONENTS_PATH` (legacy path with plain components).
 2. `LCOD_RESOLVER_PATH` (resolver repository root).
-3. Sibling checkouts (`../lcod-resolver`, `../lcod-spec/tooling/resolver`) to support mono-checkouts.
+3. Sibling checkouts (`../lcod-resolver`; legacy `../lcod-spec/tooling/resolver` kept for pre-workspace trees) to support mono-checkouts.
 
 Tooling that loads composes (tests, CLIs) should mirror this canonicalisation step. See `lcod-kernel-js/test/tooling.resolver.test.js` and `lcod-kernel-rs/tests/resolver.rs` for reference implementations.
 

@@ -24,7 +24,7 @@ explicitly, while end users can trigger it implicitly via the kernel CLI.
 
 ## Shared Components
 
-Reusable building blocks published in `lcod-spec/tooling/resolver` keep resolver
+Reusable building blocks published in `lcod-resolver/packages/resolver` keep resolver
 composes small and consistent. A resolver package exposes them as **workspace
 components** so they share the package version and can be referenced with short
 IDs:
