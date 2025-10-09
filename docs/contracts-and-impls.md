@@ -17,3 +17,4 @@
 
 ## Reserved Namespaces
 - `lcod://contract/*`, `lcod://impl/*`, `lcod://axiom/*`, `lcod://flow/*`, `lcod://ui/*`
+- `lcod://tooling/*` — shared runtime helpers implemented by kernels (e.g. `tooling/test_checker@1`, `tooling/script@1`, `tooling/registry/scope@1`)

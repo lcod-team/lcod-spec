@@ -63,7 +63,9 @@ nothing is found.
   scope; only public components get promoted to shared registries.
 - **Resolver helpers** — kernels look for helper components in `LCOD_RESOLVER_COMPONENTS_PATH`
   or `LCOD_RESOLVER_PATH` before falling back to packaged catalogues. Set these env vars when
-  running the resolver in-tree to avoid hitting the global registry.
+  running the resolver in-tree to avoid hitting the global registry. Once `tooling/registry/scope@1`
+  is available, the resolver compose will wrap helper registration in a scoped registry to keep
+  internal components private.
 
 ## CLI Conventions
 
