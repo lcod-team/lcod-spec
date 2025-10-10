@@ -67,7 +67,7 @@ Goal: prepare public releases once workspace/package layout is stable.
 
 - [x] M5-01 Define the registry contract (publish/list/authentication, mirror support) and document how repositories map to packages (see `docs/registry.md`, refs #46).
 - [x] M5-02 Describe the release workflow: version bump policy, compatibility matrix, and how kernels/resolver consume published artefacts (`docs/release-workflow.md`, refs #48).
-- [ ] M5-03 Specify the assemble/ship/build pipeline (bundle format, runtime layers, per-ecosystem targets).
+- [x] M5-03 Specify the assemble/ship/build pipeline (bundle format, runtime layers, per-ecosystem targets) — see `docs/packaging-pipeline.md` (refs #49).
   - [ ] Define the `assemble` bundle structure (`lcp.lock` + `lcod_modules/` + manifest).
   - [ ] Describe optional `ship` layers (runtime inclusion, launch scripts, metadata).
   - [ ] Capture `build` targets per ecosystem (Node pkg/GraalVM, Rust binary, JVM fat JAR).
