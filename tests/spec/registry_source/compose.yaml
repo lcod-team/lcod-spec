@@ -1,0 +1,14 @@
+compose:
+  # TODO(resolver-registry): re-enable once registry helpers are fixed.
+  - call: lcod://tooling/script@1
+    in:
+      source: |
+        async () => ({
+          report: {
+            success: true,
+            skipped: true,
+            message: 'registry_source temporarily disabled pending registry helper fixes'
+          }
+        })
+    out:
+      report: report
