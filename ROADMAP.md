@@ -65,25 +65,22 @@ Next:
 
 Goal: prepare public releases once workspace/package layout is stable.
 
-- [x] M5-01 Define the registry contract (publish/list/authentication, mirror support) and document how repositories map to packages (`docs/registry.md` captures the Git-first manifest, index, and mirror model).
+- [ ] M5-01 Define the registry contract (publish/list/authentication, mirror support) and document how repositories map to packages.
 - [ ] M5-02 Describe the release workflow: version bump policy, compatibility matrix, and how kernels/resolver consume published artefacts.
 - [ ] M5-03 Specify the assemble/ship/build pipeline (bundle format, runtime layers, per-ecosystem targets).
   - [ ] Define the `assemble` bundle structure (`lcp.lock` + `lcod_modules/` + manifest).
   - [ ] Describe optional `ship` layers (runtime inclusion, launch scripts, metadata).
   - [ ] Capture `build` targets per ecosystem (Node pkg/GraalVM, Rust binary, JVM fat JAR).
 - [x] Pre-req satisfied: compose normalization helpers are in place (shared loader component).
-- [ ] M5-04 Publish registry helper components (`tooling/registry/fetch@1`, `tooling/registry/index@1`, caching helpers) so kernels can consume the Git-first registry.
-- [ ] M5-04a Revalider les fixtures `registry_source` / `registry_resolution` une fois les helpers registry stabilisés (tests actuellement désactivés).
-- [ ] M5-05 Seed the `lcod-registry` repository with the `registry.json` scaffold, namespace policies, and CI guards for immutable releases.
 
 ## M6 — Backend service POC
 
 Goal: deliver a runnable HTTP backend that exercises advanced composes and prepares deployment scenarios.
 
 - [x] M6-01 Spec: define HTTP environment/project components (slots for sequences & routes)
-- [x] M6-02 Node backend POC: compose an HTTP endpoint backed by LCOD sequences, integrate the logging contract, and make it deployable from the CLI (delivered in `lcod-kernel-js#12`; demo available via `npm run demo:http`).
+- [ ] M6-02 Node backend POC: compose an HTTP endpoint backed by LCOD sequences, integrate the logging contract, and make it deployable from the CLI.
 - [ ] M6-02a (stretch) Hot reload support for `env/http_host` so projects can be reloaded without downtime
-- [x] M6-03 Rust backend parity: mirror the Node backend path with the Rust kernel once M3 parity is complete (`lcod-kernel-rs#6` covers the CLI parity and tests).
+- [ ] M6-03 Rust backend parity: mirror the Node backend path with the Rust kernel once M3 parity is complete.
 - [x] M6-04 lc0d-resolver rewrite: express the resolver pipeline as LCOD compose (#36)
   - Shared resolver helpers (`load-descriptor`, `load-config`, `lock-path`, `build-lock`) published in `lcod-spec` and consumed by `lcod-resolver`.
 - [ ] M6-05 Populate `lcod-registry` with sample functional components
