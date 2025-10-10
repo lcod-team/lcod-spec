@@ -13,8 +13,7 @@ compose:
                   in:
                     source: |
                       async ({ state }) => `base:${state?.payload ?? ''}`
-                    input:
-                      payload: $.payload
+                    input: __lcod_state__
                   out:
                     value: $
         children:
@@ -29,8 +28,7 @@ compose:
                       in:
                         source: |
                           async ({ state }) => `override:${state?.payload ?? ''}`
-                        input:
-                          payload: $.payload
+                        input: __lcod_state__
                       out:
                         value: $
                 - id: lcod://helper/testing/echo@1
@@ -39,8 +37,7 @@ compose:
                       in:
                         source: |
                           async ({ state }) => ({ echoed: state?.value ?? null })
-                        input:
-                          value: $.value
+                        input: __lcod_state__
                       out:
                         result: $
             children:
