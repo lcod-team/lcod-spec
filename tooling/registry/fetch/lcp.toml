@@ -1,0 +1,22 @@
+schemaVersion = "1.0"
+id = "lcod://tooling/registry/fetch@0.1.0"
+name = "registry_fetch"
+namespace = "tooling/registry"
+version = "0.1.0"
+kind = "function"
+summary = "Download and cache registry manifests (and optional artefacts) with integrity verification."
+
+[tool]
+name = "Registry Fetch"
+description = "Resolves manifest locations against a registry, reuses cached copies when hashes match, and downloads artefacts when present."
+inputSchema = "schema/fetch.in.json"
+outputSchema = "schema/fetch.out.json"
+
+[deps]
+requires = [
+  "lcod://impl/set@1",
+  "lcod://tooling/script@1"
+]
+
+[docs]
+readme = "README.md"

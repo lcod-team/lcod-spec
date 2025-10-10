@@ -1,4 +1,7 @@
 {
+  "tooling": {
+    "specRoot": "../../.."
+  },
   "sources": {
     "lcod://tooling/resolver@0.1.0": {
       "type": "path",

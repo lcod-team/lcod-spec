@@ -1,0 +1,22 @@
+schemaVersion = "1.0"
+id = "lcod://tooling/registry/index@0.1.0"
+name = "registry_index"
+namespace = "tooling/registry"
+version = "0.1.0"
+kind = "function"
+summary = "Parse registry JSONL streams and produce ordered package indices."
+
+[tool]
+name = "Registry Index"
+description = "Parses `packages.jsonl` fragments (local or remote), extracts registry metadata, and orders component versions by priority."
+inputSchema = "schema/index.in.json"
+outputSchema = "schema/index.out.json"
+
+[deps]
+requires = [
+  "lcod://impl/set@1",
+  "lcod://tooling/script@1"
+]
+
+[docs]
+readme = "README.md"
