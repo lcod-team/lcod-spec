@@ -1,0 +1,108 @@
+compose:
+  - call: lcod://tooling/script@1
+    in:
+      source: |
+        async ({ input, imports }) => {
+          const projectPath = typeof input.projectPath === 'string' && input.projectPath.length > 0
+            ? input.projectPath
+            : process.cwd();
+          const sourcesInput = Array.isArray(input.sources)
+            ? input.sources
+            : [];
+          const loadResult = await imports.loadSources({
+            projectPath,
+            sources: sourcesInput
+          });
+
+          const indexResult = await imports.indexSources({
+            sources: loadResult?.sources || []
+          });
+
+          const requestList = Array.isArray(input.requests)
+            ? input.requests
+            : [];
+          const resolved = [];
+          const selectionWarnings = [];
+
+          for (const request of requestList) {
+            if (!request || typeof request !== 'object') {
+              selectionWarnings.push('registry: ignoring invalid request');
+              continue;
+            }
+            const id = typeof request.id === 'string' && request.id.length > 0 ? request.id : null;
+            if (!id) {
+              selectionWarnings.push('registry: missing id');
+              continue;
+            }
+            const selectInput = {
+              packages: indexResult?.packages || {},
+              id
+            };
+            if (typeof request.range === 'string' && request.range.trim().length > 0) {
+              selectInput.range = request.range.trim();
+            }
+            if (typeof request.registryId === 'string' && request.registryId.length > 0) {
+              selectInput.registryId = request.registryId;
+            }
+
+            try {
+              const selection = await imports.selectComponent(selectInput);
+              if (selection?.entry) {
+                resolved.push({
+                  id,
+                  entry: {
+                    version: selection.entry.version,
+                    registryId: selection.entry.registryId,
+                    manifest: selection.entry.manifest,
+                    sha256: selection.entry.sha256
+                  }
+                });
+              } else {
+                selectionWarnings.push(`registry: no entry found for ${id}`);
+              }
+            } catch (err) {
+              selectionWarnings.push(`registry: failed to select ${id}: ${err.message}`);
+            }
+          }
+
+          const registries = Array.isArray(indexResult?.registries)
+            ? indexResult.registries.map((entry) => {
+                if (!entry || typeof entry !== 'object') return null;
+                const result = { id: entry.id };
+                if (typeof entry.type === 'string') result.type = entry.type;
+                if (typeof entry.url === 'string') result.url = entry.url;
+                if (Number.isFinite(entry.priority)) result.priority = Math.trunc(entry.priority);
+                return result;
+              }).filter(Boolean)
+            : [];
+
+          const combinedWarnings = [
+            ...(loadResult?.warnings || []),
+            ...(indexResult?.errors || []),
+            ...selectionWarnings
+          ].filter((msg) => typeof msg === 'string' && msg.length > 0);
+
+          return {
+            registries,
+            resolved,
+            warnings: combinedWarnings,
+            entries: Array.isArray(indexResult?.entries) ? indexResult.entries : [],
+            packages: indexResult?.packages && typeof indexResult.packages === 'object'
+              ? indexResult.packages
+              : {}
+          };
+        }
+      input:
+        projectPath: $.projectPath
+        sources: $.sources
+        requests: $.requests
+      imports:
+        loadSources: lcod://tooling/registry/source/load@0.1.0
+        indexSources: lcod://tooling/registry/index@0.1.0
+        selectComponent: lcod://tooling/registry/select@0.1.0
+    out:
+      registries: registries
+      resolved: resolved
+      warnings: warnings
+      entries: entries
+      packages: packages
