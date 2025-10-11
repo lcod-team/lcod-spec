@@ -3,12 +3,17 @@ compose:
     in:
       source: |
         async ({ state, imports }) => {
+          const fallbackCwd = typeof state.cwd === 'string' && state.cwd.length > 0
+            ? state.cwd
+            : (typeof process !== 'undefined' && process && typeof process.cwd === 'function'
+              ? process.cwd()
+              : '.');
           const rawProjectPath = typeof state.projectPath === 'string' && state.projectPath.length > 0
             ? state.projectPath
-            : process.cwd();
+            : fallbackCwd;
           const projectPath = rawProjectPath.startsWith('/') || rawProjectPath.startsWith('~')
             ? rawProjectPath
-            : (await imports.pathJoin({ base: process.cwd(), segment: rawProjectPath }))?.path || process.cwd();
+            : (await imports.pathJoin({ base: fallbackCwd, segment: rawProjectPath }))?.path || rawProjectPath;
           const rawSources = Array.isArray(state.sources) ? state.sources : [];
           const resolvedSources = [];
           const warnings = [];

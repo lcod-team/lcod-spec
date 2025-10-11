@@ -32,9 +32,14 @@ compose:
             }
           }
 
+          const fallbackCwd = typeof input.cwd === 'string' && input.cwd.length > 0
+            ? input.cwd
+            : (typeof process !== 'undefined' && process && typeof process.cwd === 'function'
+              ? process.cwd()
+              : '.');
           const projectPath = typeof input.projectPath === 'string' && input.projectPath.length > 0
             ? input.projectPath
-            : (typeof process?.cwd === 'function' ? process.cwd() : '.');
+            : fallbackCwd;
           const cacheRoot = typeof input.cacheRoot === 'string' && input.cacheRoot.length > 0
             ? input.cacheRoot
             : projectPath;

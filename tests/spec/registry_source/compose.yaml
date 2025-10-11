@@ -1,14 +1,173 @@
 compose:
-  # TODO(resolver-registry): re-enable once registry helpers are fixed.
-  - call: lcod://tooling/script@1
+  - call: lcod://tooling/test_checker@1
     in:
-      source: |
-        async () => ({
-          report: {
-            success: true,
-            skipped: true,
-            message: 'registry_source temporarily disabled pending registry helper fixes'
-          }
-        })
+      compose:
+        - call: lcod://tooling/script@1
+          in:
+            source: |
+              async ({ state, imports }) => {
+                const make = () => Object.create(null);
+                const { sources: rawSources, warnings } = await imports.loadSources({
+                  projectPath: '.',
+                  sources: state.sources,
+                  cwd: '.'
+                });
+                const parseJsonLines = (text) => {
+                  if (typeof text !== 'string' || text.trim().length === 0) return [];
+                  return text
+                    .split('\n')
+                    .map((line) => line.trim())
+                    .filter((line) => line.length > 0)
+                    .map((line) => {
+                      try {
+                        return JSON.parse(line);
+                      } catch (_err) {
+                        return null;
+                      }
+                    })
+                    .filter(Boolean);
+                };
+                const asComponentIds = (records) => records
+                  .filter((record) => record && record.kind === 'component')
+                  .map((record) => `${record.id}@${record.version}`);
+                const findRegistryUrl = (records, lines, defaults) => {
+                  const fromRecords = records.find((record) => record && record.kind === 'registry');
+                  if (fromRecords && typeof fromRecords.url === 'string') return fromRecords.url;
+                  const fromLines = Array.isArray(lines)
+                    ? lines.find((entry) => entry && entry.kind === 'registry')
+                    : null;
+                  if (fromLines && typeof fromLines.url === 'string') return fromLines.url;
+                  if (defaults && typeof defaults.url === 'string') return defaults.url;
+                  return null;
+                };
+
+                const summary = rawSources
+                  .map((source) => {
+                    const jsonlRecords = parseJsonLines(source.jsonl);
+                    const inlineRecords = Array.isArray(source.lines)
+                      ? source.lines.filter((entry) => entry && typeof entry === 'object')
+                      : [];
+                    const defaults = source.defaults && typeof source.defaults === 'object'
+                      ? (() => {
+                          const obj = make();
+                          obj.id = source.defaults.id ?? null;
+                          obj.type = source.defaults.type ?? null;
+                          obj.url = source.defaults.url ?? null;
+                          return obj;
+                        })()
+                      : null;
+                    const packages = [
+                      ...asComponentIds(jsonlRecords),
+                      ...asComponentIds(inlineRecords)
+                    ].sort();
+                    const entry = make();
+                    entry.registryId = source.registryId;
+                    entry.priority = Number.isFinite(source.priority) ? source.priority : null;
+                    entry.defaults = defaults;
+                    entry.packages = packages;
+                    entry.hasInlineLines = inlineRecords.length > 0;
+                    entry.registryUrl = findRegistryUrl(jsonlRecords, inlineRecords, defaults);
+                    return entry;
+                  })
+                  .sort((a, b) => a.registryId.localeCompare(b.registryId));
+
+                const expectedSummary = [
+                  (() => {
+                    const entry = make();
+                    entry.registryId = 'inline';
+                    entry.priority = null;
+                    entry.defaults = null;
+                    entry.packages = ['lcod://demo/inline@0.1.0', 'lcod://demo/inline@0.1.1'];
+                    entry.hasInlineLines = true;
+                    entry.registryUrl = 'https://example.com/inline.git';
+                    return entry;
+                  })(),
+                  (() => {
+                    const entry = make();
+                    entry.registryId = 'official';
+                    entry.priority = 5;
+                    const defaults = make();
+                    defaults.id = 'official';
+                    defaults.type = 'http';
+                    defaults.url = 'https://registry.example.com';
+                    entry.defaults = defaults;
+                    entry.packages = ['lcod://demo/catalog@1.1.0', 'lcod://demo/catalog@1.2.0'];
+                    entry.hasInlineLines = false;
+                    entry.registryUrl = 'https://registry.example.com';
+                    return entry;
+                  })(),
+                  (() => {
+                    const entry = make();
+                    entry.registryId = 'staging';
+                    entry.priority = null;
+                    const defaults = make();
+                    defaults.id = 'staging';
+                    defaults.type = 'http';
+                    defaults.url = 'https://staging.example.com';
+                    entry.defaults = defaults;
+                    entry.packages = ['lcod://demo/catalog@1.0.1'];
+                    entry.hasInlineLines = false;
+                    entry.registryUrl = 'https://staging.example.com';
+                    return entry;
+                  })()
+                ];
+
+                const summaryMatches = JSON.stringify(summary) === JSON.stringify(expectedSummary);
+                const cleanWarnings = Array.isArray(warnings) ? [...warnings] : [];
+                const warningsMatch = cleanWarnings.length === 0;
+
+                const result = make();
+                result.success = summaryMatches && warningsMatch;
+                if (!result.success) {
+                  result.summary = summary;
+                  result.expectedSummary = expectedSummary;
+                  result.warnings = cleanWarnings;
+                }
+                return result;
+              }
+            input:
+              sources:
+                - id: official
+                  type: jsonl
+                  priority: 5
+                  jsonl: |
+                    {"kind":"registry","id":"official","type":"http","url":"https://registry.example.com"}
+                    {"kind":"component","id":"lcod://demo/catalog","version":"1.2.0","manifest":"packages/demo/catalog/1.2.0/manifest.json"}
+                    {"kind":"component","id":"lcod://demo/catalog","version":"1.1.0","manifest":"packages/demo/catalog/1.1.0/manifest.json"}
+                  defaults:
+                    id: official
+                    type: http
+                    url: https://registry.example.com
+                - id: staging
+                  type: jsonl
+                  jsonl: |
+                    {"kind":"registry","id":"staging","type":"http","url":"https://staging.example.com"}
+                    {"kind":"component","id":"lcod://demo/catalog","version":"1.0.1","manifest":"packages/demo/catalog/1.0.1/manifest.json"}
+                  defaults:
+                    id: staging
+                    type: http
+                    url: https://staging.example.com
+                - id: inline
+                  type: inline
+                  lines:
+                    - kind: registry
+                      id: inline
+                      type: git
+                      url: https://example.com/inline.git
+                    - kind: component
+                      id: lcod://demo/inline
+                      version: 0.1.0
+                      manifest: inline/0.1.0/manifest.json
+                  jsonl: |
+                    {"kind":"component","id":"lcod://demo/inline","version":"0.1.1","manifest":"inline/0.1.1/manifest.json"}
+            imports:
+              loadSources: lcod://tooling/registry/source/load@0.1.0
+          out:
+            success: success
+            summary: summary
+            expectedSummary: expectedSummary
+            warnings: warnings
+      expected:
+        success: true
     out:
-      report: report
+      report: $

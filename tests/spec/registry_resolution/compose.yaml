@@ -1,14 +1,323 @@
 compose:
-  # TODO(resolver-registry): re-enable once registry helpers are fixed.
-  - call: lcod://tooling/script@1
+  - call: lcod://tooling/test_checker@1
     in:
-      source: |
-        async () => ({
-          report: {
-            success: true,
-            skipped: true,
-            message: 'registry_resolution temporarily disabled pending registry helper fixes'
-          }
-        })
+      compose:
+        - call: lcod://tooling/script@1
+          in:
+            source: |
+              async ({ state, imports }) => {
+                const make = () => Object.create(null);
+                const clonePlain = (value) => {
+                  if (Array.isArray(value)) {
+                    return value.map((item) => clonePlain(item));
+                  }
+                  if (value && typeof value === 'object') {
+                    const obj = make();
+                    for (const [key, val] of Object.entries(value)) {
+                      obj[key] = clonePlain(val);
+                    }
+                    return obj;
+                  }
+                  return value;
+                };
+
+                const { registries, entries, packages, resolved, warnings } = await imports.resolve({
+                  projectPath: '.',
+                  sources: state.sources,
+                  requests: state.requests,
+                  cwd: '.'
+                });
+
+                const baseRegistries = clonePlain(Array.isArray(registries) ? registries : []);
+                const baseEntries = clonePlain(Array.isArray(entries) ? entries : []);
+                const basePackages = clonePlain(packages && typeof packages === 'object' ? packages : {});
+                const baseResolved = clonePlain(Array.isArray(resolved) ? resolved : []);
+                const cleanWarnings = Array.isArray(warnings) ? [...warnings] : [];
+
+                const parseSemver = (value) => {
+                  if (typeof value !== 'string') return [0, 0, 0];
+                  return value.split('.').map((token) => Number.parseInt(token, 10) || 0);
+                };
+                const compareSemver = (a, b) => {
+                  const av = parseSemver(a);
+                  const bv = parseSemver(b);
+                  for (let i = 0; i < 3; i += 1) {
+                    if (av[i] > bv[i]) return 1;
+                    if (av[i] < bv[i]) return -1;
+                  }
+                  return 0;
+                };
+
+                const registrySummary = baseRegistries
+                  .map((entry) => {
+                    const obj = make();
+                    obj.id = entry?.id ?? null;
+                    obj.type = entry?.type ?? null;
+                    obj.url = entry?.url ?? null;
+                    return obj;
+                  })
+                  .sort((a, b) => (a.id && b.id ? a.id.localeCompare(b.id) : 0));
+
+                const resolvedSummary = baseResolved
+                  .map((item) => {
+                    const obj = make();
+                    obj.id = item?.id ?? null;
+                    obj.version = item?.entry?.version ?? null;
+                    obj.registryId = item?.entry?.registryId ?? null;
+                    return obj;
+                  })
+                  .sort((a, b) => (a.id && b.id ? a.id.localeCompare(b.id) : 0));
+
+                const packageSummary = Object.entries(basePackages)
+                  .map(([id, list]) => {
+                    const obj = make();
+                    obj.id = id;
+                    obj.versions = Array.isArray(list)
+                      ? list
+                          .map((entry) => entry?.version)
+                          .filter((version) => typeof version === 'string')
+                          .sort(compareSemver)
+                      : [];
+                    return obj;
+                  })
+                  .sort((a, b) => a.id.localeCompare(b.id));
+
+                const expected = (() => {
+                  const root = make();
+
+                  const registry = (id, priority, type, url) => {
+                    const entry = make();
+                    entry.id = id;
+                    entry.priority = priority;
+                    entry.type = type;
+                    entry.url = url;
+                    const raw = make();
+                    raw.kind = 'registry';
+                    raw.id = id;
+                    raw.type = type;
+                    raw.url = url;
+                    entry.raw = raw;
+                    return entry;
+                  };
+
+                  const component = (id, version, manifest, registryId, priority, order) => {
+                    const entry = make();
+                    entry.id = id;
+                    entry.version = version;
+                    entry.manifest = manifest;
+                    entry.registryId = registryId;
+                    entry.priority = priority;
+                    entry.order = order;
+                    const raw = make();
+                    raw.kind = 'component';
+                    raw.id = id;
+                    raw.version = version;
+                    raw.manifest = manifest;
+                    entry.raw = raw;
+                    return entry;
+                  };
+
+                  const registries = [
+                    registry('official', 5, 'http', 'https://registry.example.com'),
+                    registry('inline', 100, 'git', 'https://example.com/inline.git'),
+                    registry('staging', 100, 'http', 'https://staging.example.com')
+                  ];
+
+                  const entries = [
+                    component('lcod://demo/catalog', '1.2.0', 'packages/demo/catalog/1.2.0/manifest.json', 'official', 5, 0),
+                    component('lcod://demo/catalog', '1.1.0', 'packages/demo/catalog/1.1.0/manifest.json', 'official', 5, 1),
+                    component('lcod://demo/catalog', '1.0.1', 'packages/demo/catalog/1.0.1/manifest.json', 'staging', 100, 2),
+                    component('lcod://demo/inline', '0.1.1', 'inline/0.1.1/manifest.json', 'inline', 100, 3),
+                    component('lcod://demo/inline', '0.1.0', 'inline/0.1.0/manifest.json', 'inline', 100, 4)
+                  ];
+
+                  const packages = make();
+                  packages['lcod://demo/catalog'] = [entries[0], entries[1], entries[2]];
+                  packages['lcod://demo/inline'] = [entries[3], entries[4]];
+
+                  const resolvedList = [
+                    (() => {
+                      const entry = make();
+                      entry.id = 'lcod://demo/catalog';
+                      entry.entry = entries[0];
+                      return entry;
+                    })(),
+                    (() => {
+                      const entry = make();
+                      entry.id = 'lcod://demo/inline';
+                      entry.entry = entries[3];
+                      return entry;
+                    })()
+                  ];
+
+                  const regSummary = [
+                    (() => {
+                      const entry = make();
+                      entry.id = 'inline';
+                      entry.type = 'git';
+                      entry.url = 'https://example.com/inline.git';
+                      return entry;
+                    })(),
+                    (() => {
+                      const entry = make();
+                      entry.id = 'official';
+                      entry.type = 'http';
+                      entry.url = 'https://registry.example.com';
+                      return entry;
+                    })(),
+                    (() => {
+                      const entry = make();
+                      entry.id = 'staging';
+                      entry.type = 'http';
+                      entry.url = 'https://staging.example.com';
+                      return entry;
+                    })()
+                  ];
+
+                  const resSummary = [
+                    (() => {
+                      const entry = make();
+                      entry.id = 'lcod://demo/catalog';
+                      entry.version = '1.2.0';
+                      entry.registryId = 'official';
+                      return entry;
+                    })(),
+                    (() => {
+                      const entry = make();
+                      entry.id = 'lcod://demo/inline';
+                      entry.version = '0.1.1';
+                      entry.registryId = 'inline';
+                      return entry;
+                    })()
+                  ];
+
+                  const pkgSummary = [
+                    (() => {
+                      const entry = make();
+                      entry.id = 'lcod://demo/catalog';
+                      entry.versions = ['1.0.1', '1.1.0', '1.2.0'];
+                      return entry;
+                    })(),
+                    (() => {
+                      const entry = make();
+                      entry.id = 'lcod://demo/inline';
+                      entry.versions = ['0.1.0', '0.1.1'];
+                      return entry;
+                    })()
+                  ];
+
+                  root.registries = registries;
+                  root.entries = entries;
+                  root.packages = packages;
+                  root.resolved = resolvedList;
+                  root.warnings = [];
+                  root.registrySummary = regSummary;
+                  root.resolvedSummary = resSummary;
+                  root.packageSummary = pkgSummary;
+                  return root;
+                })();
+
+                const registryById = (id) => baseRegistries.find((entry) => entry?.id === id) ?? null;
+                const registryMatches = (id, type, url, priority) => {
+                  const entry = registryById(id);
+                  return entry
+                    && entry.type === type
+                    && entry.url === url
+                    && entry.priority === priority;
+                };
+
+                const packageVersions = (id) => {
+                  const list = basePackages[id];
+                  if (!Array.isArray(list)) return [];
+                  return list.map((entry) => entry?.version).filter((v) => typeof v === 'string').sort();
+                };
+
+                const resolvedEntryVersion = (id) => {
+                  const entry = baseResolved.find((item) => item?.id === id);
+                  return entry?.entry?.version ?? null;
+                };
+                const resolvedEntryRegistry = (id) => {
+                  const entry = baseResolved.find((item) => item?.id === id);
+                  return entry?.entry?.registryId ?? null;
+                };
+
+                const success =
+                  registryMatches('official', 'http', 'https://registry.example.com', 5)
+                  && registryMatches('staging', 'http', 'https://staging.example.com', 100)
+                  && registryMatches('inline', 'git', 'https://example.com/inline.git', 100)
+                  && JSON.stringify(packageVersions('lcod://demo/catalog')) === JSON.stringify(['1.0.1', '1.1.0', '1.2.0'])
+                  && JSON.stringify(packageVersions('lcod://demo/inline')) === JSON.stringify(['0.1.0', '0.1.1'])
+                  && resolvedEntryVersion('lcod://demo/catalog') === '1.2.0'
+                  && resolvedEntryRegistry('lcod://demo/catalog') === 'official'
+                  && resolvedEntryVersion('lcod://demo/inline') === '0.1.1'
+                  && resolvedEntryRegistry('lcod://demo/inline') === 'inline'
+                  && cleanWarnings.length === 0;
+
+                const result = make();
+                result.success = success;
+                if (!success) {
+                  const actual = make();
+                  actual.registries = baseRegistries;
+                  actual.entries = baseEntries;
+                  actual.packages = basePackages;
+                  actual.resolved = baseResolved;
+                  actual.registrySummary = registrySummary;
+                  actual.resolvedSummary = resolvedSummary;
+                  actual.packageSummary = packageSummary;
+                  actual.warnings = cleanWarnings;
+                  result.actual = actual;
+                  result.expected = expected;
+                }
+                return result;
+              }
+            input:
+              sources:
+                - id: official
+                  type: jsonl
+                  priority: 5
+                  jsonl: |
+                    {"kind":"registry","id":"official","type":"http","url":"https://registry.example.com"}
+                    {"kind":"component","id":"lcod://demo/catalog","version":"1.2.0","manifest":"packages/demo/catalog/1.2.0/manifest.json"}
+                    {"kind":"component","id":"lcod://demo/catalog","version":"1.1.0","manifest":"packages/demo/catalog/1.1.0/manifest.json"}
+                  defaults:
+                    id: official
+                    type: http
+                    url: https://registry.example.com
+                - id: staging
+                  type: jsonl
+                  jsonl: |
+                    {"kind":"registry","id":"staging","type":"http","url":"https://staging.example.com"}
+                    {"kind":"component","id":"lcod://demo/catalog","version":"1.0.1","manifest":"packages/demo/catalog/1.0.1/manifest.json"}
+                  defaults:
+                    id: staging
+                    type: http
+                    url: https://staging.example.com
+                - id: inline
+                  type: inline
+                  lines:
+                    - kind: registry
+                      id: inline
+                      type: git
+                      url: https://example.com/inline.git
+                    - kind: component
+                      id: lcod://demo/inline
+                      version: 0.1.0
+                      manifest: inline/0.1.0/manifest.json
+                  jsonl: |
+                    {"kind":"component","id":"lcod://demo/inline","version":"0.1.1","manifest":"inline/0.1.1/manifest.json"}
+              requests:
+                - id: lcod://demo/catalog
+                  range: "^1.0.0"
+                - id: lcod://demo/inline
+                  range: "~0.1.1"
+                  registryId: inline
+            imports:
+              resolve: lcod://tooling/registry/resolution@0.1.0
+          out:
+            success: success
+            actual: actual
+            expected: expected
+      expected:
+        success: true
     out:
-      report: report
+      report: $

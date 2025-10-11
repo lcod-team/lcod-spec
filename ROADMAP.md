@@ -72,7 +72,7 @@ Goal: prepare public releases once workspace/package layout is stable.
   - [ ] Describe optional `ship` layers (runtime inclusion, launch scripts, metadata).
   - [ ] Capture `build` targets per ecosystem (Node pkg/GraalVM, Rust binary, JVM fat JAR).
 - [x] M5-04 Publish registry helper components (`tooling/registry/fetch@1`, `tooling/registry/index@1`, caching helpers) so kernels can consume the Git-first registry (helpers + spec fixtures landed, refs #47).
-- [ ] M5-04a Revalider les fixtures `registry_source` / `registry_resolution` une fois les helpers registry stabilisés (tests actuellement désactivés).
+- [x] M5-04a Revalider les fixtures `registry_source` / `registry_resolution` une fois les helpers registry stabilisés (tests réactivés).
 - [ ] M5-05 Seed the `lcod-registry` repository with the `registry.json` scaffold, namespace policies, and CI guards for immutable releases.
 - [x] Pre-req satisfied: compose normalization helpers are in place (shared loader component).
 
