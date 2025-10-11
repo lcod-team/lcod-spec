@@ -22,61 +22,40 @@ LCOD is designed like an onion, with a minimal core and optional layers built on
 
 ```mermaid
 flowchart TD
-    subgraph "Kernel (minimal core)"
-        K0[Resolve & Validate]
-        K1[Execute blocks]
+    subgraph "Spec & Registry"
+        spec[lcod-spec\nSpec, fixtures, helpers]
+        registry[lcod-registry\npackages.jsonl + manifests]
     end
-    subgraph "SDKs / Substrate"
-        S0[Axis primitives 'axioms']
-        S1[Native wrappers]
+    subgraph "Resolution"
+        resolver[lcod-resolver\nCompose-first CLI/API]
     end
-    subgraph "Composition & Tooling"
-        C0[TOML/JSON loader]
-        C1[Compose operator]
-        C2[Test runner & mocks]
+    subgraph "Runtimes"
+        kernelJS[lcod-kernel-js\nNode kernel]
+        kernelRS[lcod-kernel-rs\nRust kernel]
     end
-    subgraph "Adapters"
-        A0[HTTP/JSON‑RPC API]
-        A1[MCP tools & bridges]
-        A2[CLI & Shell]
+    subgraph "Tooling & Delivery"
+        packaging[CI / packaging pipeline\nassemble → ship → build]
+        ide[lcod-ide (WIP)\nRAG-assisted authoring]
     end
-    subgraph "Hosts"
-        H0[Embedded library]
-        H1[Sidecar service]
-        H2[Standalone server]
-    end
-    subgraph "Tools & IDE"
-        T0[Registry & Resolver]
-        T1[RAG Catalogue]
-        T2[Web IDE]
-        T3[Code Generators]
-    end
-    K0 --> K1
-    K1 --> S0
-    K1 --> S1
-    S0 --> C0
-    S1 --> C0
-    C0 --> C1
-    C1 --> C2
-    C2 --> A0
-    C2 --> A1
-    C2 --> A2
-    A0 --> H0
-    A1 --> H0
-    A2 --> H0
-    H0 --> T0
-    H1 --> T0
-    H2 --> T0
-    T0 --> T1
-    T1 --> T2
-    T2 --> T3
+    spec --> registry
+    spec --> resolver
+    registry --> resolver
+    resolver --> kernelJS
+    resolver --> kernelRS
+    kernelJS --> packaging
+    kernelRS --> packaging
+    packaging --> ide
+    ide --> spec
+    registry --> ide
 ```
 
-**N0 (Kernel)** — provides only the ability to resolve a block by its ID, validate inputs/outputs against JSON Schemas, and execute it by delegating to either primitive `axiom` functions, `native` implementations, or composite flows defined via the compose operator. It defines the `Func` and `Registry` interfaces and is free of any I/O or networking concerns.
+**Spec & Registry** — `lcod-spec` documents the format and ships reusable helpers; `lcod-registry` aggregates manifests and the generated catalogue that clients can fetch via HTTP or Git.
 
-**N1 (SDKs)** — language‑specific substrates supply primitive functions (axioms) such as `http.get`, `fs.read`, `time.now`, etc. They also allow registering native implementations of blocks when available (e.g., a `smtp` implementation for Node.js or Rust). External dependencies are declared by the implementation (npm, Cargo, Maven, …) and resolved/packaged by the resolver, so the kernel itself remains immutable and only loads these plugins dynamically.
+**Resolution** — `lcod-resolver` applies mirrors/replacements, locks versions and feeds kernels with resolved packages. The resolver itself is an LCOD composition, so the same helpers run in CI pipelines and local scripts.
 
-**N2 (Composition & tooling)** — builds on the kernel to load block descriptors (`lcp.toml`), interpret the `compose` operator with slots, map inputs and outputs, bind contracts to implementations, run declarative tests with mocks and hints (timeout, retry, idempotence) and produce runtime metadata (traces, logs).
+**Runtimes** — portable kernels (`lcod-kernel-js`, `lcod-kernel-rs`) execute compose flows, validate schemas and expose a uniform context API. SDK layers provide axioms / native bindings per language.
+
+**Tooling & Delivery** — packaging pipelines assemble `.lcpkg` artefacts or application bundles; the future IDE and RAG layer sit on top of the same registry to help author flows and components.
 
 **N3 (Adapters)** — optional modules that expose blocks through external interfaces such as HTTP (Express for Node, Spring Boot for Java), JSON‑RPC/MCP, CLIs or message queues. They translate between the kernel’s call semantics and the chosen transport.
 
@@ -136,37 +115,29 @@ slots = ["header", "content", "footer"]
 The directory structure of a typical block looks like this:
 
 ```mermaid
-graph TD
-    A(lcp.toml) --> B1(README.md)
-    A --> B2(schema)
-    B2 --> C1(json schema files)
-    A --> B3(impl)
-    B3 --> D1(ts)
-    D1 --> E1(meta.toml)
-    D1 --> E2(deps.json)
-    D1 --> E3(node18/src/…)
-    B3 --> D2(java)
-    D2 --> F1(meta.toml)
-    D2 --> F2(deps.json)
-    D2 --> F3(v21/src/…)
-    A --> B4(tests)
-    B4 --> G1(unit/*.json)
-    A --> B5(assets)
-    A --> B6(doc_assets)
+flowchart TB
+    lcp[lcp.toml] --> docs[README.md / docs/]
+    lcp --> schemas[schema/*.json]
+    lcp --> impl[impl/<lang>/]
+    impl --> meta[meta.toml]
+    impl --> deps[deps.json]
+    impl --> targets[target folders (node18/, v21/, …)]
+    lcp --> tests[tests/unit/*.json]
+    lcp --> assets[assets/]
+    lcp --> docAssets[doc_assets/]
+    lcp --> extras[index.json, hints]
 ```
 
 Explanation:
 
 - `lcp.toml` – canonical descriptor (TOML). It should be the only descriptor file in the package.
-- `README.md` – long description, usage examples and additional notes. Agents can parse this for context.
-- `schema/` – JSON Schemas referenced by `inputSchema`, `outputSchema`, and optional `propsSchema` for UI blocks.
-- `impl/<lang>/` – implementation variants. Each contains:
-  - `meta.toml` – metadata about targets (e.g. Node versions, JDK versions) and build hints.
-  - `deps.json` – language‑agnostic list of runtime and test dependencies. Assemblers translate this into `package.json`, `pom.xml`, `Cargo.toml`, etc.
-  - Subfolders by target (e.g. `node18/`, `browser/`, `v21/`) containing actual source code.
-- `tests/` – declarative unit tests (`unit/*.json`) with inputs, expected outputs, and axiom mocks. These tests run identically across languages.
-- `assets/` – runtime assets used by the block (icons, templates).
-- `doc_assets/` – images and diagrams used in documentation.
+- `README.md` / `docs/` – long-form description and usage notes consumed by humans and agents.
+- `schema/` – JSON Schemas referenced by `inputSchema`, `outputSchema`, and optional `propsSchema`.
+- `impl/<lang>/` – native variants. Each folder includes `meta.toml`, `deps.json`, and target subfolders (`node18/`, `browser/`, `v21/`, …).
+- `tests/unit/*.json` – declarative tests shared by all runtimes (with axiom mocks).
+- `assets/` – runtime resources such as icons, templates or localisation files.
+- `doc_assets/` – visuals used in documentation / marketing material.
+- `index.json` (optional) – explicit mapping for non-standard artefacts so resolvers and packagers know where to find them.
 
 When non‑standard file names are used, they must be listed in an optional `index.json` so that resolvers know how to find them.
 
