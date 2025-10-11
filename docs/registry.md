@@ -192,6 +192,17 @@ for the runtime.
 Community registries follow the same flow but relax ownership checks at their
 discretion.
 
+### 6.1 Automated catalogue generation
+
+The repository `lcod-registry` uses the LCOD component
+`lcod://tooling/registry/catalog/generate@0.1.0` to turn `catalog.json` and the
+per-package `versions.json` descriptors into the derived artefacts
+`registry.json` and `packages.jsonl`. The helper component lives in `lcod-spec`
+so any registry can reuse it via the standard kernels. A GitHub Action clones
+`lcod-spec`, runs the component through the Node kernel, rewrites the catalogue
+when needed, and commits the update with a `[registry ci]` marker to prevent
+pipeline loops.
+
 ## 7. Semantic Versions & Updates
 
 - Versions follow SemVer (`MAJOR.MINOR.PATCH`). `versions.json` keeps all published
