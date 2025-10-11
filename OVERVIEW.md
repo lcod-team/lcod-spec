@@ -23,19 +23,19 @@ LCOD is designed like an onion, with a minimal core and optional layers built on
 ```mermaid
 flowchart TD
     subgraph "Spec & Registry"
-        spec[lcod-spec\nSpec, fixtures, helpers]
-        registry[lcod-registry\npackages.jsonl + manifests]
+        spec["lcod-spec<br/>Spec, fixtures, helpers"]
+        registry["lcod-registry<br/>Catalog & manifests"]
     end
     subgraph "Resolution"
-        resolver[lcod-resolver\nCompose-first CLI/API]
+        resolver["lcod-resolver<br/>Compose-first CLI/API"]
     end
     subgraph "Runtimes"
-        kernelJS[lcod-kernel-js\nNode kernel]
-        kernelRS[lcod-kernel-rs\nRust kernel]
+        kernelJS["lcod-kernel-js<br/>Node kernel"]
+        kernelRS["lcod-kernel-rs<br/>Rust kernel"]
     end
     subgraph "Tooling & Delivery"
-        packaging[CI / packaging pipeline\nassemble → ship → build]
-        ide[lcod-ide (WIP)\nRAG-assisted authoring]
+        packaging["Packaging pipeline<br/>assemble → ship → build"]
+        ide["lcod-ide (WIP)<br/>RAG-assisted authoring"]
     end
     spec --> registry
     spec --> resolver
@@ -116,16 +116,16 @@ The directory structure of a typical block looks like this:
 
 ```mermaid
 flowchart TB
-    lcp[lcp.toml] --> docs[README.md / docs/]
-    lcp --> schemas[schema/*.json]
-    lcp --> impl[impl/<lang>/]
-    impl --> meta[meta.toml]
-    impl --> deps[deps.json]
-    impl --> targets[target folders (node18/, v21/, …)]
-    lcp --> tests[tests/unit/*.json]
-    lcp --> assets[assets/]
-    lcp --> docAssets[doc_assets/]
-    lcp --> extras[index.json, hints]
+    lcp["lcp.toml"] --> docs["README.md / docs/"]
+    lcp --> schemas["schema/*.json"]
+    lcp --> impl["impl/&lt;lang&gt;/"]
+    impl --> meta["meta.toml"]
+    impl --> deps["deps.json"]
+    impl --> targets["targets: node18/, v21/, etc."]
+    lcp --> tests["tests/unit/*.json"]
+    lcp --> assets["assets/"]
+    lcp --> docAssets["doc_assets/"]
+    lcp --> extras["index.json (optional)"]
 ```
 
 Explanation:
