@@ -6,7 +6,8 @@
   "license": "UNLICENSED",
   "scripts": {
     "validate": "node scripts/validate.cjs",
-    "test:conformance": "node scripts/run-conformance.mjs"
+    "test:conformance": "node scripts/run-conformance.mjs",
+    "bundle:runtime": "node scripts/package-runtime.mjs"
   },
   "devDependencies": {
     "@iarna/toml": "^3.0.0",

@@ -1,0 +1,86 @@
+name: Publish Runtime Bundle
+
+on:
+  workflow_dispatch:
+    inputs:
+      label:
+        description: "Bundle label (defaults to git tag or short SHA)"
+        required: false
+      resolver-ref:
+        description: "lcod-resolver ref to checkout"
+        required: false
+  release:
+    types: [published]
+
+jobs:
+  bundle:
+    name: Build Runtime Bundle
+    runs-on: ubuntu-latest
+    env:
+      NODE_VERSION: '20'
+    steps:
+      - name: Checkout lcod-spec
+        uses: actions/checkout@v4
+
+      - name: Checkout lcod-resolver
+        uses: actions/checkout@v4
+        with:
+          repository: lcod-team/lcod-resolver
+          ref: ${{ github.event.inputs.resolver-ref || github.event.release.tag_name || 'main' }}
+          path: lcod-resolver
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - name: Install spec dependencies
+        run: npm ci
+
+      - name: Export resolver runtime snapshot
+        run: node scripts/export-runtime.mjs
+        working-directory: lcod-resolver
+
+      - name: Determine bundle label
+        id: label
+        run: |
+          if [ "${{ github.event_name }}" = "release" ]; then
+            LABEL="${{ github.event.release.tag_name }}"
+          elif [ -n "${{ github.event.inputs.label }}" ]; then
+            LABEL="${{ github.event.inputs.label }}"
+          else
+            LABEL="dev-${GITHUB_SHA::7}"
+          fi
+          SANITIZED=$(echo "$LABEL" | tr '/' '-')
+          echo "label=$SANITIZED" >> "$GITHUB_OUTPUT"
+
+      - name: Build runtime bundle
+        run: |
+          node scripts/package-runtime.mjs \
+            --output dist/runtime \
+            --label "${{ steps.label.outputs.label }}" \
+            --resolver "$GITHUB_WORKSPACE/lcod-resolver"
+
+      - name: Generate SHA256 checksum
+        run: |
+          cd dist/runtime
+          sha256sum "lcod-runtime-${{ steps.label.outputs.label }}.tar.gz" > "lcod-runtime-${{ steps.label.outputs.label }}.sha256"
+
+      - name: Upload bundle artifact (manual runs)
+        if: ${{ github.event_name != 'release' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: lcod-runtime-${{ steps.label.outputs.label }}
+          path: |
+            dist/runtime/lcod-runtime-${{ steps.label.outputs.label }}.tar.gz
+            dist/runtime/lcod-runtime-${{ steps.label.outputs.label }}.sha256
+
+      - name: Attach bundle to release
+        if: ${{ github.event_name == 'release' }}
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/runtime/lcod-runtime-${{ steps.label.outputs.label }}.tar.gz
+            dist/runtime/lcod-runtime-${{ steps.label.outputs.label }}.sha256
+          tag_name: ${{ github.event.release.tag_name }}

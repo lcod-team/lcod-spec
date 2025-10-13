@@ -46,7 +46,10 @@ When a helper bumps its MAJOR version, a new row is added and the documentation 
 6. **Tag & publish**
    - Once the PR is merged, tag the commit (`vX.Y.Z`) in each repo.
    - Push tags and publish the registry PR.
-   - Trigger automation for package distribution (npm/cargo crates when applicable).
+   - The `Publish Runtime Bundle` workflow runs on release publication and attaches
+     `lcod-runtime-<tag>.tar.gz` + checksum to the GitHub Release. If a release is
+     prepared manually, trigger the workflow via *Run workflow* (provide the same tag)
+     to regenerate the archive.
 
 ## 4. Registry Publication Flow
 
