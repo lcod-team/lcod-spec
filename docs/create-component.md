@@ -1,5 +1,10 @@
 # Create a New Component
 
+> Consultez également `docs/component-conventions.md` pour la liste des champs
+> attendus (summary, palette, inputs/outputs, README). Toutes les bases de
+> composants doivent s’y conformer afin de rester compatibles avec la palette
+> et les outils d’automatisation.
+
 1) Create the folder structure
 
 - `lcp.toml` at the root
@@ -20,4 +25,3 @@
 4) Validate
 
 - Run `make validate` to check basics (IDs, files, JSON). In CI, Ajv validates against `schema/lcp.schema.json`.
-
