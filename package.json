@@ -1,0 +1,19 @@
+{
+  "name": "lcod-spec",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "license": "UNLICENSED",
+  "scripts": {
+    "validate": "node scripts/validate.cjs",
+    "test:conformance": "node scripts/run-conformance.mjs",
+    "bundle:runtime": "node scripts/package-runtime.mjs"
+  },
+  "devDependencies": {
+    "@iarna/toml": "^3.0.0",
+    "ajv": "^8.17.1",
+    "ajv-formats": "^3.0.1",
+    "yaml": "^2.5.0",
+    "tar": "^6.2.0"
+  }
+}
