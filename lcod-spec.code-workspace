@@ -17,6 +17,9 @@
 		},
 		{
 			"path": "../lcod-kernel-rs"
+		},
+		{
+			"path": "../lcod-components"
 		}
 	],
 	"settings": {}
