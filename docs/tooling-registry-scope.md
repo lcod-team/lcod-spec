@@ -1,6 +1,6 @@
 # Registry Scope Tooling (`tooling/registry/scope@1`)
 
-`tooling/registry/scope@1` provides a portable way to open an isolated component registry for the duration of a compose block. It mirrors the JVM classloader pattern: pushes a child registry, runs the requested steps, then restores the parent registry automatically. This prevents sibling compositions (or untrusted helpers) from overriding shared components while still enabling hot reload and local overrides.
+`tooling/registry/scope@1` provides a portable way to open an isolated component registry for the duration of a compose block. It mirrors the JVM classloader pattern: pushes a child registry, runs the requested steps, then restores the parent registry automatically. This prevents sibling compositions (or untrusted helpers) from overriding shared components while still enabling hot reload and local overrides. Scopes are orthogonal to the **federated registry** model described in `docs/registry.md`: scopes operate on the in-memory registry stack, whereas catalogues determine which manifests are available globally.
 
 ## Motivation
 
@@ -87,7 +87,7 @@ compose:
       - call: flow-alpha/internal/cache@1
 ```
 
-Any component or binding registered inside the scope is available to child steps, but not to the parent scope.
+Any component or binding registered inside the scope is available to child steps, but not to the parent scope. When the federated registry loader (`lcod-resolver`) pulls catalogues from multiple sources, the base scope already contains all registered components from these catalogues; `tooling/registry/scope@1` simply layers temporary overrides on top.
 
 ## Kernel expectations
 

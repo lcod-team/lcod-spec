@@ -24,7 +24,8 @@ Spec docs
 - [docs/namespaces.md](docs/namespaces.md) — Namespace policy
 - [docs/structure.md](docs/structure.md) — Package structure conventions
 - [docs/workspaces.md](docs/workspaces.md) — Workspace layout, scope aliases and helper registration
-- [docs/tooling-registry-scope.md](docs/tooling-registry-scope.md) — Registry scope tooling contract (`tooling/registry/scope@1`)
+- [docs/tooling-registry-scope.md](docs/tooling-registry-scope.md) — Registry scope tooling contract (`tooling/registry/scope@1`) and how it interacts with federated catalogues
+- [docs/registry.md](docs/registry.md) — Federated registry format (catalogues, manifest pointers, resolver sources)
 - [docs/schemas.md](docs/schemas.md) — Tool schema best practices
 - [docs/create-component.md](docs/create-component.md) — Create a new component
 - [docs/compose-dsl.md](docs/compose-dsl.md) — YAML DSL for `compose.yaml`
