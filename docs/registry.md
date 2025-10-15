@@ -32,6 +32,37 @@ README.md / docs/               # human documentation
 Registries no longer duplicate `packages/<namespace>/<name>` folders. Instead, they point at
 catalogues maintained by upstream projects.
 
+```mermaid
+flowchart LR
+    subgraph "lcod-registry (optional curator)"
+        catalogues["catalogues.json"]
+    end
+    subgraph "Upstream catalogue (tooling/std)"
+        manifestsStd["components.std.json"]
+        repoStd["lcod-components repo"]
+        repoStd --> manifestsStd
+    end
+    subgraph "Company catalogue (acme/payments)"
+        manifestsAcme["components.json"]
+        repoAcme["acme/payments repo"]
+        repoAcme --> manifestsAcme
+    end
+    subgraph "Client resolver"
+        sources["sources.json"]
+        runtime["runtime cache"]
+    end
+
+    catalogues -- references --> manifestsStd
+    catalogues -- references --> manifestsAcme
+    sources -- merge --> catalogues
+    sources -- merge --> manifestsStd
+    sources -- merge --> manifestsAcme
+    manifestsStd -- manifests point at --> repoStd
+    manifestsAcme -- manifests point at --> repoAcme
+    runtime -- downloads manifests/artefacts --> repoStd
+    runtime -- downloads manifests/artefacts --> repoAcme
+```
+
 ### 2.1 `catalogues.json`
 
 This file lists the catalogues curated by the registry. Each entry tells the resolver where
