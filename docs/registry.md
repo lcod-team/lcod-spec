@@ -182,21 +182,33 @@ any Git repository as long as the catalogue points at them.
 
 ## 5. Resolver Configuration
 
-Each runtime ships with a **local sources file** (JSON). It lists the catalogues trusted by
-default. Users can edit or replace this file at any time.
+Each runtime ships with a **local sources file** (`sources.json`). It lists the catalogues
+trusted by default and pins their expected location/checksums. Users can edit or replace this
+file at any time.
 
 ```json
 {
+  "schema": "lcod-resolver/sources@1",
   "sources": [
     {
       "id": "lcod-default",
-      "url": "https://raw.githubusercontent.com/lcod-team/lcod-registry/main/catalogues.json",
-      "priority": 50
+      "priority": 50,
+      "entrypoint": {
+        "type": "https",
+        "url": "https://raw.githubusercontent.com/lcod-team/lcod-registry/main/catalogues.json"
+      },
+      "checksum": "sha256-…",
+      "publicKey": "keys/tooling/lcod-team.pem"
     },
     {
       "id": "acme-internal",
-      "url": "https://git.acme.com/platform/registry/catalogues.json",
-      "priority": 20
+      "priority": 20,
+      "entrypoint": {
+        "type": "git",
+        "url": "https://git.acme.com/platform/registry.git",
+        "commit": "a79e…",
+        "subpath": "catalogues.json"
+      }
     }
   ]
 }
@@ -205,10 +217,11 @@ default. Users can edit or replace this file at any time.
 At runtime the resolver:
 
 1. Loads the local configuration (project overrides + user defaults).
-2. Fetches each `catalogues.json` in priority order and expands it into individual catalogues.
-3. Fetches referenced catalogues (and signatures/checksums when required).
-4. Merges component entries (first match wins).
-5. Resolves dependencies by downloading the referenced manifests and verifying hashes.
+2. Fetches each pointer in priority order and expands it into individual catalogues.
+3. Verifies optional checksums/signatures for each pointer.
+4. Fetches referenced catalogues (and their signatures/checksums when required).
+5. Merges component entries (first match wins).
+6. Resolves dependencies by downloading the referenced manifests and verifying hashes.
 
 ### Direct references
 

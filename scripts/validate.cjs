@@ -73,6 +73,18 @@ function* findLcpToml(root) {
   }
 }
 
+function* findJsonFiles(root) {
+  const stack = [root];
+  while (stack.length) {
+    const dir = stack.pop();
+    for (const ent of fs.readdirSync(dir, { withFileTypes: true })) {
+      const p = path.join(dir, ent.name);
+      if (ent.isDirectory()) stack.push(p);
+      else if (ent.isFile() && ent.name.toLowerCase().endsWith('.json')) yield p;
+    }
+  }
+}
+
 (function main() {
   const repoRoot = path.resolve(__dirname, '..');
   const schemaRoot = path.join(repoRoot, 'schema');
@@ -86,8 +98,14 @@ function* findLcpToml(root) {
   if (!exists(lockSchemaPath)) { issues.push('ERROR: Missing schema/lcp-lock.schema.json'); failed++; }
   else { const err = safeJsonParse(lockSchemaPath); if (err) { issues.push('ERROR: Invalid JSON at schema/lcp-lock.schema.json: ' + err); failed++; } }
 
+  const resolverSourcesSchemaPath = path.join(schemaRoot, 'resolver-sources.schema.json');
+  if (exists(resolverSourcesSchemaPath)) {
+    const err = safeJsonParse(resolverSourcesSchemaPath);
+    if (err) { issues.push('ERROR: Invalid JSON at schema/resolver-sources.schema.json: ' + err); failed++; }
+  }
+
   let ajv = null; let lcpSchemaJson = null; let lockSchemaJson = null;
-  let validateLcp = null; let validateLock = null;
+  let validateLcp = null; let validateLock = null; let validateResolverSources = null;
   try {
     lcpSchemaJson = JSON.parse(read(lcpSchemaPath));
     lockSchemaJson = JSON.parse(read(lockSchemaPath));
@@ -103,6 +121,15 @@ function* findLcpToml(root) {
   } catch (e) {
     issues.push('ERROR: Unable to compile LCP schema: ' + e.message);
     failed++;
+  }
+  if (ajv && exists(resolverSourcesSchemaPath)) {
+    try {
+      const resolverSourcesSchemaJson = JSON.parse(read(resolverSourcesSchemaPath));
+      validateResolverSources = ajv.compile(resolverSourcesSchemaJson);
+    } catch (e) {
+      issues.push('ERROR: Unable to compile resolver sources schema: ' + e.message);
+      failed++;
+    }
   }
 
   for (const file of findLcpToml(examplesRoot)) {
@@ -163,6 +190,29 @@ function* findLcpToml(root) {
       } catch (e) {
         issues.push(`ERROR: Cannot parse ${path.relative(repoRoot, lockPath)}: ${e.message}`);
         failed++;
+      }
+    }
+  }
+
+  if (validateResolverSources) {
+    const fixturesRoot = path.join(repoRoot, 'tests/fixtures/resolver_sources');
+    if (exists(fixturesRoot)) {
+      for (const file of findJsonFiles(fixturesRoot)) {
+        let data = null;
+        const rel = path.relative(repoRoot, file);
+        try {
+          data = JSON.parse(read(file));
+        } catch (e) {
+          issues.push(`ERROR: Cannot parse ${rel}: ${e.message}`);
+          failed++;
+          continue;
+        }
+        const ok = validateResolverSources(data);
+        if (!ok) {
+          failed++;
+          const errs = (validateResolverSources.errors || []).map((e) => `${e.instancePath || '/'} ${e.message}`).join('; ');
+          issues.push(`ERROR: ${rel}: schema validation failed: ${errs}`);
+        }
       }
     }
   }

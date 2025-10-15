@@ -1,0 +1,218 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.lcod.dev/resolver/sources.json",
+  "title": "LCOD resolver sources configuration",
+  "type": "object",
+  "required": ["schema", "sources"],
+  "properties": {
+    "schema": {
+      "type": "string",
+      "const": "lcod-resolver/sources@1"
+    },
+    "description": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Optional human readable summary of the configuration."
+    },
+    "defaults": {
+      "$ref": "#/$defs/defaults"
+    },
+    "sources": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/source"
+      },
+      "description": "Ordered list of resolver sources. Lower index means higher precedence when priorities match."
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "defaults": {
+      "type": "object",
+      "properties": {
+        "priority": {
+          "$ref": "#/$defs/priority"
+        },
+        "entrypoint": {
+          "$ref": "#/$defs/entrypoint"
+        },
+        "transport": {
+          "$ref": "#/$defs/transport"
+        }
+      },
+      "additionalProperties": false,
+      "description": "Shared defaults applied to each source when the corresponding field is omitted."
+    },
+    "source": {
+      "type": "object",
+      "required": ["id", "entrypoint"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9](?:[a-z0-9._/-]*[a-z0-9])?$",
+          "description": "Identifier used in logs and tooling. Lowercase letters, digits, dot, slash and dash are allowed."
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Optional explanation about the origin or purpose of this source."
+        },
+        "priority": {
+          "$ref": "#/$defs/priority"
+        },
+        "entrypoint": {
+          "$ref": "#/$defs/entrypoint"
+        },
+        "transport": {
+          "$ref": "#/$defs/transport"
+        },
+        "checksum": {
+          "$ref": "#/$defs/checksum"
+        },
+        "signature": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Relative path or URL for the detached signature that authenticates the fetched artifact."
+        },
+        "publicKey": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Relative path to a PEM encoded key bundled with the resolver or absolute URL."
+        },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": true,
+          "description": "Free-form metadata preserved for tooling. Not interpreted by the resolver."
+        }
+      },
+      "additionalProperties": false
+    },
+    "priority": {
+      "type": "integer",
+      "description": "Lower priority wins when merging catalogues. Defaults to 100.",
+      "minimum": 0,
+      "maximum": 1000
+    },
+    "transport": {
+      "type": "object",
+      "properties": {
+        "headers": {
+          "type": "object",
+          "description": "Optional HTTP headers applied when fetching HTTP(S) resources.",
+          "patternProperties": {
+            "^[A-Za-z0-9-]+$": { "type": "string" }
+          },
+          "additionalProperties": false
+        },
+        "timeoutMs": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Per-request timeout in milliseconds."
+        },
+        "retries": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 5,
+          "description": "Maximum number of retry attempts after a transient failure."
+        }
+      },
+      "additionalProperties": false
+    },
+    "entrypoint": {
+      "type": "object",
+      "required": ["type"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["https", "http", "git", "file"],
+          "description": "Transport used to access the catalogue pointer."
+        },
+        "url": {
+          "type": "string",
+          "format": "uri",
+          "description": "Remote URL when using http(s) or git transports."
+        },
+        "path": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Local filesystem path (absolute or relative to the configuration file) for file transports."
+        },
+        "ref": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Named ref (branch or tag) to checkout when cloning a git repository."
+        },
+        "commit": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{7,40}$",
+          "description": "Exact commit SHA expected when cloning a git repository."
+        },
+        "subpath": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Path to the target file inside the git checkout."
+        },
+        "checksum": {
+          "$ref": "#/$defs/checksum"
+        }
+      },
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": { "properties": { "type": { "const": "file" } } },
+          "then": {
+            "required": ["path"],
+            "properties": {
+              "path": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Local filesystem path (absolute or relative to the configuration file) for file transports."
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": { "enum": ["http", "https"] }
+            }
+          },
+          "then": {
+            "required": ["url"],
+            "properties": {
+              "url": {
+                "type": "string",
+                "format": "uri",
+                "description": "Remote URL when using http(s) transports."
+              }
+            }
+          }
+        },
+        {
+          "if": { "properties": { "type": { "const": "git" } } },
+          "then": {
+            "required": ["url"],
+            "properties": {
+              "path": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Path to the file inside the git repository. Defaults to catalogues.json."
+              },
+              "url": {
+                "type": "string",
+                "format": "uri",
+                "description": "Git repository URL containing the catalogue pointer."
+              }
+            }
+          }
+        }
+      ]
+    },
+    "checksum": {
+      "type": "string",
+      "pattern": "^sha256-[A-Za-z0-9+/=_-]{16,}$",
+      "description": "Integrity string ensuring the fetched file matches the expected SHA-256 digest."
+    }
+  }
+}

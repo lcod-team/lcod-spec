@@ -79,7 +79,7 @@ Goal: prepare public releases once workspace/package layout is stable.
 - [x] M5-07 Automate bundle publication alongside spec releases (GitHub Releases + checksums/signatures) and document install steps (`docs/runtime-bundle.md`).
 - [x] M5-08 Ship a minimal verification compose/tests so kernels and CI pipelines can validate a downloaded bundle before execution.
 - [x] M5-F1 Document the federated registry format (catalogues, catalogues.json, resolver sources) in `docs/registry.md`.
-- [ ] M5-F2 Specify resolver configuration schema (`sources.json`) and validation rules.
+- [x] M5-F2 Specify resolver configuration schema (`sources.json`) and validation rules (refs #54).
 
 ## M6 — Backend service POC
 
