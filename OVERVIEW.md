@@ -13,7 +13,7 @@ Key ideas:
 - Design‑time vs. runtime separation – A large language model (LLM) and retrieval augmented generation (RAG) assist only during the design phase (searching for blocks, composing them, filling in parameters). At runtime, the application executes natively without incurring LLM token costs.
 - Minimal kernel – A core runtime library that understands a small DSL for composition and delegation. It can call native functions, run composite flows, and defer to platform‑specific SDKs. Everything else (HTTP servers, CLIs, code generators) is layered on top.
 - Standardized packaging – Each block lives in its own directory (component package) with a canonical descriptor file (`lcp.toml`), schemas, documentation, implementation variants and tests. Blocks are referenced via canonical URIs (`lcod://namespace/name@version`) and can be fetched from Git, HTTP or local mirrors.
-- Flexible resolution – A resolver supports mirror and replacement rules to fetch blocks from different sources (company registry, forks, offline cache) and can produce a lockfile for reproducibility. The resolver itself can be expressed as an LCOD composite, running on top of different kernels via a shared axiom set. The registry remains Git-first and declarative: `registry.json` points at immutable component manifests, each listing file hashes or prebuilt artefacts plus SemVer constraints so clients can fetch, verify, and cache packages without changing kernel behaviour (see `docs/registry.md`).
+- Flexible resolution – A resolver merges several catalogues (official, company-specific, project-specific) and applies mirror/replacement rules to fetch blocks from different sources (company registry, forks, offline cache). Catalogues are lightweight JSON files that point at immutable manifests in the original repository; the resolver verifies hashes/signatures and produces a lockfile for reproducibility. The resolver itself is an LCOD composite, running on top of different kernels via a shared axiom set (see `docs/registry.md`).
 - Agent‑assisted IDE – A graphical IDE allows humans to drag and drop blocks in a tree/flow view, while an AI assistant suggests next blocks and fills in parameters by querying the RAG index. Generated code or binaries are produced on demand.
 
 ## 2. Layered Architecture
@@ -51,7 +51,7 @@ flowchart TD
 
 **Spec & Registry** — `lcod-spec` documents the format and ships reusable helpers; `lcod-registry` aggregates manifests and the generated catalogue that clients can fetch via HTTP or Git.
 
-**Resolution** — `lcod-resolver` applies mirrors/replacements, locks versions and feeds kernels with resolved packages. The resolver itself is an LCOD composition, so the same helpers run in CI pipelines and local scripts.
+**Resolution** — `lcod-resolver` merges local and remote catalogues (the runtime ships with a default `sources.json` pointing at the official registry, but developers can add or remove catalogues freely), applies mirrors/replacements, locks versions and feeds kernels with resolved packages. The resolver itself is an LCOD composition, so the same helpers run in CI pipelines and local scripts.
 
 **Runtimes** — portable kernels (`lcod-kernel-js`, `lcod-kernel-rs`) execute compose flows, validate schemas and expose a uniform context API. SDK layers provide axioms / native bindings per language.
 

@@ -1,281 +1,220 @@
-# LCOD Registry Architecture
+# LCOD Registry Architecture (Federated)
 
-This document specifies the minimal registry model used to publish and consume LCOD
-components. The design keeps kernels small, lets the resolver do the heavy lifting,
-and allows organisations to extend or mirror the registry without custom servers.
+This document describes the **federated registry** model used to publish and consume LCOD
+components. The goal is to keep registries light, composable and verifiable, so that any
+organisation can expose its own catalogue without relying on a central server.
 
-## 1. Goals
+## 1. Design Principles
 
-- **Git-first & HTTP-friendly**: the official registry is a Git repository. Static
-  hosting (GitHub Pages, S3) is enough for read access.
-- **KISS publication**: a new component is added through a pull request that links
-  to an immutable Git commit (no bespoke API).
-- **Deterministic resolution**: every entry includes hashes so the resolver can
-  verify downloads and populate `lcp.lock`.
-- **Composable registries**: clients can chain official and community registries
-  and override the lookup order locally.
-- **Offline cache**: downloaded artefacts are cached on disk and reused when
-  available.
-- **Ready for RAG**: manifests and docs live alongside the index so the search
-  service can ingest them easily.
+- **Pointer-first** – registries publish *references* to immutable manifests hosted in the
+  original repository. They do not mirror component files.
+- **Git-friendly** – a registry can be a plain Git repo (or any static HTTP host). Releasing a
+  component is a commit or pull request, not a bespoke API call.
+- **Composable sources** – clients merge several registries (official, company-specific,
+  project-specific). The lookup order is explicit in the resolver configuration.
+- **Verifiable** – every catalogue entry carries the information needed to check provenance:
+  repository URL, commit SHA, optional signature. Clients refuse entries that do not match
+  their trust policy.
+- **Opt-in aggregation** – an “official” registry may curate a list of other catalogues, but
+  each catalogue remains autonomous. Removing the aggregator does not break consumers who
+  reference catalogues directly.
 
 ## 2. Repository Layout
 
-The registry root contains two primary directories:
+A registry repository is intentionally small:
 
 ```
-registry.json               # top-level index (registries + package catalogue)
-packages/<namespace>/<name>/versions.json
-packages/<namespace>/<name>/<version>/manifest.json
-packages/<namespace>/<name>/<version>/manifest.sig        (optional)
-packages/<namespace>/<name>/<version>/files/<relative-path>
+catalogues.json                 # list of external catalogues (optional)
+keys/<namespace>/<owner>.pem    # trusted public keys (optional)
+README.md / docs/               # human documentation
 ```
 
-### 2.1 `registry.json`
+Registries no longer duplicate `packages/<namespace>/<name>` folders. Instead, they point at
+catalogues maintained by upstream projects.
 
-`registry.json` combines global configuration with pointers to available packages.
+### 2.1 `catalogues.json`
+
+This file lists the catalogues curated by the registry. Each entry tells the resolver where
+to fetch the catalogue, how to authenticate it, and how it should be merged locally.
 
 ```json
 {
-  "schema": "lcod-registry@1",
-  "registries": [
-    { "id": "official", "type": "http", "url": "https://lcod-team.github.io/registry" },
-    { "id": "acme", "type": "git", "url": "https://git.acme.com/lcod/registry.git" }
-  ],
-  "namespaces": {
-    "lcod": { "owners": ["github:lcod-team"], "requireSignature": true },
-    "acme": { "owners": ["gitlab:acme/platform"], "requireSignature": false }
-  },
-  "packages": {
-    "lcod://tooling/log": { "registry": "official" },
-    "acme://payments/checkout": { "registry": "acme" }
-  }
-}
-```
-
-- `registries` enumerates other registries that can be chained. Clients merge this
-  list with their local configuration when resolving packages.
-- `namespaces` documents ownership metadata (used to validate submissions).
-- `packages` indicates which registry hosts the metadata for a given component ID.
-
-### 2.2 `versions.json`
-
-Each component has a catalogue of published versions:
-
-```json
-{
-  "schema": "lcod-registry/versions@1",
-  "id": "lcod://tooling/log",
-  "versions": [
-    { "version": "1.2.0", "manifest": "1.2.0/manifest.json", "sha256": "…" },
-    { "version": "1.1.0", "manifest": "1.1.0/manifest.json", "sha256": "…" }
+  "schema": "lcod-registry/catalogues@1",
+  "catalogues": [
+    {
+      "id": "tooling/std",
+      "description": "Standard tooling components maintained by the LCOD team",
+      "url": "https://raw.githubusercontent.com/lcod-team/lcod-components/main/registry/components.std.json",
+      "kind": "git",
+      "commit": "4a569e82930c784d2b4f2a40a39e85daea774a80",
+      "publicKey": "keys/tooling/lcod-team.pem",
+      "priority": 50
+    },
+    {
+      "id": "acme/payments",
+      "description": "Acme Corp payment building blocks",
+      "url": "https://git.acme.com/platform/payments/registry/components.json",
+      "kind": "https",
+      "checksum": "sha256-…",
+      "priority": 90
+    }
   ]
 }
 ```
 
-The resolver reads this file, applies semantic version constraints, and then
-downloads the selected manifest.
+- `kind` indicates how the resolver should interpret `url` (`git`, `https`, `file`).
+- `commit` or `checksum` pins the catalogue to an immutable revision.
+- `publicKey` is optional. When present, the resolver expects a detached signature next to the
+  catalogue and verifies it with the provided key.
+- `priority` controls merge order when several catalogues expose the same component ID (lower
+  numbers win).
 
-### 2.3 `packages.jsonl`
+A registry may publish `catalogues.json` at the repository root or rely on documentation only.
+Consumers can also ignore it entirely and point directly to the catalogues they trust.
 
-To keep lookups fast even when the catalogue grows, the registry also publishes
-an append-only JSON Lines index:
+## 3. Catalogue Format
 
+A catalogue is a JSON document maintained by the component author. It enumerates the versions
+exposed by the catalogue and provides enough metadata for the resolver to fetch manifests.
+
+```json
+{
+  "schema": "lcod-registry/catalogue@1",
+  "id": "tooling/std",
+  "origin": {
+    "type": "git",
+    "url": "https://github.com/lcod-team/lcod-components",
+    "commit": "4a569e82930c784d2b4f2a40a39e85daea774a80"
+  },
+  "components": [
+    {
+      "id": "lcod://tooling/array/append",
+      "versions": [
+        {
+          "version": "0.1.0",
+          "manifest": "packages/std/components/tooling/array.append/0.1.0/manifest.json",
+          "sha256": "sha256-…"
+        }
+      ]
+    },
+    {
+      "id": "lcod://tooling/registry_catalog/collect",
+      "versions": [
+        {
+          "version": "0.1.0",
+          "manifest": "packages/std/components/tooling/registry_catalog.collect/0.1.0/manifest.json"
+        }
+      ]
+    }
+  ]
+}
 ```
-{"kind":"registry","id":"official","type":"http","url":"https://lcod-team.github.io/registry"}
-{"kind":"registry","id":"acme","type":"git","url":"https://git.acme.com/lcod/registry.git"}
-{"kind":"component","id":"lcod://tooling/log","version":"1.2.0","manifest":"packages/lcod/tooling/log/1.2.0/manifest.json","sha256":"…"}
-{"kind":"component","id":"lcod://tooling/log","version":"1.1.0","manifest":"packages/lcod/tooling/log/1.1.0/manifest.json","sha256":"…"}
-```
 
-- Lines with `kind="registry"` MUST appear first and describe external registries
-  referenced by this index.
-- Each `kind="component"` line mirrors an entry from `versions.json`. Entries are
-  ordered newest → oldest to make “first match wins” resolution trivial when a
-  strict version is requested.
-- Clients may stream the file sequentially: local overrides are processed first,
-  followed by official entries. This keeps community registries usable without
-  imposing a monolithic manifest.
+Notes:
 
-## 3. Component Manifest
+- `manifest` is a relative path or URL pointing at the component manifest (see section 4).
+- `sha256` is optional but recommended. It lets consumers detect tampering even when manifests
+  live in a mutable branch.
+- A catalogue can include additional metadata (documentation links, tags, compatibility
+  matrices). Kernels ignore unknown fields.
 
-`manifest.json` is the single source of truth for a component version.
+Catalogues may be split per namespace or per product. There is no global naming rule beyond
+ensuring the `id` is unique for the publisher.
+
+## 4. Component Manifest
+
+The manifest format itself is unchanged from the monolithic model.
 
 ```json
 {
   "schema": "lcod-registry/manifest@1",
-  "id": "lcod://tooling/log@1.2.0",
-  "publishedAt": "2025-10-10T12:00:00Z",
+  "id": "lcod://tooling/array/append@0.1.0",
+  "publishedAt": "2025-10-14T18:00:00Z",
   "source": {
     "type": "git",
-    "url": "https://github.com/lcod-team/lcod-tooling.git",
-    "commit": "abc123…",
-    "path": "components/tooling/log"
+    "url": "https://github.com/lcod-team/lcod-components",
+    "commit": "4a569e82930c784d2b4f2a40a39e85daea774a80",
+    "path": "packages/std/components/tooling/array.append"
   },
   "files": [
-    { "path": "lcp.toml", "sha256": "…", "size": 2048 },
-    { "path": "README.md", "sha256": "…", "size": 5120 },
-    { "path": "schema/input.json", "sha256": "…" }
+    { "path": "lcp.toml", "sha256": "…", "size": 707 },
+    { "path": "README.md", "sha256": "…", "size": 446 },
+    { "path": "compose.yaml", "sha256": "…", "size": 399 }
   ],
-  "artifact": {
-    "url": "https://github.com/lcod-team/lcod-tooling/releases/download/v1.2.0/tooling-log.lcod.tar.zst",
-    "sha256": "…",
-    "compression": "zstd"
-  },
-  "dependencies": [
-    { "id": "lcod://tooling/log@^1.0.0" },
-    { "id": "lcod://core/fs@>=0.2.0 <0.3.0" }
-  ]
+  "dependencies": [],
+  "artifact": null
 }
 ```
 
-- `source` points at the immutable Git commit used to build the component.
-- `files` lists individual files that may be fetched separately (fallback when no
-  pre-built artefact is present).
-- `artifact` (optional) references a packaged archive; the resolver prefers this
-  when available.
-- `dependencies` collects semantic version constraints; these are resolved by the
-  client to construct an `lcp.lock`.
+Manifests remain the canonical, immutable description of a component version. They may live in
+any Git repository as long as the catalogue points at them.
 
-`manifest.sig` (optional) is the detached signature of the manifest. The registry
-publishes trusted public keys in `keys/<namespace>/<owner>.pem`.
+## 5. Resolver Configuration
 
-## 4. Resolution Workflow
-
-1. **Bootstrap**: load the resolver configuration (local `registries.json`) and
-   merge it with `registry.json` from the default registry.
-2. **Locate package**: find which registry hosts the requested component by
-   consulting `registry.json` entries (fall back to local overrides).
-3. **Catalogue lookup**: download `versions.json` from the selected registry,
-   apply the requested semantic version range, and select the newest compatible
-   version.
-   - When available, clients can eagerly scan `packages.jsonl` (local copy plus
-     upstream updates) to resolve most lookups without touching individual
-     `versions.json` files.
-4. **Manifest fetch**: download `manifest.json` (and verify the detached signature
-   if required by the namespace policy).
-5. **Artefact acquisition**:
-   - If `artifact` is present, download it, check the hash, and unpack into the
-     local cache.
-   - Otherwise download each file listed under `files`, verifying hashes.
-6. **Dependency walk**: repeat the process for every dependency declared in the
-   manifest.
-7. **Lockfile update**: record the selected versions, commit hashes, and artefact
-   hashes in `lcp.lock`.
-
-The resolver never mutates kernel behaviour; it only prepares `lcod_modules/`
-for the runtime.
-
-## 5. Caching Strategy
-
-- Artefacts and individual files are cached under
-  `~/.lcod/cache/<sha256>`. Files are deduplicated by hash.
-- Manifests and catalogues are cached with their ETag / Last-Modified headers to
-  support `If-None-Match` requests. For Git registries, the resolver can issue a
-  lightweight `git ls-remote` or `HEAD` request to detect updates before pulling.
-- `packages.jsonl` is fetched with the same conditional requests so incremental
-  updates are cheap; clients only re-download when the upstream checksum changes.
-- A registry may publish a `cache.json` hint with mirror URLs; clients can opt-in.
-
-## 6. Publication Workflow
-
-1. Component maintainers prepare their repository (ensuring `lcp.toml`,
-   documentation, and tests are up to date).
-2. Optionally build a compressed bundle (`tooling-log.lcod.tar.zst`) in CI and
-   publish it under the repository releases.
-3. Run the helper script (to be provided in `lcod-resolver`) that generates the
-   manifest, validates hashes, and opens a pull request against the official
-   registry repository.
-4. Registry maintainers review the PR, confirm namespace ownership, and merge.
-   Once merged, the entry becomes available immediately to all clients.
-
-Community registries follow the same flow but relax ownership checks at their
-discretion.
-
-### 6.1 Automated catalogue generation
-
-The repository `lcod-registry` uses the LCOD component
-`lcod://tooling/registry/catalog/generate@0.1.0` to turn `catalog.json` and the
-per-package `versions.json` descriptors into the derived artefacts
-`registry.json` and `packages.jsonl`. The helper component lives in `lcod-spec`
-so any registry can reuse it via the standard kernels. A GitHub Action clones
-`lcod-spec`, runs the component through the Node kernel, rewrites the catalogue
-when needed, and commits the update with a `[registry ci]` marker to prevent
-pipeline loops.
-
-## 7. Semantic Versions & Updates
-
-- Versions follow SemVer (`MAJOR.MINOR.PATCH`). `versions.json` keeps all published
-  entries immutable.
-- The resolver understands common constraints (`^1.2.0`, `~1.4.0`,
-  `>=1.0.0 <2.0.0`).
-- `lcod-resolver update` recalculates the dependency graph and upgrades locked
-  versions when newer compatible releases exist.
-- Components that declare incompatible changes must bump the major version; the
-  resolver never selects a version outside the requested range.
-
-## 8. Mirroring & Local Overrides
-
-- A simple `lcod-resolver mirror <registry-url> <target-dir>` command clones the
-  registry repository (or replays the streamed `packages.jsonl`) and rewrites
-  artefact URLs to point at the mirror host.
-- Developers can create `~/.lcod/registries.json` to prepend internal registries:
+Each runtime ships with a **local sources file** (JSON). It lists the catalogues trusted by
+default. Users can edit or replace this file at any time.
 
 ```json
 {
-  "registries": [
-    { "id": "corp", "type": "http", "url": "https://registry.corp.example.com" },
-    { "id": "official", "type": "http", "url": "https://lcod-team.github.io/registry" }
+  "sources": [
+    {
+      "id": "lcod-default",
+      "url": "https://raw.githubusercontent.com/lcod-team/lcod-registry/main/catalogues.json",
+      "priority": 50
+    },
+    {
+      "id": "acme-internal",
+      "url": "https://git.acme.com/platform/registry/catalogues.json",
+      "priority": 20
+    }
   ]
 }
 ```
 
-This file controls the lookup order without modifying the official index. The
-resolver processes registries in the declared order (`first match wins`), falling
-back to the next one when a component or version is missing.
+At runtime the resolver:
 
-## 9. Security & Authenticity
+1. Loads the local configuration (project overrides + user defaults).
+2. Fetches each `catalogues.json` in priority order and expands it into individual catalogues.
+3. Fetches referenced catalogues (and signatures/checksums when required).
+4. Merges component entries (first match wins).
+5. Resolves dependencies by downloading the referenced manifests and verifying hashes.
 
-- Namespace ownership is enforced through the `namespaces` metadata in
-  `registry.json`. Maintainers must be listed there for their submissions to be
-  accepted.
-- Optionally, manifests can be signed. The resolver verifies signatures when the
-  namespace flag `requireSignature` is set.
-- Hashes in `manifest.json` allow the resolver to detect tampering regardless of
-  transport (Git, HTTP, object storage).
-- CI on the registry repository rejects pull requests that attempt to modify
-  existing version directories, guaranteeing immutability.
+### Direct references
 
-## 10. RAG Integration
+For one-off experiments, a compose may reference a component by Git URL instead of going
+through a catalogue:
 
-Because manifests, READMEs, and schema files live alongside the registry index,
-they can be ingested by the RAG pipeline:
+```yaml
+compose:
+  - call: lcod://tooling/script@1
+    in:
+      source: |
+        async ({ imports }) => {
+          return await imports.gitFetch({
+            url: "https://github.com/acme/payments.git",
+            commit: "a79e…",
+            path: "registry/components.json"
+          });
+        }
+```
 
-- A crawler walks `registry.json`, downloads manifests and referenced docs, and
-  pushes them into the vector store.
-- The IDE or resolver can query the RAG service to surface relevant components
-  before composing new ones.
-- Generated components can reuse the same publication workflow, enabling a
-  feedback loop where AI-authored packages become discoverable like any other.
+This inline fetch is functionally equivalent to adding the catalogue to the resolver config,
+just less ergonomic.
 
-## 11. Tooling Components
+## 6. Migration Notes
 
-- `tooling/registry/index@1` parses local/remote `packages.jsonl` fragments,
-  attaches priority metadata, and groups component versions so resolvers can pick
-  the first compatible match.
-- `tooling/registry/fetch@1` resolves manifest locations against a registry,
-  downloads or reuses cached copies (manifests and optional artefacts), and
-  verifies declared SHA-256 hashes.
+- Existing registries that already populated `packages/…` and `packages.jsonl` may keep doing
+  so temporarily. Kernels treat the federated format as **additive**: if a catalogue references
+  a manifest inside the same repository, nothing changes.
+- New registries should prefer the federated layout to avoid exponential growth and to
+  preserve provenance.
 
-Both components are pure compose helpers backed by `tooling/script@1`, ensuring
-that every kernel can reuse the same behaviour.
+## 7. Security Checklist
 
-## 12. Future Extensions
+- Ship `catalogues.json` with checksums or signatures.
+- Keep a text log of catalogue revisions (Git commit history is enough).
+- Validate `source.commit` in manifests when importing catalogues.
+- Prefer immutable URLs (tagged releases, commit archives) over mutable branches.
 
-- Support for additional artefact backends (OCI registries, IPFS).
-- Provenance metadata (Sigstore attestations) stored alongside the manifest.
-- Incremental indexes (`packages.jsonl`) for faster cold-starts when the registry
-  grows.
-
-The current specification keeps implementation simple while providing a clear
-path toward richer workflows without changing the core contract.
+With these safeguards a resolver can consume catalogues from multiple vendors while giving
+operators full control over the trust chain.
