@@ -11,7 +11,11 @@ compose:
             if (!value || typeof value !== 'string') return value;
             return value.endsWith('/') ? value : `${value}/`;
           };
-          const sanitizeFilePath = (value) => (typeof value === 'string' ? value.replace(/\\/g, '/') : value);
+          const sanitizeFilePath = (value) => {
+            if (typeof value !== 'string') return value;
+            const replaced = value.replace(/\\/g, '/');
+            return replaced.replace(/\/\.\//g, '/');
+          };
 
           const joinPaths = async (...segments) => {
             if (!segments.length) return '';
@@ -83,14 +87,29 @@ compose:
           const warnings = [];
           const registryMap = new Map();
 
+          const detectCwd = () => {
+            if (typeof state.cwd === 'string' && state.cwd.length > 0) {
+              return state.cwd;
+            }
+            if (typeof process !== 'undefined' && process && typeof process.cwd === 'function') {
+              try {
+                return process.cwd();
+              } catch (_err) {
+                // ignore — fall back to '.'
+              }
+            }
+            return '.';
+          };
+
+          const baseCwd = detectCwd();
           const projectInput = ensureString(state.projectPath);
           let projectRoot;
           if (!projectInput) {
-            projectRoot = process.cwd();
+            projectRoot = baseCwd;
           } else if (isAbsolutePath(projectInput)) {
             projectRoot = projectInput;
           } else {
-            projectRoot = await joinPaths(process.cwd(), projectInput);
+            projectRoot = await joinPaths(baseCwd, projectInput);
           }
 
           let cacheDir = ensureString(state.cacheDir);
