@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "tooling/resolver/internal/load-sources input",
+  "type": "object",
+  "required": ["projectPath"],
+  "properties": {
+    "projectPath": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Base directory of the project invoking the resolver."
+    },
+    "cacheDir": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Directory used to cache downloaded catalogues."
+    },
+    "sourcesPath": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Explicit path to a sources.json file. Defaults to <projectPath>/sources.json."
+    },
+    "resolverConfig": {
+      "type": "object",
+      "description": "Raw resolver configuration (resolve.config.json) used for fallbacks."
+    }
+  },
+  "additionalProperties": false
+}

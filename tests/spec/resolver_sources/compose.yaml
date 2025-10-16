@@ -1,0 +1,118 @@
+compose:
+  - call: lcod://tooling/test_checker@1
+    in:
+      compose:
+        - call: lcod://tooling/script@1
+          in:
+            source: |
+              async ({ state, imports }) => {
+                const pathJoin = imports.pathJoin;
+                const project = await pathJoin({ base: state.cwd, segment: 'fixtures/basic' });
+                const cache = await pathJoin({ base: state.cwd, segment: '.cache' });
+                return {
+                  projectPath: project.path,
+                  cacheDir: cache.path
+                };
+              }
+            input:
+              cwd: '.'
+            imports:
+              pathJoin: lcod://axiom/path/join@1
+          out:
+            projectPath: projectPath
+            cacheDir: cacheDir
+
+        - call: lcod://tooling/resolver/internal/load-sources@0.1.0
+          in:
+            projectPath: $.projectPath
+            cacheDir: $.cacheDir
+          out:
+            registrySources: registrySources
+            warnings: warnings
+            sourcesPath: sourcesPath
+
+        - call: lcod://tooling/script@1
+          in:
+            source: |
+              async ({ state, imports }) => {
+                const makeSummary = (entry) => ({
+                  id: entry.id,
+                  priority: Number.isFinite(entry.priority) ? entry.priority : null,
+                  defaults: entry.defaults || null,
+                  packages: Array.isArray(entry.lines)
+                    ? entry.lines
+                        .filter((line) => line && line.kind === 'component')
+                        .map((line) => `${line.id}@${line.version}`)
+                        .sort()
+                    : []
+                });
+
+                const summary = Array.isArray(state.registrySources)
+                  ? state.registrySources.map(makeSummary).sort((a, b) => a.id.localeCompare(b.id))
+                  : [];
+
+                const toFileUrl = (absolutePath) => {
+                  const normalized = absolutePath.replace(/\\/g, '/');
+                  return `file://${normalized.endsWith('/') ? normalized : `${normalized}/`}`;
+                };
+
+                const projectAbsolute = (await imports.pathJoin({ base: '.', segment: state.projectPath })).path;
+                const coreDir = (await imports.pathJoin({ base: projectAbsolute, segment: 'registry/manifests/core' })).path;
+                const extraDir = (await imports.pathJoin({ base: projectAbsolute, segment: 'registry/manifests/extra' })).path;
+
+                const expected = {
+                  'fixture/core': {
+                    priority: 50,
+                    packages: ['lcod://fixture/core@0.1.0'],
+                    defaultsUrlSuffix: '/registry/manifests/core/'
+                  },
+                  'fixture/extra': {
+                    priority: 75,
+                    packages: ['lcod://fixture/extra@1.0.0'],
+                    defaultsUrlSuffix: '/registry/manifests/extra/'
+                  }
+                };
+
+                const summaryMap = new Map(summary.map((item) => [item.id, item]));
+
+                const expectedIds = Object.keys(expected);
+                const allPackagesMatch = expectedIds.every((id) => {
+                  const entry = summaryMap.get(id);
+                  if (!entry) return false;
+                  const expectedMeta = expected[id];
+                  if (entry.priority !== expectedMeta.priority) return false;
+                  const packages = Array.isArray(entry.packages) ? entry.packages.slice().sort() : [];
+                  const expectedPackages = expectedMeta.packages.slice().sort();
+                  if (JSON.stringify(packages) !== JSON.stringify(expectedPackages)) return false;
+                  const url = entry.defaults && entry.defaults.url ? entry.defaults.url.replace(/\\/g, '/') : null;
+                  return typeof url === 'string' && url.endsWith(expectedMeta.defaultsUrlSuffix);
+                });
+
+                const noExtraEntries = summary.length === expectedIds.length;
+                const success = allPackagesMatch && noExtraEntries && Array.isArray(state.warnings) && state.warnings.length === 0;
+
+                return {
+                  success,
+                  summary,
+                  expected,
+                  warnings: state.warnings,
+                  sourcesPath: state.sourcesPath
+                };
+              }
+            input:
+              registrySources: $.registrySources
+              warnings: $.warnings
+              projectPath: $.projectPath
+              sourcesPath: $.sourcesPath
+            imports:
+              pathJoin: lcod://axiom/path/join@1
+          out:
+            success: success
+            summary: summary
+            expected: expected
+            warnings: warnings
+            sourcesPath: sourcesPath
+      expected:
+        success: true
+    out:
+      report: $

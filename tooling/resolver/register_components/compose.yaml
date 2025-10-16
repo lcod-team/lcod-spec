@@ -19,7 +19,8 @@ compose:
             { id: 'lcod://tooling/registry/resolution@0.1.0', path: 'tooling/registry/resolution/compose.yaml' },
             { id: 'lcod://tooling/resolver/warnings/merge@0.1.0', path: 'tooling/resolver/warnings/compose.yaml' },
             { id: 'lcod://tooling/resolver/context/prepare@0.1.0', path: 'tooling/resolver/context/compose.yaml' },
-            { id: 'lcod://tooling/resolver/replace/apply@0.1.0', path: 'tooling/resolver/replace/compose.yaml' }
+            { id: 'lcod://tooling/resolver/replace/apply@0.1.0', path: 'tooling/resolver/replace/compose.yaml' },
+            { id: 'lcod://tooling/resolver/internal/load-sources@0.1.0', path: 'packages/resolver/components/internal/load_sources/compose.yaml' }
           ];
 
           const components = [];

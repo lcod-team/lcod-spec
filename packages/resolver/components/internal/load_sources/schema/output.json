@@ -1,0 +1,34 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "tooling/resolver/internal/load-sources output",
+  "type": "object",
+  "required": ["registrySources", "warnings"],
+  "properties": {
+    "registrySources": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "type"],
+        "properties": {
+          "id": { "type": "string", "minLength": 1 },
+          "type": { "type": "string" },
+          "priority": { "type": "integer" },
+          "defaults": { "type": "object" },
+          "lines": { "type": "array", "items": { "type": "object" } },
+          "jsonl": { "type": "string" }
+        },
+        "additionalProperties": true
+      },
+      "description": "Registry sources normalised to inline/jsonl entries understood by tooling/registry/source/load."
+    },
+    "warnings": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "sourcesPath": {
+      "type": ["string", "null"],
+      "description": "Resolved path to the sources.json file used for this run."
+    }
+  },
+  "additionalProperties": false
+}

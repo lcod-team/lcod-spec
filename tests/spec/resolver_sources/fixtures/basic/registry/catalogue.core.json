@@ -1,0 +1,20 @@
+{
+  "schema": "lcod-registry/catalogue@1",
+  "id": "fixture/core",
+  "origin": {
+    "type": "file",
+    "url": "./manifests/core",
+    "path": "."
+  },
+  "components": [
+    {
+      "id": "lcod://fixture/core",
+      "versions": [
+        {
+          "version": "0.1.0",
+          "manifest": "core/0.1.0/manifest.json"
+        }
+      ]
+    }
+  ]
+}

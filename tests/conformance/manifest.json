@@ -4,6 +4,7 @@
   { "name": "core_parse_roundtrip", "compose": "tests/spec/core_parse_roundtrip/compose.yaml" },
   { "name": "foreach_ctrl_demo", "compose": "tests/spec/foreach_ctrl_demo/compose.yaml" },
   { "name": "foreach_stream_demo", "compose": "tests/spec/foreach_stream_demo/compose.yaml" },
+  { "name": "resolver_sources", "compose": "tests/spec/resolver_sources/compose.yaml" },
   { "name": "script_range", "compose": "tests/spec/script_range/compose.yaml" },
   { "name": "script_run_slot", "compose": "tests/spec/script_run_slot/compose.yaml" },
   { "name": "script_tools", "compose": "tests/spec/script_tools/compose.yaml" }

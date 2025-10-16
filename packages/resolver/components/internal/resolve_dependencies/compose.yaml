@@ -5,10 +5,34 @@ compose:
     out:
       registrationWarnings: registrationWarnings
 
+  - call: lcod://tooling/resolver/internal/load-sources@0.1.0
+    in:
+      projectPath: $.projectPath
+      cacheDir: $.cacheRoot
+      resolverConfig: $.resolverConfig
+    out:
+      pointerRegistrySources: pointerRegistrySources
+      pointerWarnings: pointerWarnings
+      sourcesPath: sourcesPath
+
+  - call: lcod://tooling/script@1
+    in:
+      source: |
+        async ({ state }) => {
+          const primary = Array.isArray(state.primary) ? state.primary.filter((entry) => entry && typeof entry === 'object') : [];
+          const extra = Array.isArray(state.extra) ? state.extra.filter((entry) => entry && typeof entry === 'object') : [];
+          return { sources: [...primary, ...extra] };
+        }
+      input:
+        primary: $.normalizedConfig.registrySources
+        extra: $.pointerRegistrySources
+    out:
+      combinedRegistrySources: sources
+
   - call: lcod://tooling/registry/source/load@0.1.0
     in:
       projectPath: $.projectPath
-      sources: $.normalizedConfig.registrySources
+      sources: $.combinedRegistrySources
     out:
       registrySources: registrySources
       loadWarnings: loadWarnings
@@ -48,12 +72,21 @@ compose:
               const indexWarnings = Array.isArray(state.indexWarnings)
                 ? state.indexWarnings.filter((msg) => typeof msg === 'string' && msg.length > 0)
                 : [];
+              const pointerWarnings = Array.isArray(state.pointerWarnings)
+                ? state.pointerWarnings.filter((msg) => typeof msg === 'string' && msg.length > 0)
+                : [];
+              const pointerRegistrySources = Array.isArray(state.pointerRegistrySources)
+                ? state.pointerRegistrySources.filter((entry) => entry && typeof entry === 'object')
+                : [];
+              const sourcesPath = typeof state.sourcesPath === 'string' && state.sourcesPath.length > 0
+                ? state.sourcesPath
+                : null;
 
               let warnings = [...baseWarnings];
               if (mergeWarnings) {
                 try {
                   const merged = await mergeWarnings({
-                    buckets: [baseWarnings, loadWarnings, indexWarnings, registrationWarnings]
+                    buckets: [baseWarnings, loadWarnings, indexWarnings, registrationWarnings, pointerWarnings]
                   });
                   if (merged && Array.isArray(merged.warnings)) {
                     warnings = merged.warnings.slice();
@@ -64,11 +97,12 @@ compose:
                     ...loadWarnings,
                     ...indexWarnings,
                     ...registrationWarnings,
+                    ...pointerWarnings,
                     `Warning merge failed: ${err.message}`
                   ];
                 }
               } else {
-                warnings = [...baseWarnings, ...loadWarnings, ...indexWarnings, ...registrationWarnings];
+                warnings = [...baseWarnings, ...loadWarnings, ...indexWarnings, ...registrationWarnings, ...pointerWarnings];
               }
 
               let projectPath = typeof state.projectPath === 'string' && state.projectPath.length > 0
@@ -102,8 +136,17 @@ compose:
               if (contextPrepare) {
                 try {
                   const normalizedConfig = state.normalizedConfig && typeof state.normalizedConfig === 'object'
-                    ? state.normalizedConfig
+                    ? { ...state.normalizedConfig }
                     : {};
+                  if (pointerRegistrySources.length) {
+                    const existing = Array.isArray(normalizedConfig.registrySources)
+                      ? normalizedConfig.registrySources.filter((entry) => entry && typeof entry === 'object')
+                      : [];
+                    normalizedConfig.registrySources = [...existing, ...pointerRegistrySources];
+                  }
+                  if (sourcesPath) {
+                    normalizedConfig.sourcesPath = sourcesPath;
+                  }
                   const prepared = await contextPrepare({
                     projectPath,
                     cacheRoot,
@@ -157,8 +200,17 @@ compose:
                 }
               } else {
                 const normalized = state.normalizedConfig && typeof state.normalizedConfig === 'object'
-                  ? state.normalizedConfig
+                  ? { ...state.normalizedConfig }
                   : {};
+                if (pointerRegistrySources.length) {
+                  const existing = Array.isArray(normalized.registrySources)
+                    ? normalized.registrySources.filter((entry) => entry && typeof entry === 'object')
+                    : [];
+                  normalized.registrySources = [...existing, ...pointerRegistrySources];
+                }
+                if (sourcesPath) {
+                  normalized.sourcesPath = sourcesPath;
+                }
                 sources = normalized.sources && typeof normalized.sources === 'object'
                   ? normalized.sources
                   : {};
@@ -680,33 +732,36 @@ compose:
                 warnings
               };
             }
-          input:
-            projectPath: $.projectPath
-            cacheRoot: $.cacheRoot
-            normalizedConfig: $.normalizedConfig
-            config: $.config
-            rootId: $.rootId
-            rootDescriptor: $.rootDescriptor
-            rootDescriptorText: $.rootDescriptorText
-            warnings: $.warnings
-            loadWarnings: $.loadWarnings
-            indexWarnings: $.indexWarnings
-            registrationWarnings: $.registrationWarnings
-            registrySources: $.registrySources
-            registryPackages: $.registryPackages
-            registryEntries: $.registryEntries
-            registryRegistries: $.registryRegistries
-          imports:
-            mergeWarnings: lcod://tooling/resolver/warnings/merge@0.1.0
-            contextPrepare: lcod://tooling/resolver/context/prepare@0.1.0
-            replaceApply: lcod://tooling/resolver/replace/apply@0.1.0
-            registrySelect: lcod://tooling/registry/select@0.1.0
-            pathJoin: lcod://axiom/path/join@1
-            fsReadFile: lcod://axiom/fs/read-file@1
-            tomlParse: lcod://axiom/toml/parse@1
-            hash: lcod://contract/core/hash/sha256@1
-            gitClone: lcod://contract/core/git/clone@1
-            httpDownload: lcod://axiom/http/download@1
+      input:
+        projectPath: $.projectPath
+        cacheRoot: $.cacheRoot
+        normalizedConfig: $.normalizedConfig
+        config: $.config
+        rootId: $.rootId
+        rootDescriptor: $.rootDescriptor
+        rootDescriptorText: $.rootDescriptorText
+        warnings: $.warnings
+        loadWarnings: $.loadWarnings
+        indexWarnings: $.indexWarnings
+        registrationWarnings: $.registrationWarnings
+        registrySources: $.registrySources
+        registryPackages: $.registryPackages
+        registryEntries: $.registryEntries
+        registryRegistries: $.registryRegistries
+        pointerWarnings: $.pointerWarnings
+        pointerRegistrySources: $.pointerRegistrySources
+        sourcesPath: $.sourcesPath
+      imports:
+        mergeWarnings: lcod://tooling/resolver/warnings/merge@0.1.0
+        contextPrepare: lcod://tooling/resolver/context/prepare@0.1.0
+        replaceApply: lcod://tooling/resolver/replace/apply@0.1.0
+        registrySelect: lcod://tooling/registry/select@0.1.0
+        pathJoin: lcod://axiom/path/join@1
+        fsReadFile: lcod://axiom/fs/read-file@1
+        tomlParse: lcod://axiom/toml/parse@1
+        hash: lcod://contract/core/hash/sha256@1
+        gitClone: lcod://contract/core/git/clone@1
+        httpDownload: lcod://axiom/http/download@1
         out:
           resolverResult: resolverResult
           warnings: warnings

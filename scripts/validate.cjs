@@ -195,9 +195,12 @@ function* findJsonFiles(root) {
   }
 
   if (validateResolverSources) {
-    const fixturesRoot = path.join(repoRoot, 'tests/fixtures/resolver_sources');
+    const fixturesRoot = path.join(repoRoot, 'tests/spec/resolver_sources/fixtures');
     if (exists(fixturesRoot)) {
       for (const file of findJsonFiles(fixturesRoot)) {
+        if (path.basename(file) !== 'sources.json') {
+          continue;
+        }
         let data = null;
         const rel = path.relative(repoRoot, file);
         try {

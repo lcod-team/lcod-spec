@@ -13,6 +13,7 @@ together:
 The resolver ships with a default `sources.json` pointing at the official LCOD
 registry. Projects can add their own file at the workspace root to override or
 append sources. The schema identifier is `lcod-resolver/sources@1`.
+(A minimal working example lives in `tests/spec/resolver_sources/fixtures/basic`.)
 
 ```json
 {
@@ -75,6 +76,23 @@ append sources. The schema identifier is `lcod-resolver/sources@1`.
   the resolver downloads the signature and verifies it with the provided key.
 - `metadata` — free-form object preserved for tooling (for instance, IDE badges
   or UI labels).
+
+### Pointer payloads
+
+Each entrypoint resolves to a JSON payload. The resolver understands:
+
+- `lcod-registry/catalogues@1` — a catalogue of catalogues. Entries are
+  expanded recursively, inheriting priority, signature and public-key metadata
+  from the parent entry when not overridden.
+- `lcod-registry/catalogue@1` — a concrete list of components and versions. The
+  resolver converts each component version into inline records compatible with
+  the legacy `tooling/registry/source/load@0.1.0` pipeline.
+
+Pointer downloads honour optional `checksum` fields (using base64 encoded
+SHA-256). Mismatches produce warnings surfaced alongside the resolver report
+instead of hard failures so hosts can triage drift. A missing `sources.json`
+falls back to the official LCOD registry catalogue
+(`https://raw.githubusercontent.com/lcod-team/lcod-registry/main/catalogues.json`).
 
 ## `resolve.config.json`
 
