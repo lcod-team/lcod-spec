@@ -156,3 +156,13 @@ Options:
    - Installer script, Windows support, cache management commands.
 4. **Iteration 4**
    - Version manager hooks (`lcod-run use <version>`), multi-kernel support.
+
+## 11. Embedding the Runtime in the CLI
+
+During development the CLI can embed a specific runtime bundle by setting `LCOD_EMBED_RUNTIME=/path/to/lcod-runtime-<label>.tar.gz` before running `cargo build`. The build script copies the archive into the binary so `lcod-run` can bootstrap `LCOD_HOME` without cloning `lcod-spec`. When the variable is unset, the binary falls back to the legacy discovery (`SPEC_REPO_PATH`, neighbours, etc.).
+
+```
+LCOD_EMBED_RUNTIME=../dist/runtime/lcod-runtime-dev.tar.gz cargo build --release
+```
+
+The GitHub release pipeline will set this variable to ensure the published binaries remain self-contained.
