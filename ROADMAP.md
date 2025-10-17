@@ -95,6 +95,15 @@ Goal: deliver a runnable HTTP backend that exercises advanced composes and prepa
 - [ ] M6-05 Populate `lcod-registry` with sample functional components
 - [ ] M6-06 Evaluate lightweight models for component authoring
 
+## M7 — MCP-assisted authoring
+
+Goal: enable MCP-driven component creation so assistants can extend the catalogue safely.
+
+- [ ] M7-01 Spec: define the MCP server contract for LCOD component authoring (operations for components, slots, schemas, implementations, validation).
+- [ ] M7-02 Implement the MCP backend that persists the abstract graph and serialises to `lcp.toml` / `compose.yaml` with validation.
+- [ ] M7-03 Connect the MCP backend to the component RAG so assistants can suggest and reuse existing blocks.
+- [ ] M7-04 Deliver a reference automation (agent or CLI) that demonstrates MCP-driven component creation end-to-end.
+
 ## Future — UI & eventing
 
 - [ ] Define UI component conventions (`[ui]` annex) once backend patterns stabilise.
