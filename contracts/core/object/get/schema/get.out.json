@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": ["value", "found"],
+  "properties": {
+    "value": {
+      "description": "Value obtained at the requested path (or the default)"
+    },
+    "found": {
+      "type": "boolean",
+      "description": "True when the value existed in the original object"
+    }
+  },
+  "additionalProperties": false
+}

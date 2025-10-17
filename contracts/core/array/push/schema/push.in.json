@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": ["items", "value"],
+  "properties": {
+    "items": {
+      "type": "array",
+      "description": "Array that will receive the appended value."
+    },
+    "value": {
+      "description": "Value to append to the array."
+    },
+    "clone": {
+      "type": "boolean",
+      "description": "When true (default) the implementation must return a cloned array.",
+      "default": true
+    }
+  },
+  "additionalProperties": false
+}

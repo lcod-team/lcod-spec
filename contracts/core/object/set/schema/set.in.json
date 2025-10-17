@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": ["object", "path", "value"],
+  "properties": {
+    "object": {
+      "type": "object",
+      "description": "Source object to update"
+    },
+    "path": {
+      "type": "array",
+      "items": {
+        "anyOf": [
+          { "type": "string" },
+          { "type": "integer" }
+        ]
+      },
+      "description": "Array of keys/indices describing where to set the value"
+    },
+    "value": {
+      "description": "Value to assign at the provided path"
+    },
+    "clone": {
+      "type": "boolean",
+      "default": true,
+      "description": "When true the implementation must return a cloned object"
+    },
+    "createMissing": {
+      "type": "boolean",
+      "default": true,
+      "description": "Create intermediate containers when the path does not exist"
+    }
+  },
+  "additionalProperties": false
+}

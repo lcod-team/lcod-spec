@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": ["object", "path"],
+  "properties": {
+    "object": {
+      "type": "object",
+      "description": "Source object to read from"
+    },
+    "path": {
+      "type": "array",
+      "items": {
+        "anyOf": [
+          { "type": "string" },
+          { "type": "integer" }
+        ]
+      },
+      "description": "Array of keys/indices leading to the value"
+    },
+    "default": {
+      "description": "Fallback value returned when the path does not exist"
+    }
+  },
+  "additionalProperties": false
+}

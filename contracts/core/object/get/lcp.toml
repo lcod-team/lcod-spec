@@ -1,0 +1,16 @@
+schemaVersion = "1.0"
+id = "lcod://contract/core/object/get@1.0.0"
+name = "get"
+namespace = "contract/core/object"
+version = "1.0.0"
+kind = "contract"
+summary = "Retrieve a value from an object using a JSON path." 
+
+[tool]
+name = "core_object_get"
+description = "Read a nested value from an object; optionally supply a default value."
+inputSchema = "schema/get.in.json"
+outputSchema = "schema/get.out.json"
+
+[docs]
+readme = "README.md"

@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": ["object", "created"],
+  "properties": {
+    "object": {
+      "type": "object",
+      "description": "Updated object after the assignment"
+    },
+    "created": {
+      "type": "boolean",
+      "description": "True when the value did not previously exist at the given path"
+    }
+  },
+  "additionalProperties": false
+}

@@ -14,7 +14,10 @@ This note tracks the core contracts that anchor the runtime substrates milestone
 | `core/hash` | `lcod://contract/core/hash/sha256@1` | Compute SHA-256 over buffers/streams for integrity. | ✅ |
 | `core/parse` | `lcod://contract/core/parse/json@1` | Parse JSON strings/buffers into canonical objects. | ✅ |
 | `core/parse` | `lcod://contract/core/parse/toml@1` | Parse TOML descriptors (mirrors @iarna/toml behaviour). | ✅ |
-| `core/parse` | `lcod://contract/core/parse/csv@1` | Stream CSV rows as JSON objects for foreach pipelines. | ✅ |
+| `core/array` | `lcod://contract/core/array/length@1` | Return the number of elements in an array. | ⏳ |
+| `core/array` | `lcod://contract/core/array/push@1` | Append a value to an array. | ⏳ |
+| `core/object` | `lcod://contract/core/object/get@1` | Retrieve a nested value from an object. | ⏳ |
+| `core/object` | `lcod://contract/core/object/set@1` | Assign a nested value on an object. | ⏳ |
 
 Follow-up work will extend the list for streaming APIs (HTTP download/upload) once the first wave is stable.
 
