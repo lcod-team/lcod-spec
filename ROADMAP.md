@@ -104,6 +104,16 @@ Goal: enable MCP-driven component creation so assistants can extend the catalogu
 - [ ] M7-03 Connect the MCP backend to the component RAG so assistants can suggest and reuse existing blocks.
 - [ ] M7-04 Deliver a reference automation (agent or CLI) that demonstrates MCP-driven component creation end-to-end.
 
+## M8 — Standard library rationalisation
+
+Goal: eliminate ad-hoc scripts by providing declarative collection/object/string primitives.
+
+- [ ] M8-01 Spec: define collection/object/string primitives (schemas, slots, docs) and document guidance in `std-library-refactor.md`.
+- [ ] M8-02 Kernels: add supporting axioms (`object/get`, `object/set`, `object/merge`, `array/push`, `string/format`, JSON encode/decode) in JS & Rust runtimes.
+- [ ] M8-03 Components: publish standard collection/object/string helpers in `lcod-components` using the new primitives.
+- [ ] M8-04 Migration: refactor existing `tooling/script@1` components to rely on the new primitives; deprecate script-heavy variants.
+- [ ] M8-05 Optional: expose `tooling/expression/evaluate@1` for lightweight expressions without full scripting.
+
 ## Future — UI & eventing
 
 - [ ] Define UI component conventions (`[ui]` annex) once backend patterns stabilise.

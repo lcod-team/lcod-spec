@@ -48,6 +48,7 @@ Spec docs
 - [docs/packaging.md](docs/packaging.md) — Package archive (`.lcpkg`) format
 - [docs/guide-humans.md](docs/guide-humans.md) — Quick orientation for contributors
 - [docs/guide-ai.md](docs/guide-ai.md) — Instructions for AI assistants
+- [docs/std-library-refactor.md](docs/std-library-refactor.md) — Standard library audit and refactor plan
 
 Quick validation
 
