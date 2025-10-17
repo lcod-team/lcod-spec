@@ -1,0 +1,118 @@
+compose:
+  - call: lcod://tooling/script@1
+    in:
+      source: |
+        async ({ state, imports }) => {
+          const root =
+            typeof state.componentsRoot === 'string' && state.componentsRoot.length > 0
+              ? state.componentsRoot
+              : null;
+          const warnings = [];
+          if (!root) {
+            warnings.push('mcp_scaffold_demo: componentsRoot is required');
+            return { components: [], warnings };
+          }
+          const targets = [
+            {
+              id: 'lcod://tooling/mcp/session/open@0.1.0',
+              composePath: 'tooling/mcp.session.open/compose.yaml'
+            },
+            {
+              id: 'lcod://tooling/mcp/component/scaffold@0.1.0',
+              composePath: 'tooling/mcp.component.scaffold/compose.yaml'
+            }
+          ];
+          const components = [];
+          for (const target of targets) {
+            try {
+              const joined = await imports.pathJoin({
+                base: root,
+                segment: target.composePath
+              });
+              const resolved =
+                typeof joined?.path === 'string' ? joined.path : joined;
+              if (!resolved) {
+                warnings.push(`mcp_scaffold_demo: unable to resolve ${target.id}`);
+                continue;
+              }
+              await imports.fsReadFile({ path: resolved, encoding: 'utf-8' });
+              components.push({ id: target.id, composePath: resolved });
+            } catch (err) {
+              warnings.push(`mcp_scaffold_demo: failed to load ${target.id}: ${err.message}`);
+            }
+          }
+          return { components, warnings };
+        }
+      input:
+        componentsRoot: $.componentsRoot
+      imports:
+        pathJoin: lcod://axiom/path/join@1
+        fsReadFile: lcod://axiom/fs/read-file@1
+    out:
+      discoveredComponents: components
+      discoveryWarnings: warnings
+
+  - call: lcod://tooling/resolver/register@1
+    in:
+      components: $.discoveredComponents
+    out:
+      registeredComponents: registered
+      registerWarnings: warnings
+
+  - call: lcod://tooling/script@1
+    in:
+      source: |
+        async ({ state }) => {
+          const warnings = [];
+          const pushAll = (items) => {
+            if (!Array.isArray(items)) return;
+            for (const message of items) {
+              if (typeof message === 'string' && message.length > 0) {
+                warnings.push(message);
+              }
+            }
+          };
+          pushAll(state.discoveryWarnings);
+          pushAll(state.registerWarnings);
+          return {
+            registered: Number.isFinite(state.registeredComponents) ? state.registeredComponents : 0,
+            warnings
+          };
+        }
+      input:
+        discoveryWarnings: $.discoveryWarnings
+        registerWarnings: $.registerWarnings
+        registeredComponents: $.registeredComponents
+    out:
+      registration: $
+
+  - call: lcod://tooling/mcp/session/open@0.1.0
+    in:
+      workspaceRoot: $.workspaceRoot
+      sessionId: $.sessionId
+      componentId: $.componentId
+    out:
+      session: $
+
+  - call: lcod://tooling/mcp/component/scaffold@0.1.0
+    in:
+      workspacePath: $.session.workspacePath
+      componentId: $.componentId
+      summary: $.summary
+      palette: $.palette
+    out:
+      scaffold: $
+
+  - call: lcod://tooling/script@1
+    in:
+      source: |
+        async ({ state }) => ({
+          session: state.session,
+          scaffold: state.scaffold
+        })
+      input:
+        session: $.session
+        scaffold: $.scaffold
+    out:
+      session: session
+      scaffold: scaffold

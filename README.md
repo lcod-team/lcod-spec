@@ -40,6 +40,7 @@ Spec docs
 - [docs/tests.md](docs/tests.md) — Declarative test format
 - [docs/lockfile.md](docs/lockfile.md) — Lockfile (`lcp.lock`) structure and lifecycle
 - [docs/resolver.md](docs/resolver.md) — Resolver composite and required axioms
+- [docs/mcp-authoring.md](docs/mcp-authoring.md) — MCP-assisted authoring contract and backend expectations
 - [docs/release-workflow.md](docs/release-workflow.md) — Release workflow and maintainer checklist
 - [docs/packaging-pipeline.md](docs/packaging-pipeline.md) — Assemble → Ship → Build packaging stages
 - [docs/core-contracts.md](docs/core-contracts.md) — Core infrastructure contracts (filesystem, HTTP, Git, parsing, hashing)

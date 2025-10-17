@@ -1,0 +1,11 @@
+{
+  "componentsRoot": "../lcod-components/packages/std/components",
+  "workspaceRoot": "./.lcod/mcp-demo/workspaces",
+  "componentId": "lcod://demo/example@0.1.0",
+  "summary": "Demo component generated via MCP scaffold pipeline",
+  "palette": {
+    "category": "Demo",
+    "icon": "mdi:rocket-launch-outline",
+    "tags": ["demo", "mcp"]
+  }
+}
