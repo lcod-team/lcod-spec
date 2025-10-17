@@ -241,6 +241,10 @@ async function copyResolverWorkspace(stagingDir, resolverRoot) {
       from: path.join(resolverRoot, 'packages', 'resolver'),
       to: path.join(resolverTarget, 'packages', 'resolver'),
     },
+    {
+      from: path.join(resolverRoot, 'packages', 'resolver'),
+      to: path.join(stagingDir, 'packages', 'resolver'),
+    },
   ];
 
   for (const entry of entries) {
@@ -286,6 +290,10 @@ async function writeManifest(stagingDir, context) {
       {
         path: 'resolver',
         description: 'Resolver workspace (packages/resolver + workspace manifest)',
+      },
+      {
+        path: 'packages',
+        description: 'Resolver components mirrored at the root for runtime access',
       },
       {
         path: 'metadata/lcod-resolver-runtime.json',
