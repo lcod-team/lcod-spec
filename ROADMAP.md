@@ -110,8 +110,8 @@ Goal: eliminate ad-hoc scripts by providing declarative collection/object/string
 
 - [x] M8-01 Spec: capture the primitives (`core/object`, `core/array`, `core/string`, `core/json`), ship contract packages, and document guidance in `docs/std-library-refactor.md`.
 - [x] M8-02 Kernels: add supporting axioms (`object/merge`, `array/append`, `string/format`, JSON encode/decode) in JS & Rust runtimes (refs lcod-kernel-js#22, lcod-kernel-rs#20).
-- [ ] M8-03 Components: publish standard collection/object/string helpers in `lcod-components` using the new primitives.
-- [ ] M8-04 Migration: refactor existing `tooling/script@1` components to rely on the new primitives; deprecate script-heavy variants.
+- [x] M8-03 Components: publish standard collection/object/string helpers in `lcod-components` using the new primitives (core wrappers for array/object/string/json).
+- [x] M8-04 Migration: refactor existing `tooling/script@1` components to rely on the new primitives; deprecate script-heavy variants (`tooling/json.stringify`, `tooling/array.append`).
 - [ ] M8-05 Optional: expose `tooling/expression/evaluate@1` for lightweight expressions without full scripting.
 
 ## Future — UI & eventing
