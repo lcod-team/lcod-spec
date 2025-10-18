@@ -7,5 +7,6 @@
   { "name": "resolver_sources", "compose": "tests/spec/resolver_sources/compose.yaml" },
   { "name": "script_range", "compose": "tests/spec/script_range/compose.yaml" },
   { "name": "script_run_slot", "compose": "tests/spec/script_run_slot/compose.yaml" },
-  { "name": "script_tools", "compose": "tests/spec/script_tools/compose.yaml" }
+  { "name": "script_tools", "compose": "tests/spec/script_tools/compose.yaml" },
+  { "name": "std_primitives", "compose": "tests/spec/std_primitives/compose.yaml" }
 ]

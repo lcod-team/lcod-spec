@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "core/object/merge@1 input",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["left", "right"],
+  "properties": {
+    "left": {
+      "type": "object",
+      "description": "Base object."
+    },
+    "right": {
+      "type": "object",
+      "description": "Object whose values overwrite the base object on conflict."
+    },
+    "deep": {
+      "type": "boolean",
+      "description": "When true, merge nested objects recursively."
+    },
+    "arrayStrategy": {
+      "type": "string",
+      "enum": ["replace", "concat"],
+      "description": "How to merge arrays when deep merge is enabled (default: replace)."
+    }
+  }
+}

@@ -108,8 +108,8 @@ Goal: enable MCP-driven component creation so assistants can extend the catalogu
 
 Goal: eliminate ad-hoc scripts by providing declarative collection/object/string primitives.
 
-- [ ] M8-01 Spec: define collection/object/string primitives (schemas, slots, docs) and document guidance in `std-library-refactor.md`.
-- [ ] M8-02 Kernels: add supporting axioms (`object/get`, `object/set`, `object/merge`, `array/push`, `string/format`, JSON encode/decode) in JS & Rust runtimes.
+- [x] M8-01 Spec: capture the primitives (`core/object`, `core/array`, `core/string`, `core/json`), ship contract packages, and document guidance in `docs/std-library-refactor.md`.
+- [ ] M8-02 Kernels: add supporting axioms (`object/merge`, `array/append`, `string/format`, JSON encode/decode) in JS & Rust runtimes.
 - [ ] M8-03 Components: publish standard collection/object/string helpers in `lcod-components` using the new primitives.
 - [ ] M8-04 Migration: refactor existing `tooling/script@1` components to rely on the new primitives; deprecate script-heavy variants.
 - [ ] M8-05 Optional: expose `tooling/expression/evaluate@1` for lightweight expressions without full scripting.

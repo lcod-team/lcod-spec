@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "core/string/format@1 output",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["value"],
+  "properties": {
+    "value": {
+      "type": "string",
+      "description": "Formatted string."
+    },
+    "missing": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Placeholders that could not be resolved (only when missingPolicy=ignore)."
+    },
+    "error": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
+        },
+        "missingKeys": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": ["code", "message"],
+      "additionalProperties": true,
+      "description": "Structured error when missing placeholders are not allowed."
+    }
+  }
+}

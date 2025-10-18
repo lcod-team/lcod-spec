@@ -1,133 +1,110 @@
-# Standard Library Refactor Plan
+# Standard Library Rationalisation
 
-This note analyses the current LCOD standard components, explains why many of them rely on `tooling/script@1`, and outlines the missing building blocks we need to deliver a declarative, composable standard library. The aim is to capture concrete action items for a new milestone focused on rationalising the base library and reducing our dependence on ad-hoc JavaScript snippets.
+LCOD leans on small, composable helpers. Many early compositions rely on
+`tooling/script@1` for tasks that would be better expressed as declarative
+blocks. Milestone **M8** introduces a standard library of primitives that makes
+object, collection, and string manipulation predictable across kernels while
+remaining portable.
 
-## 1. Observations
+This document captures the shared contract surface, behavioural rules, and the
+guidelines kernels must follow when implementing the primitives.
 
-An audit of `lcod-components/packages/std/components/**/compose.yaml` shows **24 components** that invoke `lcod://tooling/script@1`. They fall into three categories:
+## Goals
 
-| Category | Examples | Purpose | Why script was used |
-|----------|----------|---------|---------------------|
-| Array helpers | `array.append`, `array.compact`, `array.find_duplicates`, `array.flatten`, `array.length`, `array.pluck` | Basic collection transforms (push, filter undefined, flatten nested arrays, pick fields). | No collection slots or primitives exist; implementing these with `flow/foreach` would be verbose and repeated in each component. |
-| Object/value helpers | `value.is_array`, `value.is_object`, `value.is_string_nonempty`, `string.ensure_trailing_newline`, `json.stringify`, `jsonl.from_objects` | Type guards and simple string/JSON helpers. | Missing axioms for common predicates/formatting; quick to express in JS. |
-| Registry & MCP tooling | `registry_catalog.*`, `fs.write_if_changed`, `mcp.session.open`, `mcp.component.scaffold` | Complex JSON restructuring, filesystem manipulation, scaffolding. | Lack of dedicated “reshape” operators; mapping and grouping logic would require many steps; script offered a quick path while prototyping. |
+- Provide first-class contracts for common tasks (object access, array updates,
+  string formatting, JSON encoding/decoding) so that compose authors can avoid
+  ad-hoc scripts.
+- Keep each primitive synchronous, deterministic, and side-effect free so
+  kernels can implement them as lightweight axioms.
+- Encourage reuse: all higher-level helpers (for example registry tooling or
+  HTTP demos) should rely on these primitives instead of embedding snippets of
+  JavaScript.
 
-In summary, our “std lib” lacks:
+## Naming scheme
 
-- **Collection operators** (filter, map, reduce, group, distinct) with slots to inject predicates.
-- **Object utilities** (get/set/merge, defaults, picking/removing keys).
-- **String/format helpers**.
-- **File-system helpers** with richer options (`write_file` already exists but structure building is manual).
+The primitives live under the `lcod://contract/core/*` namespace. Each contract
+starts at version `@1`; future evolution happens through new versions that keep
+the old ones available for backward compatibility.
 
-Without these primitives, authors naturally fall back to `tooling/script@1`. This blurs the separation between declarative compose logic and bespoke code, and it locks behaviour to QuickJS instead of leveraging native kernels.
+```
+lcod://contract/core/object/get@1
+lcod://contract/core/object/set@1
+lcod://contract/core/object/merge@1
+lcod://contract/core/array/push@1
+lcod://contract/core/array/append@1        # shorthand for concatenation
+lcod://contract/core/string/format@1
+lcod://contract/core/json/encode@1
+lcod://contract/core/json/decode@1
+```
 
-## 2. Design goals for the refactor
+> The exact set can grow after M8-01; the first iteration focuses on the
+> smallest building blocks required to replace the common script snippets found
+> in the resolver, registry tooling, and demo services.
 
-1. **Minimise script usage**: scripts become the exception, used only when no reusable primitive exists or when hosting user-provided expressions.
-2. **Composable primitives**: introduce collection/object/string components that rely on slots and axioms, so they can be combined without writing code.
-3. **Kernel support where relevant**: expose small, pure axioms (e.g. “append”, “merge object”) for performance instead of re-implementing them in JS for every compose.
-4. **Portable behaviour**: the same components must behave identically across kernels; new axioms must be implemented in both JS & Rust runtimes.
-5. **Progressive migration**: keep existing behaviours while refactoring so downstream users are not broken; deprecate script-heavy components gradually.
+## Contract expectations
 
-## 3. Proposed component families
+The following table summarises the required behaviour. Detailed schemas are
+defined in the contract packages; kernels must produce the same observable
+results when implementing the primitives.
 
-### 3.1 Collections
+| Contract | Purpose | Key rules |
+|----------|---------|-----------|
+| `core/object/get@1` | Extract a value from an object by path. | Accepts `path` as an array of keys; returns `null` when the key does not exist; never throws for missing segments. |
+| `core/object/set@1` | Assign a value at a path. | Creates intermediate objects when absent; returns a shallow copy without mutating the input. |
+| `core/object/merge@1` | Merge two objects. | Performs a shallow merge by default; optional `deep` flag enables recursive merge; right-hand side wins on conflicts. |
+| `core/array/push@1` | Append an item to an array. | Returns a new array with the extra element. |
+| `core/array/append@1` | Concatenate arrays. | Returns a new array; treats `null`/`undefined` as empty arrays; accepts a single element or an array as `item`. |
+| `core/string/format@1` | Format a string template. | Uses named placeholders (`{name}`); missing keys default to `""`; supports optional formatters later. |
+| `core/json/encode@1` | Serialize to JSON. | Deterministic encoding; supports optional `space` and `sortKeys`. |
+| `core/json/decode@1` | Parse JSON text. | Returns structured values; emits a structured error with `code="JSON_PARSE"` on invalid input. |
 
-| Component | Slots | Description |
-|-----------|-------|-------------|
-| `collection/filter@1` | `predicate` | Iterate over `items`, call predicate slot with `{ item, index }`; keep items where the slot returns `{ keep: true }`. |
-| `collection/map@1` | `mapper` | Transform each item via slot returning `{ value }`. |
-| `collection/reduce@1` | `accumulator` | Fold array into single value (`accumulator` slot receives `{ acc, item, index }`). |
-| `collection/group_by@1` | `key` + optional `value` | Group items by computed key; return object or array of groups. |
-| `collection/distinct@1` | `key` | Remove duplicates based on key function. |
-| `collection/find@1` | `predicate` | Return first matching item + index. |
+### Error handling
 
-These would replace custom scripts in `array.*` components. For convenience we can keep thin wrappers (`array.append` → `collection/map` or direct axiom) but implemented with the new primitives.
+- All operations surface predictable errors instead of throwing runtime
+  exceptions. Schemas define explicit `error` fields (or status booleans) and
+  implementations must honour them rather than raising host exceptions.
+- Implementations must treat `undefined` and absent fields as equivalent unless
+  stated otherwise. This guarantees identical behaviour across kernels.
 
-### 3.2 Object utilities
+### Determinism
 
-| Component / axiom | Behaviour |
-|-------------------|-----------|
-| `object/get@1` | Read nested property via path array. |
-| `object/set@1` | Immutable set of a nested value; returns new object plus optionally the mutated object. |
-| `object/merge@1` | Merge two objects (deep or shallow). |
-| `object/pick@1`, `object/omit@1` | Select or drop keys. |
-| `object/defaults@1` | Apply default values for missing keys. |
+- No primitive reads from external state or modifies input arguments. The
+  outputs depend solely on the inputs provided in the contract call.
+- Kernels may cache helper functions internally for performance, but must not
+  leak state between invocations.
 
-Most can be implemented as axioms for performance (`object/set` and `object/merge` are good candidates) while still wrapping them in components for clarity.
+## Authoring guidance
 
-### 3.3 String & encoding helpers
+- Prefer these primitives whenever you need to manipulate JSON-like data.
+- When a flow requires multiple operations, chain the primitives instead of
+  reaching for `tooling/script@1`. For example, use `core/object/get@1`
+  followed by `core/string/format@1` rather than writing a script that performs
+  both.
+- Document compound patterns in higher-level helpers (for instance one that
+  builds query parameters) so they can evolve independently of the primitives.
 
-| Component | Description |
-|-----------|-------------|
-| `string/concat@1` | Concatenate list of strings (with optional separator). |
-| `string/format@1` | Simple interpolation (`"Hello {name}"`). |
-| `string/trim@1`, `string/pad@1`, `string/to_case@1` | Common text transforms. |
-| `json/encode@1` / `json/decode@1` | Wrap native JSON stringify/parse with options (indentation, stable keys). |
-| `jsonl/from_array@1` | Convert array of objects to JSON Lines without scripting. |
+## Kernel implementation requirements
 
-### 3.4 Structural builders
+1. Register the primitives as axioms with deterministic behaviour.
+2. Ensure the implementations are available both in interactive mode and in
+   the runtime bundle (Node, Rust, and upcoming substrates).
+3. Mirror the contract schema exactly; differences in optional fields should be
+   treated as bugs.
+4. Provide unit tests that consume the spec fixtures once published, plus
+   kernel-side smoke tests where appropriate (for example string formatting
+   edge cases).
 
-| Component | Description |
-|-----------|-------------|
-| `struct/create_object@1` | Build object from key-value pairs passed via slots (avoids manual script). |
-| `struct/create_array@1` | Build array from child slots. |
-| `filesystem/write_if_changed@1` | Re-implement existing script using `core/fs/write-file` + `core/fs/read-file` + primitives (no script). |
+## Migration plan
 
-### 3.5 Expression evaluation (lightweight)
+1. **Spec (M8-01)** — land the new contracts, schemas, fixtures, and this
+   document. Update the roadmap once merged.
+2. **Kernels (M8-02)** — implement the axioms in `lcod-kernel-js` and
+   `lcod-kernel-rs`, adding coverage to the respective test suites.
+3. **Components (M8-03)** — publish higher-level helpers in the component
+   catalogue (new repository `lcod-components`).
+4. **Refactor (M8-04)** — replace ad-hoc scripts inside spec/tooling/resolver
+   with the primitives. Track regressions via shared fixtures.
 
-Instead of general JavaScript, provide a restricted expression lexicon (e.g. [JMESPath](https://jmespath.org/) or a minimal expression engine). This can live behind `tooling/expression/evaluate@1`, allowing:
-
-- simple arithmetic / comparison,
-- JSON-path-like value extraction,
-- optional custom functions for kernels.
-
-Scripts would then only be required for advanced or user-provided logic; most current scripts are simple enough to fit into these primitives.
-
-## 4. Kernel-level axioms to add
-
-To support the components above efficiently, we should add the following axioms (implemented in both JS and Rust kernels):
-
-| Axiom ID | Behaviour |
-|----------|-----------|
-| `lcod://axiom/object/get@1` | Return value at JSON path. |
-| `lcod://axiom/object/set@1` | Immutable set at path. |
-| `lcod://axiom/object/merge@1` | Merge objects (configurable depth). |
-| `lcod://axiom/array/push@1` | Append value to array (return new array + length). |
-| `lcod://axiom/array/concat@1` | Concatenate arrays. |
-| `lcod://axiom/string/format@1` | Interpolation with placeholders. |
-| `lcod://axiom/string/trim@1` | Trim left/right/both. |
-| `lcod://axiom/json/stringify@1` | JSON stringify with options. |
-| `lcod://axiom/json/parse@1` | JSON parse with error reporting. |
-
-Many of these exist informally via script; formalising them as axioms keeps the runtime portable and allows future kernels (Java, Go, Swift) to implement them natively.
-
-## 5. Migration plan
-
-1. **Inventory & classification** (done in §1).  
-2. **Design the new components/axioms** (spec definitions, schemas, docs).  
-3. **Implement axioms in kernels** (JS & Rust).  
-4. **Publish new components in `lcod-components`** using the primitives.  
-5. **Refactor existing components** to remove `tooling/script@1` usage.  
-6. **Add tests** covering the new primitives and the refactored components.  
-7. **Deprecate old script-based components** (announce timeline, maintain backwards compatibility until consumers migrate).  
-8. **Update documentation** (`docs/compose-dsl.md`, `docs/guide-ai.md`) to highlight the new building blocks and recommend against inline scripting.
-
-## 6. Roadmap proposal
-
-Introduce a new milestone (e.g. **M8 — Standard library rationalisation**) with sub-tasks:
-
-- M8-01 Spec: define collection/object/string primitive components + schemas.
-- M8-02 Kernels: implement supporting axioms (JS + Rust).
-- M8-03 Components: publish collection/object/string helpers in `lcod-components`.
-- M8-04 Migration: replace existing script-heavy components with the new primitives.
-- M8-05 Optional: introduce `tooling/expression/evaluate@1` for lightweight expressions.
-
-This milestone sits *above* the minimal bootstrap: kernels/resolver stay lean, while the standard library gains the expressive power needed to model real-world apps without dropping to QuickJS.
-
-## 7. Next steps
-
-1. Review and agree on the component/axiom list above.  
-2. Add the milestone to the relevant roadmaps (`lcod-spec`, `lcod-components`, kernels).  
-3. Start with the array/object primitives (they will eliminate most current scripts).  
-4. Gradually refactor the registry/MCP tooling to rely on these primitives instead of scripts.
+Keeping the standard library small and focused helps retain the KISS
+constraint: each primitive does one thing well, and larger workflows are built
+by composing them.

@@ -1,0 +1,16 @@
+schemaVersion = "1.0"
+id = "lcod://contract/core/json/encode@1.0.0"
+name = "encode"
+namespace = "contract/core/json"
+version = "1.0.0"
+kind = "contract"
+summary = "Serialize structured data into JSON text."
+
+[tool]
+name = "core_json_encode"
+description = "Serialize LCOD data into JSON text with deterministic output."
+inputSchema = "schema/encode.in.json"
+outputSchema = "schema/encode.out.json"
+
+[docs]
+readme = "README.md"

@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "core/string/format@1 input",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["template"],
+  "properties": {
+    "template": {
+      "type": "string",
+      "description": "Template string containing placeholders."
+    },
+    "values": {
+      "type": "object",
+      "description": "Named values available to the template."
+    },
+    "fallback": {
+      "type": "string",
+      "description": "Default substitution when a placeholder cannot be resolved."
+    },
+    "missingPolicy": {
+      "type": "string",
+      "enum": ["ignore", "error"],
+      "description": "How to handle missing placeholders (default: ignore)."
+    }
+  }
+}

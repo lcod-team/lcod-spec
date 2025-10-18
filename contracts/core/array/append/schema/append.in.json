@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "core/array/append@1 input",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "array": {
+      "type": "array",
+      "description": "Base array that remains unchanged."
+    },
+    "items": {
+      "type": "array",
+      "description": "Items to append to the base array."
+    },
+    "item": {
+      "description": "Single item to append (treated as the last element)."
+    }
+  },
+  "required": ["array"],
+  "oneOf": [
+    { "required": ["items"] },
+    { "required": ["item"] },
+    { "required": ["items", "item"] }
+  ]
+}

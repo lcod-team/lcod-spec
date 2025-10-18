@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "core/json/encode@1 input",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["value"],
+  "properties": {
+    "value": {
+      "description": "Structured data to encode as JSON."
+    },
+    "space": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 10,
+      "description": "Indentation width for pretty-printing (0 for compact)."
+    },
+    "sortKeys": {
+      "type": "boolean",
+      "description": "Sort object keys alphabetically before encoding."
+    },
+    "asciiOnly": {
+      "type": "boolean",
+      "description": "Escape non-ASCII characters."
+    }
+  }
+}

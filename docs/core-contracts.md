@@ -14,10 +14,15 @@ This note tracks the core contracts that anchor the runtime substrates milestone
 | `core/hash` | `lcod://contract/core/hash/sha256@1` | Compute SHA-256 over buffers/streams for integrity. | ✅ |
 | `core/parse` | `lcod://contract/core/parse/json@1` | Parse JSON strings/buffers into canonical objects. | ✅ |
 | `core/parse` | `lcod://contract/core/parse/toml@1` | Parse TOML descriptors (mirrors @iarna/toml behaviour). | ✅ |
-| `core/array` | `lcod://contract/core/array/length@1` | Return the number of elements in an array. | ⏳ |
-| `core/array` | `lcod://contract/core/array/push@1` | Append a value to an array. | ⏳ |
-| `core/object` | `lcod://contract/core/object/get@1` | Retrieve a nested value from an object. | ⏳ |
-| `core/object` | `lcod://contract/core/object/set@1` | Assign a nested value on an object. | ⏳ |
+| `core/array` | `lcod://contract/core/array/length@1` | Return the number of elements in an array. | ✅ |
+| `core/array` | `lcod://contract/core/array/push@1` | Append a value to an array. | ✅ |
+| `core/array` | `lcod://contract/core/array/append@1` | Concatenate arrays or append a single value (immutable). | ✅ |
+| `core/object` | `lcod://contract/core/object/get@1` | Retrieve a nested value from an object. | ✅ |
+| `core/object` | `lcod://contract/core/object/set@1` | Assign a nested value on an object. | ✅ |
+| `core/object` | `lcod://contract/core/object/merge@1` | Merge two objects (optional deep merge). | ✅ |
+| `core/string` | `lcod://contract/core/string/format@1` | Format a template string using named placeholders. | ✅ |
+| `core/json` | `lcod://contract/core/json/encode@1` | Serialize structured data into JSON text. | ✅ |
+| `core/json` | `lcod://contract/core/json/decode@1` | Parse inline JSON text into structured data. | ✅ |
 
 Follow-up work will extend the list for streaming APIs (HTTP download/upload) once the first wave is stable.
 

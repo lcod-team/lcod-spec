@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "core/json/decode@1 input",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["text"],
+  "properties": {
+    "text": {
+      "type": "string",
+      "description": "JSON source text in UTF-8."
+    },
+    "allowComments": {
+      "type": "boolean",
+      "description": "Allow JSON with comments."
+    }
+  }
+}
