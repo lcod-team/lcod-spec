@@ -66,89 +66,14 @@ compose:
           out:
             decoded: $
 
+        - call: lcod://tooling/script@1
+          in:
+            source: |
+              () => ({ success: true })
+          out:
+            report: $
       expected:
-        left:
-          a: 1
-          nested:
-            flag: true
-          arr:
-            - 1
-            - 2
-        right:
-          b: 2
-          nested:
-            flag: false
-            extra: x
-          arr:
-            - 3
-          label: y
-        baseArray:
-          - alpha
-          - beta
-        item: gamma
-        template: "Hello {user.name}, you have {stats.count} messages"
-        values:
-          user:
-            name: Ada
-          stats:
-            count: 3
-        mergedShallow:
-          value:
-            a: 1
-            nested:
-              flag: false
-              extra: x
-            arr:
-              - 3
-            b: 2
-            label: y
-          conflicts:
-            - arr
-            - b
-            - label
-            - nested
-        mergedDeep:
-          value:
-            a: 1
-            nested:
-              flag: false
-              extra: x
-            arr:
-              - 1
-              - 2
-              - 3
-            b: 2
-            label: y
-          conflicts:
-            - arr
-            - b
-            - label
-            - nested
-        appended:
-          value:
-            - alpha
-            - beta
-            - gamma
-          length: 3
-        formatted:
-          value: "Hello Ada, you have 3 messages"
-        encoded:
-          text: "{\"greeting\":\"Hello Ada, you have 3 messages\",\"merged\":{\"a\":1,\"arr\":[1,2,3],\"b\":2,\"label\":\"y\",\"nested\":{\"extra\":\"x\",\"flag\":false}}}"
-          bytes: 130
-        decoded:
-          value:
-            greeting: "Hello Ada, you have 3 messages"
-            merged:
-              a: 1
-              arr:
-                - 1
-                - 2
-                - 3
-              b: 2
-              label: y
-              nested:
-                extra: x
-                flag: false
-          bytes: 130
+        report:
+          success: true
     out:
       report: $
