@@ -93,18 +93,26 @@ Goal: deliver a runnable HTTP backend that exercises advanced composes and prepa
 - [x] M6-04 lc0d-resolver rewrite: express the resolver pipeline as LCOD compose (#36)
   - Shared resolver helpers (`load-descriptor`, `load-config`, `lock-path`, `build-lock`) published in `lcod-spec` and consumed by `lcod-resolver`.
 - [ ] M6-05 Populate `lcod-registry` with sample functional components
-- [ ] M6-06 Evaluate lightweight models for component authoring
 
-## M7 — MCP-assisted authoring
+## M7 — Design-time assistant & RAG
+
+Goal: help users discover and assemble components via a local RAG + LLM pipeline without générer de code externe.
+
+- [ ] M7-01 Ingestion pipeline: extraire la documentation/spec des composants, générer les embeddings et alimenter une base vectorielle.
+- [ ] M7-02 Assistant service + CLI: interroger un LLM local (Ollama) et retourner des suggestions de composants/composes.
+- [ ] M7-03 Générateur de squelette compose + validation via les kernels (`run-compose`) en restant 100 % LCOD.
+- [ ] M7-04 Boucle de feedback: mémoire de session, corrections utilisateur, métriques d’usage.
+
+## M8 — MCP-assisted authoring
 
 Goal: enable MCP-driven component creation so assistants can extend the catalogue safely.
 
-- [ ] M7-01 Spec: define the MCP server contract for LCOD component authoring (operations for components, slots, schemas, implementations, validation).
-- [ ] M7-02 Implement the MCP backend that persists the abstract graph and serialises to `lcp.toml` / `compose.yaml` with validation.
-- [ ] M7-03 Connect the MCP backend to the component RAG so assistants can suggest and reuse existing blocks.
-- [ ] M7-04 Deliver a reference automation (agent or CLI) that demonstrates MCP-driven component creation end-to-end.
+- [ ] M8-01 Spec: define the MCP server contract for LCOD component authoring (operations for components, slots, schemas, implementations, validation).
+- [ ] M8-02 Implement the MCP backend that persists the abstract graph and serialises to `lcp.toml` / `compose.yaml` with validation.
+- [ ] M8-03 Connect the MCP backend to the component RAG so assistants can suggest and reuse existing blocks.
+- [ ] M8-04 Deliver a reference automation (agent or CLI) that demonstrates MCP-driven component creation end-to-end.
 
-## M8 — Standard library rationalisation
+## M9 — Standard library rationalisation
 
 Goal: eliminate ad-hoc scripts by providing declarative collection/object/string primitives.
 
