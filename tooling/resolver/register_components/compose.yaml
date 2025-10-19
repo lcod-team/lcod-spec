@@ -12,29 +12,7 @@ compose:
             return { components: [], warnings };
           }
 
-          const joinPath = async (base, segment) => {
-            const joined = await imports.pathJoin({ base, segment });
-            return joined?.path ?? segment;
-          };
-
-          const seen = new Set();
-
-          const pushDefinition = async (base, def, optional = false) => {
-            if (seen.has(def.id)) return false;
-            try {
-              const composePath = await joinPath(base, def.path);
-              components.push({ id: def.id, composePath });
-              seen.add(def.id);
-              return true;
-            } catch (err) {
-              if (!optional) {
-                warnings.push(`resolver/register_components: failed to resolve ${def.id}: ${err.message}`);
-              }
-              return false;
-            }
-          };
-
-          const specDefinitions = [
+          const definitions = [
             { id: 'lcod://tooling/registry/source/load@0.1.0', path: 'tooling/registry/source/compose.yaml' },
             { id: 'lcod://tooling/registry/index@0.1.0', path: 'tooling/registry/index/compose.yaml' },
             { id: 'lcod://tooling/registry/select@0.1.0', path: 'tooling/registry/select/compose.yaml' },
@@ -46,98 +24,13 @@ compose:
           ];
 
           const components = [];
-          for (const def of specDefinitions) {
-            await pushDefinition(specRoot, def);
-          }
-
-          const providedCandidates = Array.isArray(state.componentsRootCandidates)
-            ? state.componentsRootCandidates.filter((value) => typeof value === 'string' && value.length > 0)
-            : [];
-          const fallbackCandidates = ['../lcod-components', '../../lcod-components'];
-          const candidateQueue = [...providedCandidates, ...fallbackCandidates];
-          const seenRoots = new Set();
-
-          const resolveCandidateRoot = async (candidate) => {
-            if (typeof candidate !== 'string' || candidate.length === 0) return null;
-            if (candidate.startsWith('file://')) {
-              return candidate.slice('file://'.length);
+          for (const def of definitions) {
+            try {
+              const { path } = await imports.pathJoin({ base: specRoot, segment: def.path });
+              components.push({ id: def.id, composePath: path });
+            } catch (err) {
+              warnings.push(`resolver/register_components: failed to resolve ${def.id}: ${err.message}`);
             }
-            if (/^(?:[A-Za-z]:[\\/]|\/|~)/.test(candidate)) {
-              return candidate;
-            }
-            return await joinPath(specRoot, candidate);
-          };
-
-          for (const candidate of candidateQueue) {
-            const candidateRoot = await resolveCandidateRoot(candidate);
-            if (!candidateRoot || seenRoots.has(candidateRoot)) {
-              continue;
-            }
-            seenRoots.add(candidateRoot);
-            const stdDefs = [
-                { id: 'lcod://core/array/append@0.1.0', path: 'packages/std/components/core/array.append/compose.yaml' },
-                { id: 'lcod://core/json/decode@0.1.0', path: 'packages/std/components/core/json.decode/compose.yaml' },
-                { id: 'lcod://core/json/encode@0.1.0', path: 'packages/std/components/core/json.encode/compose.yaml' },
-                { id: 'lcod://core/object/merge@0.1.0', path: 'packages/std/components/core/object.merge/compose.yaml' },
-                { id: 'lcod://core/string/format@0.1.0', path: 'packages/std/components/core/string.format/compose.yaml' },
-                { id: 'lcod://tooling/array/append@0.1.0', path: 'packages/std/components/tooling/array.append/compose.yaml' },
-                { id: 'lcod://tooling/array.append@0.1.0', path: 'packages/std/components/tooling/array.append/compose.yaml' },
-                { id: 'lcod://tooling/array/compact@0.1.0', path: 'packages/std/components/tooling/array.compact/compose.yaml' },
-                { id: 'lcod://tooling/array.compact@0.1.0', path: 'packages/std/components/tooling/array.compact/compose.yaml' },
-                { id: 'lcod://tooling/array/concat@0.1.0', path: 'packages/std/components/tooling/array.concat/compose.yaml' },
-                { id: 'lcod://tooling/array.concat@0.1.0', path: 'packages/std/components/tooling/array.concat/compose.yaml' },
-                { id: 'lcod://tooling/array/filter_objects@0.1.0', path: 'packages/std/components/tooling/array.filter_objects/compose.yaml' },
-                { id: 'lcod://tooling/array.filter_objects@0.1.0', path: 'packages/std/components/tooling/array.filter_objects/compose.yaml' },
-                { id: 'lcod://tooling/array/shift@0.1.0', path: 'packages/std/components/tooling/array.shift/compose.yaml' },
-                { id: 'lcod://tooling/array.shift@0.1.0', path: 'packages/std/components/tooling/array.shift/compose.yaml' },
-                { id: 'lcod://tooling/array/length@0.1.0', path: 'packages/std/components/tooling/array.length/compose.yaml' },
-                { id: 'lcod://tooling/array.length@0.1.0', path: 'packages/std/components/tooling/array.length/compose.yaml' },
-                { id: 'lcod://tooling/array/pluck@0.1.0', path: 'packages/std/components/tooling/array.pluck/compose.yaml' },
-                { id: 'lcod://tooling/array.pluck@0.1.0', path: 'packages/std/components/tooling/array.pluck/compose.yaml' },
-                { id: 'lcod://tooling/array/find_duplicates@0.1.0', path: 'packages/std/components/tooling/array.find_duplicates/compose.yaml' },
-                { id: 'lcod://tooling/array.find_duplicates@0.1.0', path: 'packages/std/components/tooling/array.find_duplicates/compose.yaml' },
-                { id: 'lcod://tooling/array/flatten@0.1.0', path: 'packages/std/components/tooling/array.flatten/compose.yaml' },
-                { id: 'lcod://tooling/array.flatten@0.1.0', path: 'packages/std/components/tooling/array.flatten/compose.yaml' },
-                { id: 'lcod://tooling/value/default_array@0.1.0', path: 'packages/std/components/tooling/value.default_array/compose.yaml' },
-                { id: 'lcod://tooling/value.default_array@0.1.0', path: 'packages/std/components/tooling/value.default_array/compose.yaml' },
-                { id: 'lcod://tooling/value/default_object@0.1.0', path: 'packages/std/components/tooling/value.default_object/compose.yaml' },
-                { id: 'lcod://tooling/value.default_object@0.1.0', path: 'packages/std/components/tooling/value.default_object/compose.yaml' },
-                { id: 'lcod://tooling/value/is_array@0.1.0', path: 'packages/std/components/tooling/value.is_array/compose.yaml' },
-                { id: 'lcod://tooling/value.is_array@0.1.0', path: 'packages/std/components/tooling/value.is_array/compose.yaml' },
-                { id: 'lcod://tooling/value/is_object@0.1.0', path: 'packages/std/components/tooling/value.is_object/compose.yaml' },
-                { id: 'lcod://tooling/value.is_object@0.1.0', path: 'packages/std/components/tooling/value.is_object/compose.yaml' },
-                { id: 'lcod://tooling/value/is_string_nonempty@0.1.0', path: 'packages/std/components/tooling/value.is_string_nonempty/compose.yaml' },
-                { id: 'lcod://tooling/value.is_string_nonempty@0.1.0', path: 'packages/std/components/tooling/value.is_string_nonempty/compose.yaml' },
-                { id: 'lcod://tooling/path/join_chain@0.1.0', path: 'packages/std/components/tooling/path.join_chain/compose.yaml' },
-                { id: 'lcod://tooling/path.join_chain@0.1.0', path: 'packages/std/components/tooling/path.join_chain/compose.yaml' },
-                { id: 'lcod://tooling/path/dirname@0.1.0', path: 'packages/std/components/tooling/path.dirname/compose.yaml' },
-                { id: 'lcod://tooling/path.dirname@0.1.0', path: 'packages/std/components/tooling/path.dirname/compose.yaml' },
-                { id: 'lcod://tooling/path/is_absolute@0.1.0', path: 'packages/std/components/tooling/path.is_absolute/compose.yaml' },
-                { id: 'lcod://tooling/path.is_absolute@0.1.0', path: 'packages/std/components/tooling/path.is_absolute/compose.yaml' },
-                { id: 'lcod://tooling/path/to_file_url@0.1.0', path: 'packages/std/components/tooling/path.to_file_url/compose.yaml' },
-                { id: 'lcod://tooling/path.to_file_url@0.1.0', path: 'packages/std/components/tooling/path.to_file_url/compose.yaml' },
-                { id: 'lcod://tooling/hash/sha256_base64@0.1.0', path: 'packages/std/components/tooling/hash.sha256_base64/compose.yaml' },
-                { id: 'lcod://tooling/fs/read_optional@0.1.0', path: 'packages/std/components/tooling/fs.read_optional/compose.yaml' },
-                { id: 'lcod://tooling/json/decode_object@0.1.0', path: 'packages/std/components/tooling/json.decode_object/compose.yaml' },
-                { id: 'lcod://tooling/registry_sources/prepare_env@0.1.0', path: 'packages/std/components/tooling/registry_sources.prepare_env/compose.yaml' },
-                { id: 'lcod://tooling/registry_sources/load_config@0.1.0', path: 'packages/std/components/tooling/registry_sources.load_config/compose.yaml' },
-                { id: 'lcod://tooling/registry_sources/normalize_pointer@0.1.0', path: 'packages/std/components/tooling/registry_sources.normalize_pointer/compose.yaml' },
-                { id: 'lcod://tooling/registry_sources/process_pointer@0.1.0', path: 'packages/std/components/tooling/registry_sources.process_pointer/compose.yaml' },
-                { id: 'lcod://tooling/registry_sources/process_catalogue@0.1.0', path: 'packages/std/components/tooling/registry_sources.process_catalogue/compose.yaml' },
-                { id: 'lcod://tooling/registry_sources/collect_entries@0.1.0', path: 'packages/std/components/tooling/registry_sources.collect_entries/compose.yaml' },
-                { id: 'lcod://tooling/registry_sources/collect_queue@0.1.0', path: 'packages/std/components/tooling/registry_sources.collect_queue/compose.yaml' },
-                { id: 'lcod://tooling/registry_sources/build_inline_entry@0.1.0', path: 'packages/std/components/tooling/registry_sources.build_inline_entry/compose.yaml' },
-                { id: 'lcod://tooling/registry_sources/merge_inline_entries@0.1.0', path: 'packages/std/components/tooling/registry_sources.merge_inline_entries/compose.yaml' },
-                { id: 'lcod://tooling/registry_sources/partition_normalized@0.1.0', path: 'packages/std/components/tooling/registry_sources.partition_normalized/compose.yaml' },
-                { id: 'lcod://tooling/registry_sources/resolve@0.1.0', path: 'packages/std/components/tooling/registry_sources.resolve/compose.yaml' }
-              ];
-
-            let addedAny = false;
-            for (const def of stdDefs) {
-              const ok = await pushDefinition(candidateRoot, def, true);
-              if (ok) addedAny = true;
-            }
-            if (addedAny) break;
           }
 
           return { components, warnings };
