@@ -97,12 +97,12 @@ Goal: deliver a runnable HTTP backend that exercises advanced composes and prepa
 
 ## M7 — Design-time assistant & RAG
 
-Goal: help users discover and assemble components via a local RAG + LLM pipeline without générer de code externe.
+Goal: help users discover and assemble components through a local RAG + LLM pipeline while keeping the toolchain entirely LCOD-native.
 
-- [ ] M7-01 Ingestion pipeline: extraire la documentation/spec des composants, générer les embeddings et alimenter une base vectorielle.
-- [ ] M7-02 Assistant service + CLI: interroger un LLM local (Ollama) et retourner des suggestions de composants/composes.
-- [ ] M7-03 Générateur de squelette compose + validation via les kernels (`run-compose`) en restant 100 % LCOD.
-- [ ] M7-04 Boucle de feedback: mémoire de session, corrections utilisateur, métriques d’usage.
+- [ ] M7-01 Registry-driven ingestion pipeline: compose an LCOD flow that reads `catalogues.json`, fetches manifests, fingerprints component docs, and reconciles Qdrant (add/update/delete) using embeddings generated via Ollama.
+- [ ] M7-02 Assistant service & CLI: expose `/query` and command-line entry points that call the compose-based retrieval, invoke Ollama, and return component/composition suggestions.
+- [ ] M7-03 Compose skeleton generator: assemble retrieved candidates into starter `compose.yaml` flows, validate them with `run-compose`, and keep the scaffolding 100% LCOD.
+- [ ] M7-04 Feedback loop & analytics: persist session hints, surface user corrections to improve ranking, and emit usage metrics for IDEs and agents.
 
 ## M8 — MCP-assisted authoring
 
