@@ -211,6 +211,7 @@ async function readResolverSnapshot(resolverRoot) {
 
 async function copySpecContents(stagingDir) {
   const entries = [
+    { source: 'core', target: 'core' },
     { source: 'tooling', target: 'tooling' },
     { source: path.join('tests', 'spec'), target: path.join('tests', 'spec') },
     {
@@ -278,8 +279,12 @@ async function writeManifest(stagingDir, context) {
     },
     contents: [
       {
+        path: 'core',
+        description: 'Core std components wrapping kernel contracts',
+      },
+      {
         path: 'tooling',
-        description: 'Spec helper components (resolver/registry/compose)',
+        description: 'Spec helper components (resolver/registry/std tooling)',
       },
       { path: 'tests/spec', description: 'Shared spec fixtures' },
       {
