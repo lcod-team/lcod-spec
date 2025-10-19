@@ -76,6 +76,7 @@ Goal: prepare public releases once workspace/package layout is stable.
 - [x] M5-05 Seed the `lcod-registry` repository with the `registry.json` scaffold, namespace policies, and CI guards for immutable releases (refs lcod-registry#2).
 - [x] Pre-req satisfied: compose normalization helpers are in place (shared loader component).
 - [x] M5-06 Produce the shared runtime bundle (`lcod-runtime-<version>.tar.gz`) bundling resolver/spec helpers, schemas and lockfiles for kernel consumption.
+- [x] M5-06a Mirror resolver std tooling/core helpers into `lcod-spec` so kernels bootstrap without `lcod-components` (refs #57, lcod-kernel-js#20, lcod-kernel-rs#9).
 - [x] M5-07 Automate bundle publication alongside spec releases (GitHub Releases + checksums/signatures) and document install steps (`docs/runtime-bundle.md`).
 - [x] M5-08 Ship a minimal verification compose/tests so kernels and CI pipelines can validate a downloaded bundle before execution.
 - [ ] M5-09 Deliver the standalone `lcod-run` CLI (embedded runtime bundle, resolver, cache UX) — see `docs/lcod-run-cli.md`.

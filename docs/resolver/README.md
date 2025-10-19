@@ -41,7 +41,11 @@ IDs:
 
 Both the specification example (`examples/tooling/resolver`) and the production
 resolver compose import these helpers, demonstrating cross-repo reuse of
-standard components. In standalone packages, the helpers live next to the
+standard components. The canonical implementations now live in
+`lcod-spec/tooling` (with matching IDs such as `lcod://tooling/value/default_object@0.1.0`
+or `lcod://core/object/merge@0.1.0`), so kernels can bootstrap the resolver
+stdlib straight from the spec checkout or packaged runtime bundle without
+cloning `lcod-components`. In standalone packages, the helpers live next to the
 primary compose with `scope = "workspace"` in `packages/resolver/lcp.toml`, and
 the repository root provides a `workspace.lcp.toml` describing the package list
 and default scope aliases. The resolver expands relative IDs (e.g.

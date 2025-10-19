@@ -49,7 +49,7 @@ flowchart TD
     registry --> ide
 ```
 
-**Spec & Registry** — `lcod-spec` documents the format and ships reusable helpers; `lcod-registry` aggregates manifests and the generated catalogue that clients can fetch via HTTP or Git.
+**Spec & Registry** — `lcod-spec` documents the format and ships reusable helpers. The `tooling/` tree now hosts the resolver’s “standard library” (`tooling/value/*`, `tooling/array/*`, `core/object/merge`, etc.) so kernels can bootstrap without cloning `lcod-components`. `lcod-registry` aggregates manifests and the generated catalogue that clients can fetch via HTTP ou Git.
 
 **Resolution** — `lcod-resolver` merges local and remote catalogues (the runtime ships with a default `sources.json` pointing at the official registry, but developers can add or remove catalogues freely), applies mirrors/replacements, locks versions and feeds kernels with resolved packages. The resolver itself is an LCOD composition, so the same helpers run in CI pipelines and local scripts.
 
