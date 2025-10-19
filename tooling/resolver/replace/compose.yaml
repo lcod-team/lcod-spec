@@ -15,7 +15,7 @@ compose:
 
           const warnings = [];
           if (!id) {
-            return { targetId: null, override: null, warnings: ['Replacement requested without a component id'] };
+            return { targetId: null, override: null, warnings };
           }
 
           const visited = new Set();
