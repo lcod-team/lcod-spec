@@ -71,6 +71,7 @@ Options:
   --global-cache, -g            Use ~/.lcod/cache instead of ./.lcod/cache.
   --log-level <level>           Minimum kernel log level (trace|debug|info|warn|error|fatal).
                                 Defaults to `fatal`; can also be provided via LCOD_LOG_LEVEL.
+  --timeout <duration>          Abort execution after the given duration (e.g. 30s, 2m).
   --version                     Print lcod-run version.
   --help                        Usage summary.
 ```
@@ -80,6 +81,12 @@ Options:
 - `lcod-run` reads `--log-level` first; if omitted it falls back to `LCOD_LOG_LEVEL` and finally to `fatal`.
 - The selected threshold is propagated to the kernels and refreshed on the fly for every log call. Updating `LCOD_LOG_LEVEL` mid-run (or using multiple `lcod-run` invocations with different flags) immediately changes the emitted diagnostics without restarting the binary.
 - Kernel diagnostics (`component = "kernel"`) remain muted unless the threshold allows them; application logs dispatched through the contract continue to flow even when no binding is installed.
+
+### Cancellation
+
+- Pressing `Ctrl+C` (SIGINT) triggers a cooperative cancellation: the current step finishes, resources are cleaned up, and the CLI exits with status `130`.
+- `--timeout <duration>` schedules the same cancellation automatically after the provided duration (accepts raw milliseconds or suffixes such as `30s`, `2m`, `1h`).
+- Cancellation errors surface as `Execution cancelled` without additional stack traces.
 
 ### Planned extensions (post-MVP)
 
