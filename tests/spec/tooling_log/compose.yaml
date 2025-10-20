@@ -38,6 +38,7 @@ compose:
                   const logs = Array.isArray(state.logs) ? state.logs : [];
                   const entry = state.entry ?? null;
                   if (!entry || typeof entry !== 'object') return { logs };
+                  if (entry.tags && entry.tags.component === 'kernel') return { logs };
                   const snapshot = typeof state.snapshot === 'string' ? state.snapshot : '';
                   const base = {
                     level: entry.level,
@@ -84,6 +85,7 @@ compose:
                       const logs = Array.isArray(state.logs) ? state.logs : [];
                       const entry = state.entry ?? null;
                       if (!entry || typeof entry !== 'object') return { logs };
+                      if (entry.tags && entry.tags.component === 'kernel') return { logs };
                       const snapshot = typeof state.snapshot === 'string' ? state.snapshot : '';
                       const base = {
                         level: entry.level,
@@ -130,6 +132,7 @@ compose:
                           const logs = Array.isArray(state.logs) ? state.logs : [];
                           const entry = state.entry ?? null;
                           if (!entry || typeof entry !== 'object') return { logs };
+                          if (entry.tags && entry.tags.component === 'kernel') return { logs };
                           const snapshot = typeof state.snapshot === 'string' ? state.snapshot : '';
                           const base = {
                             level: entry.level,
@@ -177,6 +180,7 @@ compose:
                   const logs = Array.isArray(state.logs) ? state.logs : [];
                   const entry = state.entry ?? null;
                   if (!entry || typeof entry !== 'object') return { logs };
+                  if (entry.tags && entry.tags.component === 'kernel') return { logs };
                   const snapshot = typeof state.snapshot === 'string' ? state.snapshot : '';
                   const base = {
                     level: entry.level,
@@ -222,6 +226,7 @@ compose:
                   const entries = Array.isArray(state.captured) ? state.captured : [];
                   const logs = entries.map((entry) => {
                     if (!entry || typeof entry !== 'object') return '';
+                    if (entry.tags && entry.tags.component === 'kernel') return '';
                     const base = {
                       level: entry.level,
                       message: entry.message
