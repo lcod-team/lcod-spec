@@ -179,4 +179,7 @@ During development the CLI can embed a specific runtime bundle by setting `LCOD_
 LCOD_EMBED_RUNTIME=../dist/runtime/lcod-runtime-dev.tar.gz cargo build --release
 ```
 
-The GitHub release pipeline will set this variable to ensure the published binaries remain self-contained.
+The GitHub release pipeline runs `node scripts/package-runtime.mjs` in `lcod-spec`
+to regenerate the bundle (including filesystem helpers such as
+`lcod://tooling/fs/read_optional@0.1.0`) and sets this variable so published
+binaries stay self-contained.

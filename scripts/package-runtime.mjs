@@ -319,6 +319,7 @@ async function verifyRequiredFiles(stagingDir) {
   const required = [
     path.join(stagingDir, 'tooling', 'resolver', 'register_components', 'compose.yaml'),
     path.join(stagingDir, 'tooling', 'registry', 'catalog', 'compose.yaml'),
+    path.join(stagingDir, 'tooling', 'fs', 'read_optional', 'compose.yaml'),
     path.join(stagingDir, 'metadata', 'lcod-resolver-runtime.json'),
     path.join(stagingDir, 'resolver', 'packages', 'resolver', 'compose.yaml'),
     path.join(stagingDir, 'manifest.json'),
