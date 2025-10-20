@@ -75,6 +75,12 @@ Options:
   --help                        Usage summary.
 ```
 
+### Log level control
+
+- `lcod-run` reads `--log-level` first; if omitted it falls back to `LCOD_LOG_LEVEL` and finally to `fatal`.
+- The selected threshold is propagated to the kernels and refreshed on the fly for every log call. Updating `LCOD_LOG_LEVEL` mid-run (or using multiple `lcod-run` invocations with different flags) immediately changes the emitted diagnostics without restarting the binary.
+- Kernel diagnostics (`component = "kernel"`) remain muted unless the threshold allows them; application logs dispatched through the contract continue to flow even when no binding is installed.
+
 ### Planned extensions (post-MVP)
 
 - `--sources <path-or-url>` to override default resolver sources.

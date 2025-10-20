@@ -34,6 +34,7 @@ Unknown fields are rejected to keep payloads predictable.
 - Implementations MUST NOT throw when processing logs. Failures should be reported via stderr or a metrics channel without crashing the caller.
 - The logger name `kernel` (and any helper under `lcod://kernel/log@*`) is reserved for runtime diagnostics; component packages MUST NOT rebind or override it.
 - Both kernels honour the environment variable `LCOD_LOG_LEVEL` (default `fatal`). Logs whose level ranks below the threshold are skipped unless a custom contract binding is installed. Setting `LCOD_LOG_LEVEL=info`, for example, re-enables the runtime instrumentation used for compose tracing.
+- The threshold is refreshed on every log emission: changing `LCOD_LOG_LEVEL` (or invoking `lcod-run --log-level …`) takes effect immediately without restarting the process or rebinding the logger. Only kernel diagnostics (`tags.component = "kernel"`) are muted by default; user logs continue to flow even without a custom binding.
 
 ## Logger metadata (`lcp.toml`)
 
