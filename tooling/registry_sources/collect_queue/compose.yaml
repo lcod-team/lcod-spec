@@ -3,25 +3,56 @@ compose:
     in:
       value: $.queue
     out:
-      currentQueue: resolved
+      initialQueue: resolved
 
-  - call: lcod://tooling/array/length@0.1.0
+  - call: lcod://flow/while@1
     in:
-      items: $.currentQueue
-    out:
-      queueLength: length
-
-  - call: lcod://flow/if@1
-    in:
-      cond: $.queueLength
+      state:
+        queue: $.initialQueue
+        contributions: []
+        warnings: []
+        downloadsRoot: $.downloadsRoot
+        sourcesBaseDir: $.sourcesBaseDir
+        defaultEntrypoint: $.defaultEntrypoint
+        basePriority: $.basePriority
     children:
-      then:
+      condition:
+        - call: lcod://tooling/array/length@0.1.0
+          in:
+            items: $.queue
+          out:
+            queueLength: length
+        - call: lcod://impl/set@1
+          in:
+            continue: $.queueLength
+          out:
+            continue: continue
+      body:
         - call: lcod://tooling/array/shift@0.1.0
           in:
-            items: $.currentQueue
+            items: $.queue
           out:
             headPointer: head
             restQueue: rest
+
+        - call: lcod://tooling/value/default_array@0.1.0
+          in:
+            value: $.contributions
+          out:
+            baseContributions: resolved
+
+        - call: lcod://tooling/value/default_array@0.1.0
+          in:
+            value: $.warnings
+          out:
+            baseWarnings: resolved
+
+        - call: lcod://tooling/value/default_array@0.1.0
+          in:
+            value: $.restQueue
+          out:
+            baseQueue: resolved
+
         - call: lcod://flow/if@1
           in:
             cond: $.headPointer
@@ -37,6 +68,7 @@ compose:
                   processedEntry: entry
                   pointerChildren: children
                   processWarnings: warnings
+
               - call: lcod://tooling/value/default_array@0.1.0
                 in:
                   value: $.pointerChildren
@@ -53,6 +85,7 @@ compose:
                         value: $slot.item.baseDir
                       out:
                         childHasBaseDir: ok
+
                     - call: lcod://flow/if@1
                       in:
                         cond: $.childHasBaseDir
@@ -71,6 +104,7 @@ compose:
                               pointerBaseDir: pointerBaseDir
                       out:
                         pointerBaseDir: pointerBaseDir
+
                     - call: lcod://tooling/registry_sources/normalize_pointer@0.1.0
                       in:
                         entry: $slot.item
@@ -83,6 +117,7 @@ compose:
                       out:
                         childPointer: pointer
                         normalizeWarnings: warnings
+
                     - call: lcod://impl/set@1
                       in:
                         normalized:
@@ -100,17 +135,20 @@ compose:
                 out:
                   normalizedPointers: pointers
                   normalizationWarnings: warnings
+
               - call: lcod://tooling/registry_sources/build_inline_entry@0.1.0
                 in:
                   pointer: $.headPointer
                   entry: $.processedEntry
                 out:
                   contribution: contribution
+
               - call: lcod://tooling/value/is_object@0.1.0
                 in:
                   value: $.contribution
                 out:
                   hasContribution: ok
+
               - call: lcod://flow/if@1
                 in:
                   cond: $.hasContribution
@@ -121,9 +159,21 @@ compose:
                         items: []
                         value: $.contribution
                       out:
-                        contributionsBatch: items
+                        contributionBatch: items
                 out:
-                  contributionsBatch: contributionsBatch
+                  contributionBatch: contributionBatch
+
+              - call: lcod://tooling/value/default_array@0.1.0
+                in:
+                  value: $.contributionBatch
+                out:
+                  contributionBatch: resolved
+
+              - call: lcod://tooling/value/default_array@0.1.0
+                in:
+                  value: $.normalizedPointers
+                out:
+                  normalizedPointers: resolved
 
               - call: lcod://tooling/value/default_array@0.1.0
                 in:
@@ -142,79 +192,79 @@ compose:
                   items: $.normalizedProcessWarnings
                   values: $.normalizedNormalizationWarnings
                 out:
-                  accumulatedWarnings: items
+                  pointerWarnings: items
 
               - call: lcod://tooling/array/append@0.1.0
                 in:
-                  items: $.restQueue
+                  items: $.baseWarnings
+                  values: $.pointerWarnings
+                out:
+                  updatedWarnings: items
+
+              - call: lcod://tooling/array/append@0.1.0
+                in:
+                  items: $.baseContributions
+                  values: $.contributionBatch
+                out:
+                  updatedContributions: items
+
+              - call: lcod://tooling/array/append@0.1.0
+                in:
+                  items: $.baseQueue
                   values: $.normalizedPointers
                 out:
-                  nextQueue: items
+                  updatedQueue: items
 
-              - call: lcod://tooling/registry_sources/collect_queue@0.1.0
+              - call: lcod://impl/set@1
                 in:
-                  queue: $.nextQueue
-                  downloadsRoot: $.downloadsRoot
-                  sourcesBaseDir: $.sourcesBaseDir
-                  defaultEntrypoint: $.defaultEntrypoint
-                  basePriority: $.basePriority
+                  queue: $.updatedQueue
                 out:
-                  tailContributions: contributions
-                  tailWarnings: warnings
-              - call: lcod://tooling/value/default_array@0.1.0
-                in:
-                  value: $.tailContributions
-                out:
-                  tailContributions: resolved
+                  queue: queue
 
-              - call: lcod://tooling/value/default_array@0.1.0
+              - call: lcod://impl/set@1
                 in:
-                  value: $.tailWarnings
-                out:
-                  tailWarnings: resolved
-
-              - call: lcod://tooling/value/default_array@0.1.0
-                in:
-                  value: $.contributionsBatch
-                out:
-                  contributionsBatch: resolved
-
-              - call: lcod://tooling/array/append@0.1.0
-                in:
-                  items: $.contributionsBatch
-                  values: $.tailContributions
-                out:
-                  contributions: items
-
-              - call: lcod://tooling/array/append@0.1.0
-                in:
-                  items: $.accumulatedWarnings
-                  values: $.tailWarnings
-                out:
-                  warnings: items
-
-            else:
-              - call: lcod://tooling/registry_sources/collect_queue@0.1.0
-                in:
-                  queue: $.restQueue
-                  downloadsRoot: $.downloadsRoot
-                  sourcesBaseDir: $.sourcesBaseDir
-                  defaultEntrypoint: $.defaultEntrypoint
-                  basePriority: $.basePriority
+                  contributions: $.updatedContributions
                 out:
                   contributions: contributions
+
+              - call: lcod://impl/set@1
+                in:
+                  warnings: $.updatedWarnings
+                out:
+                  warnings: warnings
+            else:
+              - call: lcod://impl/set@1
+                in:
+                  queue: $.baseQueue
+                out:
+                  queue: queue
+
+              - call: lcod://impl/set@1
+                in:
+                  contributions: $.baseContributions
+                out:
+                  contributions: contributions
+
+              - call: lcod://impl/set@1
+                in:
+                  warnings: $.baseWarnings
+                out:
                   warnings: warnings
           out:
-            contributions: contributions
-            warnings: warnings
-      else:
-        - call: lcod://impl/set@1
-          in:
-            contributions: []
-            warnings: []
-          out:
+            queue: queue
             contributions: contributions
             warnings: warnings
     out:
-      contributions: contributions
-      warnings: warnings
+      loopState: state
+
+  - call: lcod://tooling/value/default_array@0.1.0
+    in:
+      value: $.loopState.contributions
+    out:
+      contributions: resolved
+
+  - call: lcod://tooling/value/default_array@0.1.0
+    in:
+      value: $.loopState.warnings
+    out:
+      warnings: resolved
