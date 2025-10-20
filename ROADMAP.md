@@ -60,6 +60,7 @@ Next:
 - [ ] M4-02 CLI trace mode (`--trace`) to stream compose execution and inspect scope mutations
 - [ ] M4-03 Document trace schema & debugging guidelines (`docs/runtime-tracing.md`)
 - [ ] M4-04 Prototype Debug Adapter (DAP) for compose files (breakpoints, step-in/out)
+- [ ] M4-05 Logger metadata & linting: define `lcp.toml[logging]` schema, document logger declaration rules, and ship a lint tool that resolves composes to verify every logger usage (refs `docs/tooling-log.md`).
 
 ## M5 — Registry & release pipeline
 

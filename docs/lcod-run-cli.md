@@ -69,8 +69,9 @@ Options:
   --lock <path>                 Output path for generated lock (default: <compose-dir>/lcp.lock).
   --cache-dir <path>            Explicit cache directory (overrides local/global defaults).
   --global-cache, -g            Use ~/.lcod/cache instead of ./.lcod/cache.
-  --keep-temp                   Preserve checkout/download temp dir for debugging.
-  --version                     Print lcod-run version + embedded bundle metadata.
+  --log-level <level>           Minimum kernel log level (trace|debug|info|warn|error|fatal).
+                                Defaults to `fatal`; can also be provided via LCOD_LOG_LEVEL.
+  --version                     Print lcod-run version.
   --help                        Usage summary.
 ```
 
@@ -112,7 +113,7 @@ Options:
    - Print JSON to stdout.
 6. **Cleanup**
    - Stop hosts if any (serve mode is out-of-scope for MVP).
-   - Remove temporary download dir unless `--keep-temp`.
+   - Remove temporary download dir.
    - Exit with code 0 on success, 1 on failure.
 
 ## 6. Caching Strategy

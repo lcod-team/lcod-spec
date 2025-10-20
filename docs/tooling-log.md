@@ -32,6 +32,12 @@ Unknown fields are rejected to keep payloads predictable.
 - Before an implementation is bound, kernels MUST provide a fallback (stdout/stderr JSON) so logs are not lost.
 - When `tooling/registry/scope@1` opens a scope, kernels MAY push additional tags (e.g. `scopeId`, `scopeName`, `project=foo`) by augmenting context for child logs. Leaving a scope restores the previous tag set.
 - Implementations MUST NOT throw when processing logs. Failures should be reported via stderr or a metrics channel without crashing the caller.
+- The logger name `kernel` (and any helper under `lcod://kernel/log@*`) is reserved for runtime diagnostics; component packages MUST NOT rebind or override it.
+- Both kernels honour the environment variable `LCOD_LOG_LEVEL` (default `fatal`). Logs whose level ranks below the threshold are skipped unless a custom contract binding is installed. Setting `LCOD_LOG_LEVEL=info`, for example, re-enables the runtime instrumentation used for compose tracing.
+
+## Logger metadata (`lcp.toml`)
+
+Every package that emits logs SHOULD declare them under `lcp.toml[logging]`. The section lists logger identifiers, default levels, and human-readable descriptions so hosts can present a consistent configuration UI/CLI. Future lint tooling will resolve composes, enumerate logger usage (including helpers such as `tooling/log.context@1`), and verify that each logger appears in `lcp.toml[logging]`.
 
 ## Context propagation
 
