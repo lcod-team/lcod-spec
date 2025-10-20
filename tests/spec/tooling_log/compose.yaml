@@ -2,6 +2,13 @@ compose:
 - call: lcod://tooling/test_checker@1
   in:
     compose:
+      - call: lcod://tooling/script@1
+        in:
+          source: |
+            async () => {
+              process.env.LCOD_LOG_LEVEL = 'trace';
+              return {};
+            }
       - call: lcod://tooling/registry/scope@1
         in:
           bindings:
@@ -257,6 +264,13 @@ compose:
         out:
           logs: logs
           snapshot: snapshot
+      - call: lcod://tooling/script@1
+        in:
+          source: |
+            async () => {
+              delete process.env.LCOD_LOG_LEVEL;
+              return {};
+            }
     expected:
       logs:
         - '{"level":"info","message":"baseline"}'
