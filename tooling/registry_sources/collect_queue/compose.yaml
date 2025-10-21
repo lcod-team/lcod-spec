@@ -15,6 +15,7 @@ compose:
         sourcesBaseDir: $.sourcesBaseDir
         defaultEntrypoint: $.defaultEntrypoint
         basePriority: $.basePriority
+        visited: {}
     children:
       condition:
         - call: lcod://tooling/array/length@0.1.0
@@ -53,9 +54,54 @@ compose:
           out:
             baseQueue: resolved
 
+        - call: lcod://tooling/value/default_object@0.1.0
+          in:
+            value: $.visited
+          out:
+            currentVisited: resolved
+
+        - call: lcod://tooling/script@1
+          in:
+            source: |
+              async ({ state }) => {
+                const visited = state.visited && typeof state.visited === 'object' && !Array.isArray(state.visited)
+                  ? { ...state.visited }
+                  : {};
+                const pointer = state.pointer && typeof state.pointer === 'object' && !Array.isArray(state.pointer)
+                  ? state.pointer
+                  : null;
+                if (!pointer) {
+                  return { shouldProcess: false, pointerKey: null, visited };
+                }
+                let key = null;
+                if (typeof pointer.id === 'string' && pointer.id.length > 0) {
+                  key = `id:${pointer.id}`;
+                } else {
+                  try {
+                    key = `json:${JSON.stringify(pointer)}`;
+                  } catch (_err) {
+                    key = `ptr:${Date.now()}-${Math.random().toString(16).slice(2)}`;
+                  }
+                }
+                if (key && visited[key]) {
+                  return { shouldProcess: false, pointerKey: key, visited };
+                }
+                if (key) {
+                  visited[key] = true;
+                }
+                return { shouldProcess: true, pointerKey: key, visited };
+              }
+            input:
+              pointer: $.headPointer
+              visited: $.currentVisited
+          out:
+            shouldProcess: shouldProcess
+            pointerKey: pointerKey
+            nextVisited: visited
+
         - call: lcod://flow/if@1
           in:
-            cond: $.headPointer
+            cond: $.shouldProcess
           children:
             then:
               - call: lcod://tooling/registry_sources/process_pointer@0.1.0
@@ -232,6 +278,11 @@ compose:
                   warnings: $.updatedWarnings
                 out:
                   warnings: warnings
+              - call: lcod://impl/set@1
+                in:
+                  visited: $.nextVisited
+                out:
+                  visited: visited
             else:
               - call: lcod://impl/set@1
                 in:
@@ -250,10 +301,16 @@ compose:
                   warnings: $.baseWarnings
                 out:
                   warnings: warnings
+              - call: lcod://impl/set@1
+                in:
+                  visited: $.nextVisited
+                out:
+                  visited: visited
           out:
             queue: queue
             contributions: contributions
             warnings: warnings
+            visited: visited
     out:
       loopState: state
 
