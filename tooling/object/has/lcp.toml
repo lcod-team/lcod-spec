@@ -1,0 +1,34 @@
+id = "lcod://tooling/object/has@0.1.0"
+name = "object.has"
+version = "0.1.0"
+kind = "component"
+
+summary = "Test whether an object has a value at the specified path."
+
+[[io.input]]
+name = "target"
+type = "object"
+description = "Object to inspect."
+
+[[io.input]]
+name = "path"
+type = "array"
+description = "Array of string keys representing the path to check."
+
+[[io.output]]
+name = "hasKey"
+type = "boolean"
+description = "True when the path resolves to a value."
+
+[[io.output]]
+name = "value"
+type = "any"
+description = "Value found at the path when present."
+
+[deps]
+requires = [
+  "lcod://impl/set@1",
+  "lcod://tooling/script@1",
+  "lcod://tooling/value/default_array@0.1.0",
+  "lcod://tooling/value/default_object@0.1.0"
+]

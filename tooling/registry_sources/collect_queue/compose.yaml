@@ -60,50 +60,130 @@ compose:
           out:
             currentVisited: resolved
 
-        - call: lcod://tooling/script@1
+        - call: lcod://tooling/value/is_string_nonempty@0.1.0
           in:
-            source: |
-              async ({ state }) => {
-                const visited = state.visited && typeof state.visited === 'object' && !Array.isArray(state.visited)
-                  ? { ...state.visited }
-                  : {};
-                const pointer = state.pointer && typeof state.pointer === 'object' && !Array.isArray(state.pointer)
-                  ? state.pointer
-                  : null;
-                if (!pointer) {
-                  return { shouldProcess: false, pointerKey: null, visited };
-                }
-                let key = null;
-                if (typeof pointer.id === 'string' && pointer.id.length > 0) {
-                  key = `id:${pointer.id}`;
-                } else {
-                  try {
-                    key = `json:${JSON.stringify(pointer)}`;
-                  } catch (_err) {
-                    key = `ptr:${Date.now()}-${Math.random().toString(16).slice(2)}`;
-                  }
-                }
-                if (key && visited[key]) {
-                  return { shouldProcess: false, pointerKey: key, visited };
-                }
-                if (key) {
-                  visited[key] = true;
-                }
-                return { shouldProcess: true, pointerKey: key, visited };
-              }
-            input:
-              pointer: $.headPointer
-              visited: $.currentVisited
+            value: $.headPointer.id
           out:
-            shouldProcess: shouldProcess
-            pointerKey: pointerKey
-            nextVisited: visited
+            pointerHasId: ok
+
+        - call: lcod://core/string/format@0.1.0
+          in:
+            template: "id:{id}"
+            values:
+              id: $.headPointer.id
+          out:
+            pointerKeyFromId: value
+
+        - call: lcod://tooling/json/stable_stringify@0.1.0
+          in:
+            value: $.headPointer
+          out:
+            pointerSerialized: text
+            pointerSerializeWarning: warning
+
+        - call: lcod://tooling/value/is_string_nonempty@0.1.0
+          in:
+            value: $.pointerSerialized
+          out:
+            hasPointerSerialized: ok
 
         - call: lcod://flow/if@1
           in:
-            cond: $.shouldProcess
+            cond: $.hasPointerSerialized
           children:
             then:
+              - call: lcod://tooling/hash/to_key@0.1.0
+                in:
+                  text: $.pointerSerialized
+                  prefix: "json:"
+                out:
+                  hashedPointerKey: key
+            else:
+              - call: lcod://impl/set@1
+                in:
+                  hashedPointerKey: "json:missing"
+                out:
+                  hashedPointerKey: hashedPointerKey
+          out:
+            hashedPointerKey: hashedPointerKey
+
+        - call: lcod://flow/if@1
+          in:
+            cond: $.pointerHasId
+          children:
+            then:
+              - call: lcod://impl/set@1
+                in:
+                  pointerKey: $.pointerKeyFromId
+                out:
+                  pointerKey: pointerKey
+            else:
+              - call: lcod://impl/set@1
+                in:
+                  pointerKey: $.hashedPointerKey
+                out:
+                  pointerKey: pointerKey
+          out:
+            pointerKey: pointerKey
+
+        - call: lcod://tooling/array/append@0.1.0
+          in:
+            items: []
+            value: $.pointerKey
+          out:
+            pointerPath: items
+
+        - call: lcod://tooling/object/has@0.1.0
+          in:
+            target: $.currentVisited
+            path: $.pointerPath
+          out:
+            pointerAlreadyVisited: hasKey
+            existingVisitedValue: value
+
+        - call: lcod://tooling/value/is_string_nonempty@0.1.0
+          in:
+            value: $.pointerSerializeWarning
+          out:
+            hasSerializeWarning: ok
+
+        - call: lcod://flow/if@1
+          in:
+            cond: $.hasSerializeWarning
+          children:
+            then:
+              - call: lcod://tooling/array/append@0.1.0
+                in:
+                  items: $.baseWarnings
+                  value: $.pointerSerializeWarning
+                out:
+                  warningAccumulator: items
+            else:
+              - call: lcod://impl/set@1
+                in:
+                  warningAccumulator: $.baseWarnings
+                out:
+                  warningAccumulator: warningAccumulator
+          out:
+            warningAccumulator: warningAccumulator
+
+        - call: lcod://flow/if@1
+          in:
+            cond: $.pointerAlreadyVisited
+          children:
+            then:
+              - call: lcod://impl/set@1
+                in:
+                  queue: $.baseQueue
+                  contributions: $.baseContributions
+                  warnings: $.warningAccumulator
+                  visited: $.currentVisited
+                out:
+                  queue: queue
+                  contributions: contributions
+                  warnings: warnings
+                  visited: visited
+            else:
               - call: lcod://tooling/registry_sources/process_pointer@0.1.0
                 in:
                   pointer: $.headPointer
@@ -242,7 +322,7 @@ compose:
 
               - call: lcod://tooling/array/append@0.1.0
                 in:
-                  items: $.baseWarnings
+                  items: $.warningAccumulator
                   values: $.pointerWarnings
                 out:
                   updatedWarnings: items
@@ -261,50 +341,25 @@ compose:
                 out:
                   updatedQueue: items
 
+              - call: lcod://tooling/object/set@0.1.0
+                in:
+                  target: $.currentVisited
+                  path: $.pointerPath
+                  value: true
+                out:
+                  updatedVisited: object
+                  previousVisited: previous
+
               - call: lcod://impl/set@1
                 in:
                   queue: $.updatedQueue
-                out:
-                  queue: queue
-
-              - call: lcod://impl/set@1
-                in:
                   contributions: $.updatedContributions
-                out:
-                  contributions: contributions
-
-              - call: lcod://impl/set@1
-                in:
                   warnings: $.updatedWarnings
-                out:
-                  warnings: warnings
-              - call: lcod://impl/set@1
-                in:
-                  visited: $.nextVisited
-                out:
-                  visited: visited
-            else:
-              - call: lcod://impl/set@1
-                in:
-                  queue: $.baseQueue
+                  visited: $.updatedVisited
                 out:
                   queue: queue
-
-              - call: lcod://impl/set@1
-                in:
-                  contributions: $.baseContributions
-                out:
                   contributions: contributions
-
-              - call: lcod://impl/set@1
-                in:
-                  warnings: $.baseWarnings
-                out:
                   warnings: warnings
-              - call: lcod://impl/set@1
-                in:
-                  visited: $.nextVisited
-                out:
                   visited: visited
           out:
             queue: queue

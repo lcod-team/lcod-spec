@@ -1,0 +1,40 @@
+id = "lcod://tooling/object/set@0.1.0"
+name = "object.set"
+version = "0.1.0"
+kind = "component"
+
+summary = "Clone an object and assign a value at a path."
+
+[[io.input]]
+name = "target"
+type = "object"
+description = "Object to clone and mutate; optional."
+
+[[io.input]]
+name = "path"
+type = "array"
+description = "Array of string keys describing the path to set."
+
+[[io.input]]
+name = "value"
+type = "any"
+description = "Value to assign at the provided path."
+
+[[io.output]]
+name = "object"
+type = "object"
+description = "Updated object with the assigned value."
+
+[[io.output]]
+name = "previous"
+type = "object"
+description = "Clone of the original object before assignment."
+
+[deps]
+requires = [
+  "lcod://flow/if@1",
+  "lcod://impl/set@1",
+  "lcod://tooling/script@1",
+  "lcod://tooling/value/default_array@0.1.0",
+  "lcod://tooling/value/default_object@0.1.0"
+]

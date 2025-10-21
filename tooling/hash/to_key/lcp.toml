@@ -1,0 +1,28 @@
+id = "lcod://tooling/hash/to_key@0.1.0"
+name = "hash.to_key"
+version = "0.1.0"
+kind = "component"
+
+summary = "Build a key from text content with optional prefix using SHA-256."
+
+[[io.input]]
+name = "text"
+type = "string"
+description = "Input text to hash."
+
+[[io.input]]
+name = "prefix"
+type = "string"
+description = "Optional prefix prepended to the hash."
+optional = true
+
+[[io.output]]
+name = "key"
+type = "string"
+description = "Generated key."
+
+[deps]
+requires = [
+  "lcod://tooling/hash/sha256_base64@0.1.0",
+  "lcod://tooling/script@1"
+]
