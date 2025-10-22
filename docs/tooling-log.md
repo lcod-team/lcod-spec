@@ -52,11 +52,12 @@ Runtimes maintain a per-scope log context (similar to MDC). A helper like `lcod:
 compose:
   - call: tooling/log.context@1
     in: { tags: { requestId: $.request.id } }
-    children:
-      - call: lcod://contract/tooling/log@1
-        in:
-          level: info
-          message: "processing request"
+    slots:
+      body:
+        - call: lcod://contract/tooling/log@1
+          in:
+            level: info
+            message: "processing request"
 ```
 
 On exit, tags are restored. Nested scopes merge tags (`child` tags override on key collision). This matches the `Mapped Diagnostic Context` concept without relying on thread-local storage.

@@ -76,7 +76,7 @@ compose:
   - call: lcod://flow/foreach@1
     in:
       stream: $.download.stream
-    children:
+    slots:
       body:
         - call: lcod://core/stream/read@1
           in:
@@ -87,7 +87,7 @@ compose:
         - call: lcod://flow/if@1
           in:
             cond: $.current.done
-          children:
+          slots:
             then:
               - call: lcod://core/stream/close@1
                 in:

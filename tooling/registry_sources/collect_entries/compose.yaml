@@ -38,25 +38,6 @@ compose:
   - call: lcod://flow/foreach@1
     in:
       list: $.sourcesList
-    children:
-      body:
-        - call: lcod://tooling/registry_sources/normalize_pointer@0.1.0
-          in:
-            entry: $slot.item
-            baseDir: $.sourcesBaseDir
-            sourcesBaseDir: $.sourcesBaseDir
-            defaultEntrypoint: $.defaultEntrypoint
-            basePriority: $.basePriority
-          out:
-            pointer: pointer
-            warnings: warnings
-        - call: lcod://impl/set@1
-          in:
-            normalized:
-              pointer: $.pointer
-              warnings: $.warnings
-          out:
-            normalized: normalized
     collectPath: $.normalized
     out:
       rootNormalized: results

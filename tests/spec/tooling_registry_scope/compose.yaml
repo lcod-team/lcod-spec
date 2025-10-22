@@ -16,70 +16,6 @@ compose:
                       input: __lcod_state__
                     out:
                       value: $
-          children:
-            - call: lcod://tooling/registry/scope@1
-              in:
-                bindings:
-                  lcod://contract/testing/value@1: lcod://impl/testing/override@1
-                components:
-                  - id: lcod://impl/testing/override@1
-                    compose:
-                      - call: lcod://tooling/script@1
-                        in:
-                          source: |
-                            async ({ state }) => `override:${state?.payload ?? ''}`
-                          input: __lcod_state__
-                        out:
-                          value: $
-                  - id: lcod://helper/testing/echo@1
-                    compose:
-                      - call: lcod://tooling/script@1
-                        in:
-                          source: |
-                            async ({ state }) => ({ echoed: state?.value ?? null })
-                          input: __lcod_state__
-                        out:
-                          result: $
-              children:
-                - call: lcod://contract/testing/value@1
-                  in:
-                    payload: hello
-                  out:
-                    scopedValue: value
-                - call: lcod://helper/testing/echo@1
-                  in:
-                    value: inside scope
-                  out:
-                    echoResult: result
-              out:
-                scopedValue: scopedValue
-                echoResult: echoResult
-              slots:
-                - call: lcod://contract/testing/value@1
-                  in:
-                    payload: hello
-                  out:
-                    scopedValue: value
-                - call: lcod://helper/testing/echo@1
-                  in:
-                    value: inside scope
-                  out:
-                    echoResult: result
-            - call: lcod://tooling/script@1
-              in:
-                source: |
-                  async (_scope, api) => {
-                    const baseResult = await api.call('lcod://contract/testing/value@1', { payload: 'hello' });
-                    let helperAvailable = true;
-                    try {
-                      await api.call('lcod://helper/testing/echo@1', { value: 'outside scope' });
-                    } catch (_err) {
-                      helperAvailable = false;
-                    }
-                    return { baseResult: baseResult?.value ?? null, helperAvailable };
-                  }
-              out:
-                postScope: $
           out:
             scopedValue: scopedValue
             echoResult: echoResult
@@ -108,17 +44,6 @@ compose:
                           input: __lcod_state__
                         out:
                           result: $
-              children:
-                - call: lcod://contract/testing/value@1
-                  in:
-                    payload: hello
-                  out:
-                    scopedValue: value
-                - call: lcod://helper/testing/echo@1
-                  in:
-                    value: inside scope
-                  out:
-                    echoResult: result
               out:
                 scopedValue: scopedValue
                 echoResult: echoResult

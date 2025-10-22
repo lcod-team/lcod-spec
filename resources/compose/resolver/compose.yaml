@@ -31,42 +31,6 @@ compose:
       cond: $.hasConfigPath
     out:
       configText: configText
-    children:
-      then:
-        - call: lcod://axiom/fs/read-file@1
-          in:
-            path: $.configPath
-            encoding: utf-8
-          out:
-            configText: data
-      else:
-        - call: lcod://axiom/path/join@1
-          in:
-            base: $.projectPath
-            segment: resolve.config.json
-          out:
-            defaultConfigPath: path
-        - call: lcod://tooling/script@1
-          in:
-            source: |
-              async ({ state, imports }) => {
-                const fallback = '{"sources":{}}';
-                const path = typeof state?.defaultPath === 'string' ? state.defaultPath : null;
-                if (!path) return { configText: fallback };
-                try {
-                  const file = await imports.fsReadFile({ path, encoding: 'utf-8' });
-                  return { configText: file?.data ?? fallback };
-                } catch (err) {
-                  return { configText: fallback, warning: `Failed to read ${path}: ${err.message}` };
-                }
-              }
-            input:
-              defaultPath: $.defaultConfigPath
-            imports:
-              fsReadFile: lcod://axiom/fs/read-file@1
-          out:
-            configText: configText
-            configWarning: warning
     slots:
       then:
         - call: lcod://axiom/fs/read-file@1
@@ -118,20 +82,6 @@ compose:
       cond: $.hasConfigText
     out:
       resolverConfig: resolverConfig
-    children:
-      then:
-        - call: lcod://axiom/json/parse@1
-          in:
-            text: $.configText
-          out:
-            resolverConfig: value
-      else:
-        - call: lcod://impl/set@1
-          in:
-            resolverConfig:
-              sources: {}
-          out:
-            resolverConfig: resolverConfig
     slots:
       then:
         - call: lcod://axiom/json/parse@1
@@ -149,20 +99,6 @@ compose:
   - call: lcod://flow/if@1
     in:
       cond: $.outputPath
-    children:
-      then:
-        - call: lcod://impl/set@1
-          in:
-            lockPath: $.outputPath
-          out:
-            lockPath: lockPath
-      else:
-        - call: lcod://axiom/path/join@1
-          in:
-            base: $.projectPath
-            segment: lcp.lock
-          out:
-            lockPath: path
     out:
       lockPath: lockPath
     slots:
@@ -194,18 +130,6 @@ compose:
       cond: $.hasCacheOverride
     out:
       cacheDir: cacheDir
-    children:
-      then:
-        - call: lcod://impl/set@1
-          in:
-            cacheDir: $.cacheDir
-          out:
-            cacheDir: cacheDir
-      else:
-        - call: lcod://tooling/resolver/cache-dir@1
-          in: {}
-          out:
-            cacheDir: cacheDir
     slots:
       then:
         - call: lcod://impl/set@1

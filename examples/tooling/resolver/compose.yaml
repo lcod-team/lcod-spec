@@ -23,16 +23,6 @@ compose:
   - call: lcod://flow/foreach@1
     in:
       list: $.descriptor.deps.requires
-    children:
-      body:
-        - call: lcod://contract/tooling/resolve-dependency@1
-          in:
-            dependency: $slot.item
-            config: $.resolverConfig
-            projectPath: $.projectPath
-          out:
-            resolved: resolved
-      else: []
     collectPath: $.resolved
     out:
       components: results

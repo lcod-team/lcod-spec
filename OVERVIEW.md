@@ -192,12 +192,14 @@ Flow blocks with slots are expressed like:
 call: lcod://flow/if@1
 in:
   cond: $.ok
-children:
+slots:
   then:
     - call: …
   else:
     - call: …
 ```
+
+Legacy composes may still use the `children` key as a shorthand for the default slot; kernels keep accepting it for the moment, but new components should always rely on the explicit `slots` mapping.
 
 And a foreach with collection:
 
@@ -205,7 +207,7 @@ And a foreach with collection:
 call: lcod://flow/foreach@1
 in:
   list: $.chars
-children:
+slots:
   body:
     - call: lcod://contract/string/char-code@1
       in:

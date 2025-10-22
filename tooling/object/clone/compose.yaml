@@ -7,27 +7,6 @@ compose:
   - call: lcod://flow/if@1
     in:
       cond: $.isObject
-    children:
-      then:
-        - call: lcod://tooling/script@1
-          in:
-            source: |
-              async ({ state }) => {
-                if (!state.value || typeof state.value !== 'object' || Array.isArray(state.value)) {
-                  return { clone: {} };
-                }
-                return { clone: JSON.parse(JSON.stringify(state.value)) };
-              }
-            input:
-              value: $.value
-          out:
-            clone: clone
-      else:
-        - call: lcod://impl/set@1
-          in:
-            clone: {}
-          out:
-            clone: clone
     out:
       clone: clone
     slots:

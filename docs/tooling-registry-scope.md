@@ -86,8 +86,11 @@ compose:
             - call: lcod://axiom/fs/read-file@1
               in:
                 path: $.cachePath
-    children:
-      - call: flow-alpha/internal/cache@1
+    slots:
+      body:
+        - call: flow-alpha/internal/cache@1
+
+Legacy composes previously expressed scope bodies through a `children` array; kernels still accept it for compatibility, but new flows should rely on the explicit `slots.body` branch.
 ```
 
 Any component or binding registered inside the scope is available to child steps, but not to the parent scope. When the federated registry loader (`lcod-resolver`) pulls catalogues from multiple sources, the base scope already contains all registered components from these catalogues; `tooling/registry/scope@1` simply layers temporary overrides on top.
@@ -108,34 +111,40 @@ compose:
   - call: tooling/registry/scope@1  # server scope
     in:
       id: server
-    children:
-      - call: tooling/registry/scope@1  # environment: dev
-        in:
-          id: env-dev
-        children:
-          - call: tooling/registry/scope@1  # project A (dev bindings)
-            in:
-              id: projectA-dev
-              bindings:
-                lcod://contract/http/handler@1: lcod://impl/projectA/dev/http@1
-            children:
-              - call: projectA/http_app@1
-          - call: tooling/registry/scope@1  # project B (dev bindings)
-            in:
-              id: projectB-dev
-            children:
-              - call: projectB/http_app@1
-      - call: tooling/registry/scope@1  # environment: prod
-        in:
-          id: env-prod
-        children:
-          - call: tooling/registry/scope@1
-            in:
-              id: projectA-prod
-              bindings:
-                lcod://contract/http/handler@1: lcod://impl/projectA/prod/http@1
-            children:
-              - call: projectA/http_app@1
+    slots:
+      body:
+        - call: tooling/registry/scope@1  # environment: dev
+          in:
+            id: env-dev
+          slots:
+            body:
+              - call: tooling/registry/scope@1  # project A (dev bindings)
+                in:
+                  id: projectA-dev
+                  bindings:
+                    lcod://contract/http/handler@1: lcod://impl/projectA/dev/http@1
+                slots:
+                  body:
+                    - call: projectA/http_app@1
+              - call: tooling/registry/scope@1  # project B (dev bindings)
+                in:
+                  id: projectB-dev
+                slots:
+                  body:
+                    - call: projectB/http_app@1
+        - call: tooling/registry/scope@1  # environment: prod
+          in:
+            id: env-prod
+          slots:
+            body:
+              - call: tooling/registry/scope@1
+                in:
+                  id: projectA-prod
+                  bindings:
+                    lcod://contract/http/handler@1: lcod://impl/projectA/prod/http@1
+                slots:
+                  body:
+                    - call: projectA/http_app@1
 ```
 
 Each scope inherits registered helpers and bindings from its parent, so hosts can layer overrides cleanly (`project → environment → server`) while keeping the kernel ignorant of those semantics.

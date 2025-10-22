@@ -12,13 +12,6 @@ compose:
               }
             input:
               value: 4
-          children:
-            child:
-              - call: lcod://impl/echo@1
-                in:
-                  value: $.payload
-                out:
-                  result: $
           out:
             report: $
           slots:

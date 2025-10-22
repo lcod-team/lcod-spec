@@ -23,24 +23,6 @@ compose:
   - call: lcod://flow/if@1
     in:
       cond: $.configValid
-    children:
-      then:
-        - call: lcod://tooling/registry_sources/collect_entries@0.1.0
-          in:
-            sourcesConfig: $.sourcesConfig
-            sourcesBaseDir: $.sourcesBaseDir
-            downloadsRoot: $.downloadsRoot
-          out:
-            registrySources: registrySources
-            collectWarnings: warnings
-      else:
-        - call: lcod://impl/set@1
-          in:
-            registrySources: []
-            collectWarnings: []
-          out:
-            registrySources: registrySources
-            collectWarnings: collectWarnings
     out:
       registrySources: registrySources
       collectWarnings: collectWarnings

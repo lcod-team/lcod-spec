@@ -13,7 +13,7 @@ Expands author-friendly shortcuts (“sugar”) into the canonical compose shape
 | --- | --- |
 | Identity & optional keys | Collapse `foo: $.foo`/`foo: foo` boilerplate and allow opt-in omission via `key?`. |
 | Spreads | Merge whole objects with `...` shorthands instead of enumerating keys. |
-| Children | Normalize slot collections so every branch is handled consistently. |
+| Slots | Normalize slot collections so every branch is handled consistently. |
 
 The component accepts an object with a `compose` array and returns the normalized version. Kernels call it before executing any flow so that reviewers see the short form, while runtimes always deal with the fully expanded structure.
 
@@ -53,7 +53,7 @@ compose:
 1. **Identity mappings** – `foo: '='` ⇢ `foo: '$.foo'`, `bar: '='` ⇢ `bar: 'bar'`.
 2. **Optional keys** – append `?` (`configPath?: '='`) to skip mappings when the referenced path is absent.
 3. **Spreads** – use `...` to merge objects: `...: $.payload`, `...lock: '='`, or pass descriptors (`...: { source: $.payload, pick: ['path','data'] }`).
-4. **Children shorthand** – `children: [ ... ]` targets the default slot; nested maps are normalized recursively.
+4. **Slots** – ensure every slot appears under `slots: { name: [...] }`. Legacy `children` shorthands are still expanded for backwards compatibility but should be avoided in new comps.
 5. **Nested structures** – sugar only applies at the top-level, ensuring inner objects/arrays remain untouched.
 
 The component emits reserved markers to describe these constructs in canonical form:
