@@ -4,7 +4,7 @@ compose:
       compose:
         - call: lcod://tooling/component/build_artifacts@0.1.0
           in:
-            descriptorPath: "contracts/core/fs/write_file/lcp.toml"
+            descriptorPath: "../../contracts/core/fs/write_file/lcp.toml"
             write: false
           out:
             build: $
