@@ -1,0 +1,96 @@
+schemaVersion = "2.0"
+id = "lcod://contract/core/fs/write-file@1.0.0"
+version = "1.0.0"
+kind = "contract"
+summary = "Write data to the local filesystem with optional encoding and metadata controls."
+
+[hints]
+timeoutMs = 5_000
+
+[tool]
+name = "fs_write_file"
+description = "Persist data to disk, creating parent directories when requested."
+inputSchema = "schema/write_file.in.json"
+outputSchema = "schema/write_file.out.json"
+
+[inputs.path]
+summary = "Absolute or project-relative file path."
+schema = """
+{
+  "type": "string",
+  "minLength": 1
+}"""
+required = true
+
+[inputs.data]
+summary = "Payload to write. Interpreted according to encoding."
+schema = """
+{
+  "type": "string"
+}"""
+required = true
+
+[inputs.encoding]
+summary = "Encoding applied to data. Defaults to utf-8."
+schema = """
+{
+  "type": "string",
+  "enum": ["utf-8", "base64", "hex"]
+}"""
+
+[inputs.append]
+summary = "Append to an existing file instead of replacing it."
+schema = """
+{
+  "type": "boolean"
+}"""
+
+[inputs.createParents]
+summary = "Create missing parent directories when true."
+schema = """
+{
+  "type": "boolean"
+}"""
+
+[inputs.mode]
+summary = "Optional POSIX file mode (octal string)."
+schema = """
+{
+  "type": "string",
+  "pattern": "^[0-7]{3,4}$"
+}"""
+
+[outputs.bytesWritten]
+summary = "Number of bytes written to disk."
+schema = """
+{
+  "type": "integer",
+  "minimum": 0
+}"""
+required = true
+
+[outputs.mtime]
+summary = "Last modification timestamp after writing."
+schema = """
+{
+  "type": "string",
+  "format": "date-time"
+}"""
+
+[documentation]
+body = """
+Writes data to the local filesystem, optionally creating parent directories.
+
+## Input (`schema/write_file.in.json`)
+- `path` (string) — absolute or project-relative file path.
+- `data` (string) — payload to write.
+- `encoding` (string, optional) — `utf-8`, `base64`, or `hex` (defaults to `utf-8`).
+- `append` (boolean, optional) — when `true`, append to an existing file instead of replacing it.
+- `createParents` (boolean, optional) — create missing parent directories (defaults to `false`).
+- `mode` (string, optional) — POSIX-style file mode (e.g. `0644`).
+
+## Output (`schema/write_file.out.json`)
+- `bytesWritten` (number) — number of bytes written to disk.
+- `mtime` (string, optional) — last modified timestamp in ISO 8601 format.
+
+Implementations should surface filesystem errors with clear codes (e.g. `EACCES`, `ENOENT`)."""

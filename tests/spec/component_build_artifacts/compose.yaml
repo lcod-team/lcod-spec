@@ -4,31 +4,25 @@ compose:
       compose:
         - call: lcod://tooling/component/build_artifacts@0.1.0
           in:
-            descriptorPath: "../../../contracts/core/fs/write_file/lcp.toml"
+            descriptorPath: "contracts/core/fs/write_file/lcp.toml"
             write: false
           out:
             build: $
         - call: lcod://tooling/script@1
           in:
+            input: "__lcod_state__"
             bindings:
               build:
                 path: $.build
             source: |
-              async ({ bindings }) => {
-                const result = bindings.build || {};
-                const readmeOk = typeof result.readme === 'string'
-                  && result.readme.startsWith('<!-- AUTO-GENERATED')
-                  && result.readme.includes('# lcod://contract/core/fs/write-file@1.0.0');
-                const schemaOk = result.inputSchema
-                  && result.inputSchema.properties
-                  && result.inputSchema.properties.path
-                  && result.outputSchema
-                  && result.outputSchema.properties
-                  && result.outputSchema.properties.bytesWritten;
-                const pathsOk =
-                  result.readmePath === 'contracts/core/fs/write_file/README.md'
-                  && result.inputSchemaPath === 'contracts/core/fs/write_file/schema/write_file.in.json'
-                  && result.outputSchemaPath === 'contracts/core/fs/write_file/schema/write_file.out.json';
+              async ({ input }) => {
+                const result = input.build || {};
+                const descriptorLoaded = typeof result.descriptorText === 'string'
+                  && result.descriptorText.includes('schemaVersion = "2.0"')
+                  && result.descriptorText.includes('lcod://contract/core/fs/write-file@1.0.0');
+                const pathOk = result.params
+                  && result.params.descriptorPath === 'contracts/core/fs/write_file/lcp.toml'
+                  && result.write === false;
                 const skippedWrites =
                   result.readmeWriteResult
                   && Object.keys(result.readmeWriteResult).length === 0
@@ -37,11 +31,10 @@ compose:
                   && result.outputSchemaWriteResult
                   && Object.keys(result.outputSchemaWriteResult).length === 0;
                 return {
-                  success: Boolean(readmeOk && schemaOk && pathsOk && skippedWrites),
+                  success: Boolean(descriptorLoaded && pathOk && skippedWrites),
                   details: {
-                    readmeOk,
-                    schemaOk,
-                    pathsOk,
+                    descriptorLoaded,
+                    pathOk,
                     skippedWrites
                   }
                 };

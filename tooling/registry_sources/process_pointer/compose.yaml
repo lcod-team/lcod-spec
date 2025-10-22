@@ -58,10 +58,28 @@ compose:
               const baseDirHint = await ensureString(pointer.catalogueBaseDir);
               const effectiveBase = baseDirHint || pointer.baseDir || '.';
               const absolutePath = await resolveAbsolute(effectiveBase, rawPath);
-              if (!absolutePath) throw new Error('Unable to resolve file path for catalogue pointer');
-              const text = await readUtf8(absolutePath);
-              const baseDir = await dirname(absolutePath);
-              return { text, baseDir, originPath: absolutePath };
+              const readCatalogue = async (pathCandidate) => {
+                if (!pathCandidate) throw new Error('Unable to resolve file path for catalogue pointer');
+                const text = await readUtf8(pathCandidate);
+                const baseDir = await dirname(pathCandidate);
+                return { text, baseDir, originPath: pathCandidate };
+              };
+              try {
+                return await readCatalogue(absolutePath);
+              } catch (error) {
+                const fallbackBase = pointer.baseDir && pointer.baseDir.length
+                  ? await joinChain(pointer.baseDir, 'registry')
+                  : null;
+                if (fallbackBase && rawPath.startsWith('./')) {
+                  try {
+                    const fallbackPath = await resolveAbsolute(fallbackBase, rawPath);
+                    return await readCatalogue(fallbackPath);
+                  } catch (_) {
+                    throw error;
+                  }
+                }
+                throw error;
+              }
             }
 
             if (kind === 'http' || kind === 'https') {

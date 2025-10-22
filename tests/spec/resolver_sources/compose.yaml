@@ -39,12 +39,13 @@ compose:
                   id: entry.id,
                   priority: Number.isFinite(entry.priority) ? entry.priority : null,
                   defaults: entry.defaults || null,
-                  packages: Array.isArray(entry.lines)
-                    ? entry.lines
-                        .filter((line) => line && line.kind === 'component')
-                        .map((line) => `${line.id}@${line.version}`)
-                        .sort()
-                    : []
+                  packages: Array.from(new Set(
+                      Array.isArray(entry.lines)
+                        ? entry.lines
+                            .filter((line) => line && line.kind === 'component')
+                            .map((line) => `${line.id}@${line.version}`)
+                        : []
+                    )).sort()
                 });
 
                 const summary = Array.isArray(state.registrySources)
