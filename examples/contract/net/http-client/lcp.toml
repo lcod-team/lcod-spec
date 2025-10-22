@@ -1,7 +1,5 @@
-schemaVersion = "1.0"
+schemaVersion = "2.0"
 id = "lcod://contract/net/http-client@1.0.0"
-name = "http-client"
-namespace = "contract/net"
 version = "1.0.0"
 kind = "contract"
 summary = "HTTP client contract: GET-like call"
@@ -12,6 +10,5 @@ description = "Perform an HTTP GET-like request"
 inputSchema = "schema/http.in.json"
 outputSchema = "schema/http.out.json"
 
-[docs]
-readme = "README.md"
-
+[documentation]
+body = "Minimal HTTP client contract describing a GET-like call (input: url/headers/timeout; output: status/body/headers)."

@@ -1,4 +1,9 @@
-# Contract: core/parse/toml@1
+<!-- AUTO-GENERATED: edit lcp.toml and run scripts/build-component-artifacts.mjs -->
+# lcod://contract/core/parse/toml@1.0.0
+
+Parse TOML text into a JSON-compatible object.
+
+## Notes
 
 Parses TOML content into a JSON-compatible object, mirroring the behavior expected for `lcp.toml` descriptors.
 

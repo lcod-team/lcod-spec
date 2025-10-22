@@ -4,7 +4,7 @@ Flow operators are reusable components that manipulate control flow in `compose.
 
 ## Common behaviour
 - Flow blocks are invoked like normal steps: they accept `in`, expose outputs via `out`, and may define `collectPath` semantics.
-- Each block receives a `children` object describing its slots. Missing slots default to empty arrays.
+- Each block receives a `slots` object describing its slots. Missing slots default to empty arrays. The legacy alias `children` is still accepted while older kernels are phased out.
 - Errors thrown inside slots bubble up unless the block handles them explicitly (e.g. `flow/try`).
 
 ## `lcod://flow/if@1`
@@ -16,7 +16,7 @@ Conditional execution with two slots: `then` and `else`.
 
 ### Slots
 ```
-children: {
+slots: {
   "then": [...],  // executed when cond is truthy
   "else": [...]   // executed when cond is falsy (optional)
 }
@@ -37,7 +37,7 @@ Iterates over an array or async stream and optionally collects a result.
 
 ### Slots
 ```
-children: {
+slots: {
   "body":  [...],  // required, executed for each item
   "else":  [...]   // optional, executed once when the sequence is empty
 }
@@ -63,7 +63,7 @@ Runs child tasks concurrently and waits for all of them to complete.
 
 ### Slots
 ```
-children: {
+slots: {
   "tasks": [ ... ]  // required, executed once per item in tasks array
 }
 ```
@@ -73,7 +73,7 @@ The slot receives `$slot.index` and `$slot.item` (the element from `tasks`). Eac
 The block returns an array of collected values (when `collectPath` provided) or merges explicit outputs exposed by the slot runs. Errors from any task fail the whole block unless handled internally.
 
 ## Try/Catch/Finally (preview)
-`lcod://flow/try@1` and `lcod://flow/throw@1` are specified in `docs/errors.md` (see issue M1-03). They follow the same slot model with `children`, `catch`, `finally`.
+`lcod://flow/try@1` and `lcod://flow/throw@1` are specified in `docs/errors.md` (see issue M1-03). They follow the same slot model with `slots.body`, `slots.catch`, `slots.finally`.
 
 ## Referencing flow blocks in lcp.toml
 Flow blocks are regular components published under the `flow/` namespace. Composite packages include them in `deps.requires` using major versions (e.g. `lcod://flow/foreach@1`). Hosts may replace versions or implementations through resolver bindings.

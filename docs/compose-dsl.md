@@ -51,17 +51,20 @@ out:
 
 After the step completes, subsequent steps may read `$.payload`.
 
-## `children`
-Declares nested steps for slots exposed by the callee.
+## `slots`
+Declares nested steps for the slots exposed by the callee. The canonical key is
+`slots`; the legacy alias `children` is still accepted for backward compatibility
+but new compositions should prefer `slots`.
 
-- **Single-slot shorthand** — supply an array: `"children": [ { ... }, { ... } ]`. The array is interpreted as the default slot named `children`.
+- **Single-slot shorthand** — supply an array: `"slots": [ { ... }, { ... } ]`.
+  The array is interpreted as the default slot named `body`.
 - **Named slots** — supply an object mapping slot names to arrays:
 
 ```yaml
 call: lcod://flow/if@1
 in:
   cond: $.ok
-children:
+slots:
   then:
     - call: lcod://impl/send@1
       in:
@@ -72,7 +75,9 @@ children:
         message: Fallback
 ```
 
-Nested children form their own lexical scope. The kernel injects slot variables under `$slot.*` (e.g. foreach provides `{ item, index }`). Implementations can also invoke child slots from native code via `ctx.runSlot(name, localState, slotVars)`.
+Nested slots form their own lexical scope. The kernel injects slot variables under
+`$slot.*` (e.g. foreach provides `{ item, index }`). Implementations can also
+invoke child slots from native code via `ctx.runSlot(name, localState, slotVars)`.
 
 ## `collectPath`
 Optional string evaluated after the step resolves. It reads from the result of the step (or slot state) and appends the value to a list managed by the callee. Currently used by `lcod://flow/foreach@1` to gather loop results. The path is evaluated against `{ $: stepResult, $slot: currentSlotVars }` using dot notation.
@@ -89,7 +94,7 @@ compose:
   - call: lcod://flow/foreach@1
     in:
       list: $.numbers
-    children:
+    slots:
       body:
         - call: lcod://impl/is_even@1
           in:
@@ -99,7 +104,7 @@ compose:
         - call: lcod://flow/if@1
           in:
             cond: $.even
-          children:
+          slots:
             then:
               - call: lcod://flow/continue@1
         - call: lcod://impl/echo@1

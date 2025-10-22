@@ -1,4 +1,9 @@
-# tooling/resolver
+<!-- AUTO-GENERATED: edit lcp.toml and run scripts/build-component-artifacts.mjs -->
+# lcod://tooling/resolver@0.1.0
+
+Composite resolver that produces lcp.lock from lcp.toml using filesystem/network axioms.
+
+## Notes
 
 Prototype composite that resolves dependencies declared in `lcp.toml` and emits an `lcp.lock`. It reuses the resolver helper components (`lcod://tooling/resolver/internal/load-descriptor@0.1.0`, `load-config`, `lock-path`, `build-lock`) shipped alongside the `lcod-resolver` project.
 

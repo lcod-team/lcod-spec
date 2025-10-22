@@ -1,7 +1,11 @@
 # DSL Slots and Scopes
 
-- Default single slot: `children` (array of steps). When a block has one slot, `children` can be provided directly as an array.
-- Multi-slot blocks: `children` is an object of slot names to arrays (e.g., `{ then: [...], else: [...] }`).
+- The canonical key is `slots`. Legacy `children` is still accepted and will be
+  generated automatically for backward compatibility.
+- Default single slot: `slots` may be provided directly as an array. The array
+  targets the default slot (`body` for foreach, `tasks` for parallel, etc.).
+- Multi-slot blocks: `slots` is an object of slot names to arrays (e.g.,
+  `{ then: [...], else: [...] }`).
 - Scopes and references:
   - `$` — run state (aliases created via `out`)
   - `$slot.*` — variables injected by the parent block (e.g., `item`, `index` for foreach; `error` for try)
@@ -14,6 +18,6 @@
 - Example: `collectPath: "$slot.index"` gathers iteration indices (see `test/flow.foreach.test.js`).
 
 ## Examples
-- If: `{ "call": "lcod://flow/if@1", "in": { "cond": "$.ok" }, "children": { "then": [...], "else": [...] } }`
-- Foreach: `{ "call": "lcod://flow/foreach@1", "in": { "list": "$.items" }, "children": { "body": [...] } }`
-- Parallel: `{ "call": "lcod://flow/parallel@1", "children": { "tasks": [ stepA, stepB ] } }`
+- If: `{ "call": "lcod://flow/if@1", "in": { "cond": "$.ok" }, "slots": { "then": [...], "else": [...] } }`
+- Foreach: `{ "call": "lcod://flow/foreach@1", "in": { "list": "$.items" }, "slots": { "body": [...] } }`
+- Parallel: `{ "call": "lcod://flow/parallel@1", "slots": { "tasks": [ stepA, stepB ] } }`

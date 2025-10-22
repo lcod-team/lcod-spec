@@ -1,4 +1,9 @@
-# Contract: core/stream/read@1
+<!-- AUTO-GENERATED: edit lcp.toml and run scripts/build-component-artifacts.mjs -->
+# lcod://contract/core/stream/read@1.0.0
+
+Read the next chunk from a stream handle.
+
+## Notes
 
 Reads the next chunk from a stream handle produced by another contract (HTTP response, filesystem reader, LLM event feed).
 

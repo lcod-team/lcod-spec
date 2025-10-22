@@ -1,4 +1,9 @@
-# flow/foreach demo
+<!-- AUTO-GENERATED: edit lcp.toml and run scripts/build-component-artifacts.mjs -->
+# lcod://flow/foreach_demo@0.1.0
+
+Demo foreach composition collecting values with else-slot.
+
+## Notes
 
 Minimal demo to exercise `lcod://flow/foreach@1` with value collection
 via `meta.collectPath`. Else-slot runs when the list is empty.

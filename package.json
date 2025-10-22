@@ -7,7 +7,8 @@
   "scripts": {
     "validate": "node scripts/validate.cjs",
     "test:conformance": "node scripts/run-conformance.mjs",
-    "bundle:runtime": "node scripts/package-runtime.mjs"
+    "bundle:runtime": "node scripts/package-runtime.mjs",
+    "build:components": "node scripts/build-component-artifacts.mjs"
   },
   "devDependencies": {
     "@iarna/toml": "^3.0.0",

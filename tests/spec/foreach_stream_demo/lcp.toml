@@ -1,16 +1,8 @@
-schemaVersion = "1.0"
+schemaVersion = "2.0"
 id = "lcod://tests/foreach_stream_demo@0.1.0"
-name = "foreach_stream_demo"
-namespace = "tests"
 version = "0.1.0"
 kind = "function"
 summary = "Validate the foreach_stream_demo compose using tooling/test_checker."
-
-[tool]
-name = "foreach_stream_demo"
-description = "Asserts that foreach_stream_demo consumes the provided stream chunks"
-inputSchema = "schema/foreach_stream_demo.in.json"
-outputSchema = "schema/foreach_stream_demo.out.json"
 
 [deps]
 requires = [
@@ -23,5 +15,15 @@ requires = [
   "lcod://impl/echo@1"
 ]
 
-[docs]
-readme = "README.md"
+[tool]
+name = "foreach_stream_demo"
+description = "Asserts that foreach_stream_demo consumes the provided stream chunks"
+inputSchema = "schema/foreach_stream_demo.in.json"
+outputSchema = "schema/foreach_stream_demo.out.json"
+
+[documentation]
+body = """
+Runs the `examples/flow/foreach_stream_demo` compose via
+`tooling/test_checker@1`. The test injects a synthetic UTF-8 stream emitting the
+chunks `"12"`, `"34"`, and `"56"` and expects the loop to collect these values
+before closing the handle."""

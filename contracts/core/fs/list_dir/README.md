@@ -1,4 +1,9 @@
-# Contract: core/fs/list-dir@1
+<!-- AUTO-GENERATED: edit lcp.toml and run scripts/build-component-artifacts.mjs -->
+# lcod://contract/core/fs/list-dir@1.0.0
+
+List directory entries with optional metadata.
+
+## Notes
 
 Lists entries in a directory and optionally returns filesystem metadata.
 

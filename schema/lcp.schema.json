@@ -1,42 +1,36 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://lcod.team/schemas/lcp.schema.json",
-  "title": "LCOD Component Package (LCP)",
-  "description": "Descriptor for an LCOD component package (TOML source interpreted as this JSON shape).",
+  "title": "LCOD Component Package (LCP) — schemaVersion 2.0",
+  "description": "Descriptor for an LCOD component package. The TOML source is interpreted according to this JSON structure.",
   "type": "object",
   "additionalProperties": false,
-  "required": ["schemaVersion", "id", "name", "namespace", "version", "kind", "tool"],
+  "required": ["schemaVersion", "id", "version", "kind", "summary"],
   "$defs": {
     "semver": {
       "type": "string",
       "description": "Semantic Version: MAJOR.MINOR.PATCH with optional prerelease/build.",
       "pattern": "^\\d+\\.\\d+\\.\\d+(?:-[0-9A-Za-z.-]+)?(?:\\+[0-9A-Za-z.-]+)?$",
-      "examples": ["1.0.0", "2.1.0-beta.1", "1.2.3+build.5"]
+      "examples": ["1.0.0", "2.1.0-beta.1"]
     },
     "name": {
       "type": "string",
-      "pattern": "^[a-z0-9_.-]+$",
+      "pattern": "^[A-Za-z0-9_.-]+$",
       "minLength": 1,
-      "description": "Lowercase name. Allowed: a-z, 0-9, underscore, dot, dash."
-    },
-    "namespace": {
-      "type": "string",
-      "pattern": "^[a-z0-9_.-]+(?:/[a-z0-9_.-]+)*$",
-      "minLength": 1,
-      "description": "Lowercase namespace. Segments separated by `/`; allowed characters per segment: a-z, 0-9, underscore, dot, dash."
+      "description": "Identifier segment. Allowed characters: alphanumerics plus underscore, dot, dash."
     },
     "componentId": {
       "type": "string",
-      "description": "Canonical component ID lcod://<namespace>/<name>@<version>",
+      "description": "Canonical component ID `lcod://<namespace>/<name>@<version>`.",
       "pattern": "^lcod://[a-z0-9_.-]+(?:/[a-z0-9_.-]+)+@\\d+\\.\\d+\\.\\d+(?:-[0-9A-Za-z.-]+)?(?:\\+[0-9A-Za-z.-]+)?$",
       "examples": [
         "lcod://core/http_get@1.0.0",
-        "lcod://demo/my_weather@0.1.0"
+        "lcod://tooling/value/default_array@0.1.0"
       ]
     },
     "dependencyId": {
       "type": "string",
-      "description": "Canonical ID reference allowing major-only shorthand (e.g. @1).",
+      "description": "Canonical component reference. Accepts pinned versions or major-only shorthands (`@1`).",
       "pattern": "^lcod://[a-z0-9_.-]+(?:/[a-z0-9_.-]+)+@(?:\\d+|\\d+\\.\\d+\\.\\d+(?:-[0-9A-Za-z.-]+)?(?:\\+[0-9A-Za-z.-]+)?)$",
       "examples": [
         "lcod://flow/foreach@1",
@@ -46,60 +40,106 @@
     "schemaPath": {
       "type": "string",
       "minLength": 1,
-      "description": "Relative path to a JSON Schema file within the package."
+      "description": "Relative path to a JSON Schema artefact."
     },
     "idList": {
       "type": "array",
       "items": { "$ref": "#/$defs/dependencyId" },
       "uniqueItems": true
+    },
+    "localeTexts": {
+      "type": "object",
+      "description": "Per-locale overrides for human-facing strings.",
+      "patternProperties": {
+        "^[a-z]{2}(?:-[A-Z]{2})?$": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "summary": { "type": "string" },
+            "description": { "type": "string" }
+          }
+        }
+      }
+    },
+    "ioEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["summary", "schema"],
+      "properties": {
+        "summary": { "type": "string", "description": "Short explanation (primary locale)." },
+        "description": { "type": "string", "description": "Longer Markdown description (primary locale)." },
+        "required": { "type": "boolean", "description": "Whether the property is required." },
+        "schema": { "type": "string", "description": "JSON Schema fragment stored as a string." },
+        "example": { "type": "string", "description": "Single JSON example serialised as a string." },
+        "examples": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Multiple JSON examples serialised as strings."
+        },
+        "default": { "type": "string", "description": "Default JSON value serialised as a string." },
+        "locales": { "$ref": "#/$defs/localeTexts" }
+      }
+    },
+    "slotEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["summary"],
+      "properties": {
+        "summary": { "type": "string" },
+        "description": { "type": "string" },
+        "schema": { "type": "string", "description": "Optional contract for slot inputs/outputs (JSON encoded as string)." },
+        "example": { "type": "string", "description": "Example compose snippet for the slot." },
+        "locales": { "$ref": "#/$defs/localeTexts" }
+      }
+    },
+    "ioMap": {
+      "type": "object",
+      "propertyNames": { "$ref": "#/$defs/name" },
+      "additionalProperties": { "$ref": "#/$defs/ioEntry" }
+    },
+    "slotMap": {
+      "type": "object",
+      "propertyNames": { "$ref": "#/$defs/name" },
+      "additionalProperties": { "$ref": "#/$defs/slotEntry" }
     }
   },
   "properties": {
     "schemaVersion": {
       "type": "string",
-      "const": "1.0",
-      "description": "LCP schema version understood by this descriptor. Must be \"1.0\" for M0 packages.",
-      "examples": ["1.0"]
+      "const": "2.0",
+      "description": "Descriptor schema version. Must be `\"2.0\"`."
     },
     "id": { "$ref": "#/$defs/componentId" },
-    "name": { "$ref": "#/$defs/name" },
-    "namespace": { "$ref": "#/$defs/namespace" },
     "version": { "$ref": "#/$defs/semver" },
     "kind": {
       "type": "string",
-      "enum": ["function", "axiom", "ui", "workflow", "contract"],
-      "description": "Component kind."
+      "description": "Component kind / lifecycle.",
+      "enum": ["component", "contract", "axiom", "flow", "ui", "workflow", "function"]
     },
-    "summary": { "type": "string", "description": "Short description for human readers." },
-    "docs": {
+    "summary": { "type": "string", "description": "Short human-facing summary (primary locale)." },
+    "documentation": {
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "readme": { "type": "string", "description": "Relative path to README.md." },
-        "logo": { "type": "string", "description": "Relative path to a logo or image file." }
+        "body": { "type": "string", "description": "Additional Markdown appended after the generated sections." },
+        "locales": { "$ref": "#/$defs/localeTexts" }
       }
     },
-    "tool": {
+    "palette": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["name", "inputSchema", "outputSchema"],
       "properties": {
-        "name": { "type": "string", "description": "Tool call name (MCP-style)." },
-        "description": { "type": "string" },
-        "inputSchema": { "$ref": "#/$defs/schemaPath" },
-        "outputSchema": { "$ref": "#/$defs/schemaPath" }
+        "category": { "type": "string" },
+        "icon": { "type": "string" },
+        "tags": { "type": "array", "items": { "type": "string" }, "uniqueItems": true }
       }
-    },
-    "implements": {
-      "$ref": "#/$defs/dependencyId",
-      "description": "Canonical contract ID implemented by this component. Mandatory for function/workflow/ui implementations that fulfil a contract."
     },
     "hints": {
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "timeoutMs": { "type": "integer", "minimum": 0, "description": "Timeout hint in milliseconds." },
-        "retries": { "type": "integer", "minimum": 0, "description": "Retry count hint." },
+        "timeoutMs": { "type": "integer", "minimum": 0 },
+        "retries": { "type": "integer", "minimum": 0 },
         "idempotent": { "type": "boolean" },
         "pure": { "type": "boolean" }
       }
@@ -111,6 +151,24 @@
         "requires": { "$ref": "#/$defs/idList" }
       }
     },
+    "inputs": { "$ref": "#/$defs/ioMap" },
+    "outputs": { "$ref": "#/$defs/ioMap" },
+    "slots": { "$ref": "#/$defs/slotMap" },
+    "tool": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "name": { "type": "string" },
+        "description": { "type": "string" },
+        "inputSchema": { "$ref": "#/$defs/schemaPath" },
+        "outputSchema": { "$ref": "#/$defs/schemaPath" }
+      },
+      "required": ["name"]
+    },
+    "implements": {
+      "$ref": "#/$defs/dependencyId",
+      "description": "Contract implemented by this component (where applicable)."
+    },
     "implMatrix": {
       "type": "object",
       "additionalProperties": false,
@@ -119,10 +177,9 @@
           "type": "array",
           "items": { "type": "string" },
           "uniqueItems": true,
-          "description": "Languages for which native implementations exist (e.g. [\"ts\", \"java\"])."
+          "description": "Languages for which native implementations exist."
         }
-      },
-      "description": "Implementation availability matrix for native (non-composite) components."
+      }
     },
     "ui": {
       "type": "object",
@@ -136,35 +193,38 @@
   },
   "allOf": [
     {
-      "if": { "properties": { "kind": { "const": "contract" } }, "required": ["kind"] },
+      "if": {
+        "properties": {
+          "kind": { "const": "contract" }
+        }
+      },
       "then": {
         "properties": {
           "implements": false,
           "implMatrix": false
         }
       }
-    },
-    {
-      "if": { "properties": { "kind": { "enum": ["function", "workflow", "ui"] } }, "required": ["kind"] },
-      "then": {
-        "properties": {
-          "implements": { "$ref": "#/$defs/dependencyId" }
-        }
-      }
     }
   ],
   "examples": [
     {
-      "schemaVersion": "1.0",
-      "id": "lcod://core/http_get@1.0.0",
-      "name": "http_get",
-      "namespace": "core",
-      "version": "1.0.0",
-      "kind": "function",
-      "tool": {
-        "name": "http_get",
-        "inputSchema": "schema/http_get.in.json",
-        "outputSchema": "schema/http_get.out.json"
+      "schemaVersion": "2.0",
+      "id": "lcod://tooling/value/default_array@0.1.0",
+      "version": "0.1.0",
+      "kind": "component",
+      "summary": "Return the value when it is an array, otherwise fallback to a default array.",
+      "inputs": {
+        "value": {
+          "summary": "Candidate list to normalise.",
+          "required": false,
+          "schema": "{}"
+        }
+      },
+      "outputs": {
+        "value": {
+          "summary": "Normalised array.",
+          "schema": "{ \"type\": \"array\" }"
+        }
       }
     }
   ]

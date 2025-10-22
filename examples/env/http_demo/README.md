@@ -1,4 +1,9 @@
-# Example: env/http_demo
+<!-- AUTO-GENERATED: edit lcp.toml and run scripts/build-component-artifacts.mjs -->
+# lcod://examples/env/http_demo@0.1.0
+
+Example HTTP environment illustrating env/http_host and project/http_app contracts.
+
+## Notes
 
 Illustrates how HTTP environments can be composed using the new contracts:
 

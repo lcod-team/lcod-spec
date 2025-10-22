@@ -1,10 +1,11 @@
-schemaVersion = "1.0"
+schemaVersion = "2.0"
 id = "lcod://contract/core/parse/toml@1.0.0"
-name = "toml"
-namespace = "contract/core/parse"
 version = "1.0.0"
 kind = "contract"
 summary = "Parse TOML text into a JSON-compatible object."
+
+[hints]
+timeoutMs = 2_000
 
 [tool]
 name = "core_parse_toml"
@@ -12,8 +13,21 @@ description = "Parses TOML strings (from text/file/stream) and returns structure
 inputSchema = "schema/toml.in.json"
 outputSchema = "schema/toml.out.json"
 
-[hints]
-timeoutMs = 2000
+[documentation]
+body = """
+Parses TOML content into a JSON-compatible object, mirroring the behavior expected for `lcp.toml` descriptors.
 
-[docs]
-readme = "README.md"
+## Input (`schema/toml.in.json`)
+- `text` (string, optional) — TOML text.
+- `encoding` (string, optional) — encoding for `text` (`utf-8` by default).
+- `path` (string, optional) — file path pointing to TOML content.
+- `stream` (object, optional) — stream handle that yields TOML text.
+- `allowInlineTableMultiline` (boolean, optional) — enable relaxed parsing for inline tables (implementation specific).
+
+One of `text`, `path`, or `stream` must be provided.
+
+## Output (`schema/toml.out.json`)
+- `value` (object) — parsed result expressed as JSON-compatible data.
+- `bytes` (number, optional) — number of bytes consumed.
+
+Implementations should surface parsing errors with location info (line/column). When reading from `stream`, they must close it once parsing completes."""

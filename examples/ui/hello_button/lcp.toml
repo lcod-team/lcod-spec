@@ -1,10 +1,13 @@
-schemaVersion = "1.0"
+schemaVersion = "2.0"
 id = "lcod://ui/hello_button@0.1.0"
-name = "hello_button"
-namespace = "ui"
 version = "0.1.0"
 kind = "ui"
 summary = "Minimal UI example with props."
+
+[ui]
+kind = "react"
+propsSchema = "schema/props.json"
+slots = [ "default" ]
 
 [tool]
 name = "hello_button"
@@ -12,11 +15,5 @@ description = "A button that emits a click event."
 inputSchema = "schema/props.json"
 outputSchema = "schema/events.json"
 
-[ui]
-kind = "react"
-propsSchema = "schema/props.json"
-slots = ["default"]
-
-[docs]
-readme = "README.md"
-
+[documentation]
+body = "Minimal UI component example with props and a simple event shape."

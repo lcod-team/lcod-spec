@@ -1,10 +1,11 @@
-schemaVersion = "1.0"
+schemaVersion = "2.0"
 id = "lcod://tests/script_tools@0.1.0"
-name = "script_tools"
-namespace = "tests"
 version = "0.1.0"
 kind = "function"
 summary = "Validate tooling/script@1 helpers (api.run/api.config)."
+
+[deps]
+requires = [ "lcod://tooling/test_checker@1", "lcod://tooling/script@1" ]
 
 [tool]
 name = "script_tools"
@@ -12,11 +13,20 @@ description = "Checks helper execution and config lookup in tooling/script@1."
 inputSchema = "schema/script_tools.in.json"
 outputSchema = "schema/script_tools.out.json"
 
-[deps]
-requires = [
-  "lcod://tooling/test_checker@1",
-  "lcod://tooling/script@1"
-]
+[documentation]
+body = """
+Validates the extended sandbox API of `tooling/script@1`:
 
-[docs]
-readme = "README.md"
+- `api.config` reads nested configuration values and returns the entire config
+  when called without a path.
+- `api.run` invokes helper functions declared under `tools`, allowing scripts to
+  compose lightweight logic without leaving the sandbox.
+- Helper scripts can log via `api.log`, reuse `api.config`, and return rich
+  payloads.
+- Import aliases expose frequently used components (e.g. hashing) as
+  `imports.<alias>()` helpers while keeping FQDN calls available through
+  `api.call`.
+
+The main script doubles an input value through a helper, checks it with another
+helper that consults the config, computes a SHA-256 digest via an import alias,
+and returns the aggregated result."""

@@ -1,10 +1,20 @@
-schemaVersion = "1.0"
+schemaVersion = "2.0"
 id = "lcod://core/http_get@1.0.0"
-name = "http_get"
-namespace = "core"
 version = "1.0.0"
 kind = "function"
 summary = "HTTP GET primitive wrapper."
+
+[hints]
+timeoutMs = 5_000
+retries = 0
+idempotent = true
+pure = false
+
+[deps]
+requires = [ ]
+
+[implMatrix]
+languages = [ "ts", "java" ]
 
 [tool]
 name = "http_get"
@@ -12,18 +22,5 @@ description = "Perform an HTTP GET request."
 inputSchema = "schema/http_get.in.json"
 outputSchema = "schema/http_get.out.json"
 
-[hints]
-timeoutMs = 5000
-retries = 0
-idempotent = true
-pure = false
-
-[deps]
-requires = []
-
-[docs]
-readme = "README.md"
-
-[implMatrix]
-languages = ["ts", "java"]
-
+[documentation]
+body = "Minimal HTTP GET primitive wrapper component. Provides input/output schemas for a GET call."

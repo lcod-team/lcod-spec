@@ -6,7 +6,6 @@ compose:
       descriptor: descriptor
       descriptorText: descriptorText
       descriptorPath: descriptorPath
-
   - call: lcod://tooling/resolver/internal/load-config@0.1.0
     in:
       projectPath: $.projectPath
@@ -15,14 +14,12 @@ compose:
       config: resolverConfig
       configPath: resolvedConfigPath
       warnings: configWarnings
-
   - call: lcod://tooling/resolver/internal/lock-path@0.1.0
     in:
       projectPath: $.projectPath
       outputPath: $.outputPath
     out:
       lockPath: lockPath
-
   - call: lcod://flow/foreach@1
     in:
       list: $.descriptor.deps.requires
@@ -39,7 +36,16 @@ compose:
     collectPath: $.resolved
     out:
       components: results
-
+    slots:
+      body:
+        - call: lcod://contract/tooling/resolve-dependency@1
+          in:
+            dependency: $slot.item
+            config: $.resolverConfig
+            projectPath: $.projectPath
+          out:
+            resolved: resolved
+      else: []
   - call: lcod://impl/set@1
     in:
       dependencyGraph: $.components
@@ -49,7 +55,6 @@ compose:
       dependencyGraph: dependencyGraph
       rootIntegrity: rootIntegrity
       aggregatedWarnings: aggregatedWarnings
-
   - call: lcod://tooling/resolver/internal/build-lock@0.1.0
     in:
       descriptor: $.descriptor
@@ -59,14 +64,12 @@ compose:
     out:
       lockDocument: lockDocument
       lockText: lockText
-
   - call: lcod://axiom/fs/write-file@1
     in:
       path: $.lockPath
       data: $.lockText
     out:
       ok: wrote
-
   - call: lcod://tooling/script@1
     in:
       source: |

@@ -1,16 +1,8 @@
-schemaVersion = "1.0"
+schemaVersion = "2.0"
 id = "lcod://flow/foreach_stream_demo@0.1.0"
-name = "foreach_stream_demo"
-namespace = "flow"
 version = "0.1.0"
 kind = "function"
 summary = "Iterate over a stream and collect echoed values."
-
-[tool]
-name = "foreach_stream_demo"
-description = "Showcases foreach over a stream input with an else branch."
-inputSchema = "schema/foreach_stream_demo.in.json"
-outputSchema = "schema/foreach_stream_demo.out.json"
 
 [deps]
 requires = [
@@ -22,5 +14,44 @@ requires = [
   "lcod://contract/core/stream/close@1"
 ]
 
-[docs]
-readme = "README.md"
+[tool]
+name = "foreach_stream_demo"
+description = "Showcases foreach over a stream input with an else branch."
+inputSchema = "schema/foreach_stream_demo.in.json"
+outputSchema = "schema/foreach_stream_demo.out.json"
+
+[documentation]
+body = """
+This compose iterates over a real stream handle by repeatedly invoking
+`lcod://core/stream/read@1` inside a `flow/foreach@1` loop. It illustrates how
+to pull fixed-size chunks, collect them, and release the handle via
+`core/stream/close@1` when the stream reports `done = true`.
+
+## Expected state
+
+The host runtime must provide two fields in the initial state:
+
+- `numbers.stream` — a stream handle managed by the host. Each call to
+  `core/stream/read@1` should yield the next portion of the underlying data. In
+  the tests we feed the digits `1` through `6` and request `maxBytes = 2`, which
+  produces three chunks: `"12"`, `"34"`, and `"56"`.
+- `attempts` — an iteration budget for `flow/foreach@1`. The list length should
+  exceed the expected number of iterations so that the loop can break once the
+  stream signals completion.
+
+Running the compose with the sample stream described above returns:
+
+```json
+{ "results": ["12", "34", "56"] }
+```
+
+If the stream is empty, the loop takes the `else` branch and closes the handle
+without collecting any chunks, resulting in:
+
+```json
+{ "results": [] }
+```
+
+Implementations may back the stream handle with a temporary file, an in-memory
+buffer, or any other storage mechanism. The compose only interacts with the
+handle via `core/stream/read@1` and `core/stream/close@1`."""

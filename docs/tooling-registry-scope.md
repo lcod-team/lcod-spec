@@ -2,6 +2,9 @@
 
 `tooling/registry/scope@1` provides a portable way to open an isolated component registry for the duration of a compose block. It mirrors the JVM classloader pattern: pushes a child registry, runs the requested steps, then restores the parent registry automatically. This prevents sibling compositions (or untrusted helpers) from overriding shared components while still enabling hot reload and local overrides. Scopes are orthogonal to the **federated registry** model described in `docs/registry.md`: scopes operate on the in-memory registry stack, whereas catalogues determine which manifests are available globally.
 
+> **Note:** Examples still show the legacy `children` key for brevity. The
+> canonical slot binding is `slots`; kernels populate both during the migration.
+
 ## Motivation
 
 - **Isolation** – keep flow-scoped helpers private without affecting the platform catalogue.
@@ -12,7 +15,7 @@
 
 1. Push a new registry scope that inherits from the current scope.
 2. Optionally register additional components/aliases in that scope.
-3. Execute the `children` slot inside the new scope.
+3. Execute the body slot (`slots.body`) inside the new scope.
 4. Pop the scope automatically on completion (success or error).
 
 During the scope, component resolution proceeds as:

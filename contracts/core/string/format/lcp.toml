@@ -1,7 +1,5 @@
-schemaVersion = "1.0"
+schemaVersion = "2.0"
 id = "lcod://contract/core/string/format@1.0.0"
-name = "format"
-namespace = "contract/core/string"
 version = "1.0.0"
 kind = "contract"
 summary = "Format a template string using named placeholders."
@@ -12,5 +10,8 @@ description = "Perform named placeholder substitution on a template string."
 inputSchema = "schema/format.in.json"
 outputSchema = "schema/format.out.json"
 
-[docs]
-readme = "README.md"
+[documentation]
+body = """
+Formats a template string using named placeholders. Placeholders follow the
+`{placeholder}` syntax. Nested values can be referenced with dot notation (for
+example `{user.name}`) and array indices (`{items[0]}`)."""

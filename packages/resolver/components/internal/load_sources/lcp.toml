@@ -1,16 +1,8 @@
-schemaVersion = "1.0"
+schemaVersion = "2.0"
 id = "lcod://tooling/resolver/internal/load-sources@0.1.0"
-name = "load-sources"
-namespace = "tooling/resolver/internal"
 version = "0.1.0"
 kind = "function"
 summary = "Resolve resolver sources.json into inline registry catalogue entries."
-
-[tool]
-name = "load_sources"
-description = "Read sources.json, fetch referenced catalogues, and emit registry source payloads ready for indexing."
-inputSchema = "schema/input.json"
-outputSchema = "schema/output.json"
 
 [deps]
 requires = [
@@ -18,5 +10,24 @@ requires = [
   "lcod://impl/set@1"
 ]
 
-[docs]
-readme = "README.md"
+[tool]
+name = "load_sources"
+description = "Read sources.json, fetch referenced catalogues, and emit registry source payloads ready for indexing."
+inputSchema = "schema/input.json"
+outputSchema = "schema/output.json"
+
+[documentation]
+body = """
+Loads a resolver `sources.json`, fetches the referenced catalogues, and emits
+registry source records that the existing registry tooling can consume.
+
+The component understands pointer entries served over `file`, `http(s)` and
+`git` transports. Pointer payloads may either be:
+
+- `lcod-registry/catalogues@1` (catalogue of catalogues) which is expanded
+  recursively.
+- `lcod-registry/catalogue@1` listing components and versions.
+
+Each concrete catalogue is converted into an inline source with the same shape
+as the legacy `registry.sources` configuration so downstream steps can reuse
+`tooling/registry/source/load@0.1.0` unchanged."""

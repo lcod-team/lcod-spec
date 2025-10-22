@@ -1,35 +1,13 @@
-schemaVersion = "1.0"
+schemaVersion = "2.0"
 id = "lcod://tooling/mcp/register_local@0.1.0"
-name = "register_local"
-namespace = "tooling/mcp"
 version = "0.1.0"
 kind = "component"
-
 summary = "Register MCP authoring components located on disk (e.g. lcod-components workspace) so they can be used in local workflows."
 
 [palette]
 category = "Authoring"
 icon = "mdi:integration-helper"
-tags = ["mcp", "register", "workspace"]
-
-[docs]
-readme = "docs/README.md"
-
-[[io.input]]
-name = "componentsRoot"
-type = "string"
-required = true
-description = "Filesystem path containing MCP component directories (e.g. lcod-components/packages/std/components)."
-
-[[io.output]]
-name = "registered"
-type = "number"
-description = "Number of components successfully registered."
-
-[[io.output]]
-name = "warnings"
-type = "array"
-description = "Diagnostics collected while resolving or registering components."
+tags = [ "mcp", "register", "workspace" ]
 
 [deps]
 requires = [
@@ -38,3 +16,25 @@ requires = [
   "lcod://axiom/path/join@1",
   "lcod://axiom/fs/read-file@1"
 ]
+
+[inputs.componentsRoot]
+summary = "Filesystem path containing MCP component directories (e.g. lcod-components/packages/std/components)."
+required = true
+schema = """
+{
+  "type": "string"
+}"""
+
+[outputs.registered]
+summary = "Number of components successfully registered."
+schema = """
+{
+  "type": "number"
+}"""
+
+[outputs.warnings]
+summary = "Diagnostics collected while resolving or registering components."
+schema = """
+{
+  "type": "array"
+}"""

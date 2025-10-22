@@ -1,4 +1,9 @@
-# Contract: core/stream/close@1
+<!-- AUTO-GENERATED: edit lcp.toml and run scripts/build-component-artifacts.mjs -->
+# lcod://contract/core/stream/close@1.0.0
+
+Release resources associated with a stream handle.
+
+## Notes
 
 Closes a stream handle returned by `core/stream/read@1` producers (HTTP downloads, file readers, etc.). It guarantees resources are released even if consumers exit early.
 

@@ -2,23 +2,20 @@ compose:
   - call: lcod://axiom/path/join@1
     in:
       base: $.projectPath
-      segment: "lcp.toml"
+      segment: lcp.toml
     out:
       descriptorPath: path
-
   - call: lcod://axiom/fs/read-file@1
     in:
       path: $.descriptorPath
-      encoding: "utf-8"
+      encoding: utf-8
     out:
       descriptorText: data
-
   - call: lcod://axiom/toml/parse@1
     in:
       text: $.descriptorText
     out:
       descriptor: value
-
   - call: lcod://tooling/script@1
     in:
       source: |
@@ -29,7 +26,6 @@ compose:
         configPath: $.configPath
     out:
       hasConfigPath: hasConfigPath
-
   - call: lcod://flow/if@1
     in:
       cond: $.hasConfigPath
@@ -40,14 +36,14 @@ compose:
         - call: lcod://axiom/fs/read-file@1
           in:
             path: $.configPath
-            encoding: "utf-8"
+            encoding: utf-8
           out:
             configText: data
       else:
         - call: lcod://axiom/path/join@1
           in:
             base: $.projectPath
-            segment: "resolve.config.json"
+            segment: resolve.config.json
           out:
             defaultConfigPath: path
         - call: lcod://tooling/script@1
@@ -71,7 +67,42 @@ compose:
           out:
             configText: configText
             configWarning: warning
-
+    slots:
+      then:
+        - call: lcod://axiom/fs/read-file@1
+          in:
+            path: $.configPath
+            encoding: utf-8
+          out:
+            configText: data
+      else:
+        - call: lcod://axiom/path/join@1
+          in:
+            base: $.projectPath
+            segment: resolve.config.json
+          out:
+            defaultConfigPath: path
+        - call: lcod://tooling/script@1
+          in:
+            source: |
+              async ({ state, imports }) => {
+                const fallback = '{"sources":{}}';
+                const path = typeof state?.defaultPath === 'string' ? state.defaultPath : null;
+                if (!path) return { configText: fallback };
+                try {
+                  const file = await imports.fsReadFile({ path, encoding: 'utf-8' });
+                  return { configText: file?.data ?? fallback };
+                } catch (err) {
+                  return { configText: fallback, warning: `Failed to read ${path}: ${err.message}` };
+                }
+              }
+            input:
+              defaultPath: $.defaultConfigPath
+            imports:
+              fsReadFile: lcod://axiom/fs/read-file@1
+          out:
+            configText: configText
+            configWarning: warning
   - call: lcod://tooling/script@1
     in:
       source: |
@@ -82,7 +113,6 @@ compose:
         configText: $.configText
     out:
       hasConfigText: hasConfigText
-
   - call: lcod://flow/if@1
     in:
       cond: $.hasConfigText
@@ -102,7 +132,20 @@ compose:
               sources: {}
           out:
             resolverConfig: resolverConfig
-
+    slots:
+      then:
+        - call: lcod://axiom/json/parse@1
+          in:
+            text: $.configText
+          out:
+            resolverConfig: value
+      else:
+        - call: lcod://impl/set@1
+          in:
+            resolverConfig:
+              sources: {}
+          out:
+            resolverConfig: resolverConfig
   - call: lcod://flow/if@1
     in:
       cond: $.outputPath
@@ -117,12 +160,25 @@ compose:
         - call: lcod://axiom/path/join@1
           in:
             base: $.projectPath
-            segment: "lcp.lock"
+            segment: lcp.lock
           out:
             lockPath: path
     out:
       lockPath: lockPath
-
+    slots:
+      then:
+        - call: lcod://impl/set@1
+          in:
+            lockPath: $.outputPath
+          out:
+            lockPath: lockPath
+      else:
+        - call: lcod://axiom/path/join@1
+          in:
+            base: $.projectPath
+            segment: lcp.lock
+          out:
+            lockPath: path
   - call: lcod://tooling/script@1
     in:
       source: |
@@ -133,7 +189,6 @@ compose:
         cacheOverride: $.cacheDir
     out:
       hasCacheOverride: hasCacheOverride
-
   - call: lcod://flow/if@1
     in:
       cond: $.hasCacheOverride
@@ -151,7 +206,18 @@ compose:
           in: {}
           out:
             cacheDir: cacheDir
-
+    slots:
+      then:
+        - call: lcod://impl/set@1
+          in:
+            cacheDir: $.cacheDir
+          out:
+            cacheDir: cacheDir
+      else:
+        - call: lcod://tooling/resolver/cache-dir@1
+          in: {}
+          out:
+            cacheDir: cacheDir
   - call: lcod://tooling/script@1
     in:
       source: |
@@ -162,7 +228,6 @@ compose:
         descriptor: $.descriptor
     out:
       rootId: rootId
-
   - call: lcod://tooling/script@1
     in:
       source: |
@@ -177,7 +242,6 @@ compose:
         configWarning: $.configWarning
     out:
       warnings: warnings
-
   - call: lcod://tooling/script@1
     in:
       source: |
@@ -197,7 +261,6 @@ compose:
       cacheDir: cacheDir
       rootId: rootId
       warnings: warnings
-
   - call: lcod://tooling/script@1
     in:
       source: |
@@ -356,7 +419,6 @@ compose:
         cacheDir: lcod://tooling/resolver/cache-dir@1
     out:
       resolverOutput: $
-
   - call: lcod://tooling/script@1
     in:
       source: |
@@ -375,7 +437,6 @@ compose:
       dependencyGraph: dependencyGraph
       rootIntegrity: rootIntegrity
       collectedWarnings: collectedWarnings
-
   - call: lcod://tooling/script@1
     in:
       source: |
@@ -404,13 +465,11 @@ compose:
         collectedWarnings: $.collectedWarnings
     out:
       lockDocument: lockDocument
-
   - call: lcod://axiom/toml/stringify@1
     in:
       value: $.lockDocument
     out:
       lockText: text
-
   - call: lcod://axiom/fs/write-file@1
     in:
       path: $.lockPath
@@ -418,7 +477,6 @@ compose:
       createParents: true
     out:
       ok: wrote
-
   - call: lcod://impl/set@1
     in:
       lockPath: $.lockPath

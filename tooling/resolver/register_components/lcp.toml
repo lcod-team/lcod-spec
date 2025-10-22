@@ -1,16 +1,8 @@
-schemaVersion = "1.0"
+schemaVersion = "2.0"
 id = "lcod://tooling/resolver/register_components@0.1.0"
-name = "register_components"
-namespace = "tooling/resolver"
 version = "0.1.0"
 kind = "function"
 summary = "Register shared resolver helper components via the tooling/resolver/register axiom."
-
-[tool]
-name = "Register Resolver Components"
-description = "Resolves compose files within lcod-spec and registers them using the tooling/resolver/register@1 axiom."
-inputSchema = "schema/register_components.in.json"
-outputSchema = "schema/register_components.out.json"
 
 [deps]
 requires = [
@@ -19,5 +11,11 @@ requires = [
   "lcod://tooling/resolver/register@1"
 ]
 
-[docs]
-readme = "README.md"
+[tool]
+name = "Register Resolver Components"
+description = "Resolves compose files within lcod-spec and registers them using the tooling/resolver/register@1 axiom."
+inputSchema = "schema/register_components.in.json"
+outputSchema = "schema/register_components.out.json"
+
+[documentation]
+body = "Registers shared resolver helper components (registry loaders, selectors, and resolver utilities) with the runtime. The component expects a `specRoot` pointing to the `lcod-spec` repository and calls the `tooling/resolver/register@1` axiom to publish each compose."

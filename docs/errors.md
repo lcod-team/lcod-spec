@@ -2,6 +2,10 @@
 
 LCOD expresses synchronous error handling with dedicated flow blocks. Errors propagate as structured objects so that hosts can render consistent diagnostics.
 
+> **Note:** The examples below use the canonical `slots` key. Existing composes
+> may still rely on the legacy alias `children`; kernels accept both during the
+> transition.
+
 ## Error shape
 
 All errors bubble up as JSON objects with the following structure:
@@ -29,13 +33,13 @@ The block never returns. It throws the normalized error which can be caught by a
 
 ## `lcod://flow/try@1`
 
-Executes the `children` slot and provides hooks for `catch` and `finally`.
+Executes the default slot (`slots.body`) and provides hooks for `catch` and `finally`.
 
 ```json
 {
   "call": "lcod://flow/try@1",
-  "children": {
-    "children": [ ... ],   // main body (required)
+  "slots": {
+    "body": [ ... ],       // main body (required)
     "catch": [ ... ],      // optional catch block
     "finally": [ ... ]     // optional finally block
   }
@@ -43,20 +47,20 @@ Executes the `children` slot and provides hooks for `catch` and `finally`.
 ```
 
 ### Slots
-- `children` — required. Runs first; may expose state via `out`.
+- `body` — required. Runs first; may expose state via `out`.
 - `catch` — optional. Runs only when the body throws. Receives `$slot.error` (normalized error). The catch slot may expose new state via `out` or rethrow.
 - `finally` — optional. Runs after either the body or catch complete. Executed even if `catch` throws; its result is ignored (state after try/catch is preserved).
 
 ### Behaviour
-1. Run `children`. If it completes successfully, skip `catch`.
-2. If `children` throws, normalize the error and execute the `catch` slot. The slot scope receives:
+1. Run the body slot. If it completes successfully, skip `catch`.
+2. If the body throws, normalize the error and execute the `catch` slot. The slot scope receives:
    - `$slot.error` — normalized error
    - `$slot.phase = "catch"`
-3. After either `children` or `catch` finish (whether success or error), execute `finally` if provided. `$slot.phase` is set to `"finally"`.
+3. After either the body or `catch` finish (whether success or error), execute `finally` if provided. `$slot.phase` is set to `"finally"`.
 4. If `catch` handles the error (returns without throwing), the try step is considered successful and may expose outputs via `out` mappings. If `catch` rethrows (via `flow/throw` or by propagating the error), the error bubbles up after `finally` runs.
 
 ### Outputs
-State changes from whichever slot completed last (`children` or `catch`). Use `out` on the `flow/try` step to expose aggregate values.
+State changes from whichever slot completed last (body or `catch`). Use `out` on the `flow/try` step to expose aggregate values.
 
 ## Example
 
@@ -65,8 +69,8 @@ State changes from whichever slot completed last (`children` or `catch`). Use `o
   "compose": [
     {
       "call": "lcod://flow/try@1",
-      "children": {
-        "children": [ { "call": "lcod://impl/might_fail@1" } ],
+      "slots": {
+        "body": [ { "call": "lcod://impl/might_fail@1" } ],
         "catch": [
           { "call": "lcod://impl/log@1", "in": { "message": "$slot.error.message" } },
           { "call": "lcod://impl/recover@1", "out": { "value": "result" } }

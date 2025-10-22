@@ -1,4 +1,9 @@
-# Contract: core/hash/sha256@1
+<!-- AUTO-GENERATED: edit lcp.toml and run scripts/build-component-artifacts.mjs -->
+# lcod://contract/core/hash/sha256@1.0.0
+
+Compute the SHA-256 digest of data provided inline or via stream/file handle.
+
+## Notes
 
 Computes the SHA-256 digest of data provided inline, as a file path, or via a stream handle.
 

@@ -1,10 +1,11 @@
-schemaVersion = "1.0"
+schemaVersion = "2.0"
 id = "lcod://contract/core/fs/list-dir@1.0.0"
-name = "list-dir"
-namespace = "contract/core/fs"
 version = "1.0.0"
 kind = "contract"
 summary = "List directory entries with optional metadata."
+
+[hints]
+timeoutMs = 5_000
 
 [tool]
 name = "fs_list_dir"
@@ -12,8 +13,24 @@ description = "Enumerate directory contents, optionally including stats and filt
 inputSchema = "schema/list_dir.in.json"
 outputSchema = "schema/list_dir.out.json"
 
-[hints]
-timeoutMs = 5000
+[documentation]
+body = """
+Lists entries in a directory and optionally returns filesystem metadata.
 
-[docs]
-readme = "README.md"
+## Input (`schema/list_dir.in.json`)
+- `path` (string) — absolute or project-relative directory path.
+- `recursive` (boolean, optional) — traverse subdirectories (defaults to `false`).
+- `maxDepth` (number, optional) — depth limit when `recursive` is `true`.
+- `includeStats` (boolean, optional) — include `size` and `mtime` for each entry.
+- `includeHidden` (boolean, optional) — include entries whose name starts with `.`.
+- `pattern` (string, optional) — glob-style filter (e.g. `**/*.json`).
+
+## Output (`schema/list_dir.out.json`)
+- `entries` (array) — each entry describes a child file/directory:
+  - `name` (string) — basename.
+  - `path` (string) — absolute or project-relative path of the entry.
+  - `type` (string) — `file`, `directory`, or `symlink`.
+  - `size` (number, optional) — size in bytes (only when `includeStats` is `true`).
+  - `mtime` (string, optional) — ISO 8601 modification time (only when `includeStats` is `true`).
+
+Implementations should return errors when the directory cannot be read (e.g. `ENOENT`, `EACCES`)."""

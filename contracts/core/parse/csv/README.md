@@ -1,4 +1,9 @@
-# Contract: core/parse/csv@1
+<!-- AUTO-GENERATED: edit lcp.toml and run scripts/build-component-artifacts.mjs -->
+# lcod://contract/core/parse/csv@1.0.0
+
+Parse CSV data into JSON rows, exposing the result as a stream handle or array depending on size.
+
+## Notes
 
 Parses CSV content and returns rows as JSON objects, with streaming support for large datasets.
 

@@ -1,10 +1,11 @@
-schemaVersion = "1.0"
+schemaVersion = "2.0"
 id = "lcod://contract/core/fs/read-file@1.0.0"
-name = "read-file"
-namespace = "contract/core/fs"
 version = "1.0.0"
 kind = "contract"
 summary = "Read file contents from the local filesystem."
+
+[hints]
+timeoutMs = 5_000
 
 [tool]
 name = "fs_read_file"
@@ -12,8 +13,18 @@ description = "Read a file from the filesystem, optionally decoding text."
 inputSchema = "schema/read_file.in.json"
 outputSchema = "schema/read_file.out.json"
 
-[hints]
-timeoutMs = 5000
+[documentation]
+body = """
+Reads a file from the local filesystem.
 
-[docs]
-readme = "README.md"
+## Input (`schema/read_file.in.json`)
+- `path` (string) — absolute or project-relative path
+- `encoding` (string, optional) — `utf-8`, `base64`, or `hex` (default `utf-8`)
+
+## Output (`schema/read_file.out.json`)
+- `data` — string encoded with the requested encoding (defaults to UTF-8)
+- `encoding` (string) — encoding applied to `data`
+- `size` (number) — number of bytes
+- `mtime` (string, optional) — last modified timestamp
+
+Implementations should surface errors with meaningful codes (e.g. `ENOENT`)."""

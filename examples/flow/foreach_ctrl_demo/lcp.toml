@@ -1,16 +1,8 @@
-schemaVersion = "1.0"
+schemaVersion = "2.0"
 id = "lcod://flow/foreach_ctrl_demo@0.1.0"
-name = "foreach_ctrl_demo"
-namespace = "flow"
 version = "0.1.0"
 kind = "function"
 summary = "Foreach demo with continue/break and collectPath."
-
-[tool]
-name = "foreach_ctrl_demo"
-description = "Skip even numbers, break > 7, collect echoed values."
-inputSchema = "schema/foreach_ctrl_demo.in.json"
-outputSchema = "schema/foreach_ctrl_demo.out.json"
 
 [deps]
 requires = [
@@ -23,6 +15,18 @@ requires = [
   "lcod://impl/gt@1"
 ]
 
-[docs]
-readme = "README.md"
+[tool]
+name = "foreach_ctrl_demo"
+description = "Skip even numbers, break > 7, collect echoed values."
+inputSchema = "schema/foreach_ctrl_demo.in.json"
+outputSchema = "schema/foreach_ctrl_demo.out.json"
 
+[documentation]
+body = """
+Demonstrates `continue` and `break` in `lcod://flow/foreach@1`:
+- Skip even numbers via `is_even` + `flow/continue@1`
+- Stop at the first number greater than 7 via `gt` + `flow/break@1`
+- Collects the echoed values via `collectPath: "$.val"`
+
+Input: `{ "numbers": [1,2,3,8,9] }`
+Output: `{ "results": [1,3] }`"""

@@ -27,6 +27,7 @@ compose:
             { id: 'lcod://tooling/fs/read_optional@0.1.0', path: 'tooling/fs/read_optional/compose.yaml' },
             { id: 'lcod://tooling/json/decode_object@0.1.0', path: 'tooling/json/decode_object/compose.yaml' },
             { id: 'lcod://tooling/hash/sha256_base64@0.1.0', path: 'tooling/hash/sha256_base64/compose.yaml' },
+            { id: 'lcod://tooling/component/build_artifacts@0.1.0', path: 'tooling/component/build_artifacts/compose.yaml' },
             { id: 'lcod://tooling/path/join_chain@0.1.0', path: 'tooling/path/join_chain/compose.yaml' },
             { id: 'lcod://tooling/path/dirname@0.1.0', path: 'tooling/path/dirname/compose.yaml' },
             { id: 'lcod://tooling/path/is_absolute@0.1.0', path: 'tooling/path/is_absolute/compose.yaml' },

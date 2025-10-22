@@ -1,4 +1,9 @@
-# Contract: core/fs/read-file@1
+<!-- AUTO-GENERATED: edit lcp.toml and run scripts/build-component-artifacts.mjs -->
+# lcod://contract/core/fs/read-file@1.0.0
+
+Read file contents from the local filesystem.
+
+## Notes
 
 Reads a file from the local filesystem.
 

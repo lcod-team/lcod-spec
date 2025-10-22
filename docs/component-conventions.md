@@ -11,46 +11,66 @@ principles below.
 components/<namespace>/<name>/
   lcp.toml        # descriptor (identity, metadata, dependencies)
   compose.yaml    # implementation (for composites/flows)
-  README.md       # human-friendly summary and examples
-  schema/         # optional JSON Schemas when inputs/outputs are non-trivial
+  README.md       # generated from lcp.toml (do not edit directly)
+  schema/         # generated JSON Schemas for tool invocation
   tests/          # optional declarative tests (JSON)
   assets/         # optional icons or supporting artefacts (SVG, images)
 ```
 
 ## Descriptor metadata (`lcp.toml`)
 
-Extend the base schema with the following fields:
+`lcp.toml` is the **single source of truth**. All human-authored metadata must
+live here so the generator (`npm run build:components`) can derive the README
+and JSON Schemas reliably.
 
 ```toml
-summary = "One-line description shown in palettes."
+schemaVersion = "2.0"
+id = "lcod://tooling/registry/catalog@0.1.0"
+version = "0.1.0"
+kind = "component"
+summary = "Load a registry catalogue from disk or HTTP and return normalised entries."
 
 [palette]
 category = "Registry"
 icon = "mdi:database-cog-outline"   # mdi:<name> or relative path to SVG
-tags = ["catalog", "resolver"]      # optional facet hints
+tags = ["catalog", "resolver"]
 
-[docs]
-readme = "README.md"                # optional long-form documentation
+[inputs.rootPath]
+summary = "Base path used to resolve relative catalogue files."
+schema = """
+{ "type": "string" }
+"""
 
-[[io.input]]
-name = "rootPath"
-type = "string"
-required = false
-description = "Base path used to resolve relative catalog files."
+[inputs.catalogues]
+summary = "List of catalogue URLs or inline overrides."
+schema = """
+{
+  "type": "array",
+  "items": { "type": "string" }
+}
+"""
 
-[[io.output]]
-name = "packagesJsonl"
-type = "string"
-description = "JSON Lines text listing registry and component entries."
+[outputs.packagesJsonl]
+summary = "JSON Lines text listing registry and component entries."
+schema = """
+{ "type": "string" }
+"""
+
+[documentation]
+body = """
+Add any long-form Markdown (examples, troubleshooting) here. The generator will
+place it after the structured sections in the README.
+"""
 ```
 
-- `summary` and `[palette]` allow editors to render the component in a palette
-  with a dedicated icon and category.
-- `[[io.input]]` / `[[io.output]]` describe the interface succinctly. For
-  complex shapes, place canonical JSON Schemas under `schema/` and reference
-  them via `tool.inputSchema` / `tool.outputSchema`.
-- `README.md` should provide longer examples, edge cases or troubleshooting
-  notes. Keep it concise so the IDE can display it inline.
+- `summary` and `[palette]` remain the primary hints for IDE palettes.
+- `inputs.*`, `outputs.*` and `slots.*` hold JSON Schema fragments **as strings**.
+  The generator parses them, validates the JSON and assembles the tool schemas.
+- Use `*.locales.<locale>.summary` / `description` to provide translations.
+- Place longer Markdown in `documentation.body`; the builder injects it into
+  the generated README.
+- Declare tool bindings via `[tool]` and keep the schema paths stable. The
+  build step overwrites the JSON files each time.
 
 ## Tests
 

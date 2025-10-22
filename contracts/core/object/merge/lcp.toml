@@ -1,7 +1,5 @@
-schemaVersion = "1.0"
+schemaVersion = "2.0"
 id = "lcod://contract/core/object/merge@1.0.0"
-name = "merge"
-namespace = "contract/core/object"
 version = "1.0.0"
 kind = "contract"
 summary = "Merge two objects into a new structure without mutating the inputs."
@@ -12,5 +10,8 @@ description = "Merge two objects (shallow by default, optional deep merge)."
 inputSchema = "schema/merge.in.json"
 outputSchema = "schema/merge.out.json"
 
-[docs]
-readme = "README.md"
+[documentation]
+body = """
+Merges two objects and returns a new object containing the combined properties.
+By default the merge is shallow (top-level keys). When `deep` is enabled, nested
+objects are merged recursively."""

@@ -1,16 +1,8 @@
-schemaVersion = "1.0"
+schemaVersion = "2.0"
 id = "lcod://tests/core_fs_roundtrip@0.1.0"
-name = "core_fs_roundtrip"
-namespace = "tests"
 version = "0.1.0"
 kind = "function"
 summary = "Validate core/fs read, write and list contracts end-to-end."
-
-[tool]
-name = "core_fs_roundtrip"
-description = "Writes a temporary file, reads it back and checks directory listing."
-inputSchema = "schema/core_fs_roundtrip.in.json"
-outputSchema = "schema/core_fs_roundtrip.out.json"
 
 [deps]
 requires = [
@@ -21,5 +13,14 @@ requires = [
   "lcod://contract/core/fs/list-dir@1"
 ]
 
-[docs]
-readme = "README.md"
+[tool]
+name = "core_fs_roundtrip"
+description = "Writes a temporary file, reads it back and checks directory listing."
+inputSchema = "schema/core_fs_roundtrip.in.json"
+outputSchema = "schema/core_fs_roundtrip.out.json"
+
+[documentation]
+body = """
+Ensures the `core/fs` contracts can write, read and list files within the
+sandbox. The harness writes to a local temporary directory, reads the content
+back and verifies the entry appears in the directory listing."""

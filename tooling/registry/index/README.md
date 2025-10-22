@@ -1,4 +1,9 @@
-# Registry Index (`tooling/registry/index@0.1.0`)
+<!-- AUTO-GENERATED: edit lcp.toml and run scripts/build-component-artifacts.mjs -->
+# lcod://tooling/registry/index@0.1.0
+
+Parse registry JSONL streams and produce ordered package indices.
+
+## Notes
 
 Builds an ordered in-memory catalogue from one or more `packages.jsonl` streams.
 Each stream corresponds to a registry (or a local override file) and may define:
@@ -21,51 +26,6 @@ groups versions per component so resolvers can pick the newest compatible one.
   the original JSONL ordering.
 - Blank lines or invalid JSON lines are ignored but reported in the `errors`
   output to aid debugging.
-
-## Inputs
-
-```json
-{
-  "sources": [
-    {
-      "registryId": "official",
-      "priority": 10,
-      "jsonl": "…",                 // raw JSON Lines content
-      "lines": [ { "kind": "component", … } ], // optional pre-parsed entries
-      "defaults": {                 // optional registry defaults
-        "type": "http",
-        "url": "https://registry.example.com"
-      }
-    }
-  ]
-}
-```
-
-`priority` defaults to `100`. When both `jsonl` and `lines` are provided their
-entries are concatenated.
-
-## Outputs
-
-```json
-{
-  "registries": [
-    { "id": "official", "type": "http", "url": "https://…", "priority": 10 }
-  ],
-  "entries": [
-    { "id": "lcod://foo/bar", "version": "1.2.0", "manifest": "…", "registryId": "official", "priority": 10, "order": 0 }
-  ],
-  "packages": {
-    "lcod://foo/bar": [
-      { "id": "lcod://foo/bar", "version": "1.2.0", … },
-      { "id": "lcod://foo/bar", "version": "1.1.0", … }
-    ]
-  },
-  "errors": [ "line 4: invalid JSON" ]
-}
-```
-
-Each `entries` item also includes the original JSON object under `raw` for
-consumers that need additional metadata.
 
 ## Notes
 

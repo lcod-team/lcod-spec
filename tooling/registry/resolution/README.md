@@ -1,4 +1,9 @@
-# Registry Resolution (`tooling/registry/resolution@0.1.0`)
+<!-- AUTO-GENERATED: edit lcp.toml and run scripts/build-component-artifacts.mjs -->
+# lcod://tooling/registry/resolution@0.1.0
+
+Load registry sources, index packages, and select entries for dependencies.
+
+## Notes
 
 Wraps the registry helpers into a single call:
 

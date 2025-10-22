@@ -1,3 +1,10 @@
+<!-- AUTO-GENERATED: edit lcp.toml and run scripts/build-component-artifacts.mjs -->
+# lcod://tooling/registry/catalog/generate@0.1.0
+
+Generate registry.json and packages.jsonl content from a catalog definition.
+
+## Notes
+
 ## Registry Catalog Generator (`tooling/registry/catalog/generate@0.1.0`)
 
 Builds the two canonical registry artefacts (`registry.json` and `packages.jsonl`) from

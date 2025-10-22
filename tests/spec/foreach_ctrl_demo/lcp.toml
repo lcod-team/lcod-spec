@@ -1,16 +1,8 @@
-schemaVersion = "1.0"
+schemaVersion = "2.0"
 id = "lcod://tests/foreach_ctrl_demo@0.1.0"
-name = "foreach_ctrl_demo"
-namespace = "tests"
 version = "0.1.0"
 kind = "function"
 summary = "Validate the foreach_ctrl_demo compose using tooling/test_checker."
-
-[tool]
-name = "foreach_ctrl_demo"
-description = "Asserts that foreach_ctrl_demo collects [1, 3]"
-inputSchema = "schema/foreach_ctrl_demo.in.json"
-outputSchema = "schema/foreach_ctrl_demo.out.json"
 
 [deps]
 requires = [
@@ -24,5 +16,17 @@ requires = [
   "lcod://impl/gt@1"
 ]
 
-[docs]
-readme = "README.md"
+[tool]
+name = "foreach_ctrl_demo"
+description = "Asserts that foreach_ctrl_demo collects [1, 3]"
+inputSchema = "schema/foreach_ctrl_demo.in.json"
+outputSchema = "schema/foreach_ctrl_demo.out.json"
+
+[documentation]
+body = """
+Runs the `examples/flow/foreach_ctrl_demo` compose through the
+`tooling/test_checker@1` contract. The test feeds the same input as the demo and
+expects the loop to collect `[1, 3]`.
+
+This fixture is intended to be consumed by runtimes (Node, Rust, …) so they all
+share the exact same assertions."""

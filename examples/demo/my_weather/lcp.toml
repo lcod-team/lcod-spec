@@ -1,16 +1,8 @@
-schemaVersion = "1.0"
+schemaVersion = "2.0"
 id = "lcod://demo/my_weather@0.1.0"
-name = "my_weather"
-namespace = "demo"
 version = "0.1.0"
 kind = "function"
 summary = "Demo composite that fetches weather for the user city."
-
-[tool]
-name = "my_weather"
-description = "Get current temperature for the current city."
-inputSchema = "schema/my_weather.in.json"
-outputSchema = "schema/my_weather.out.json"
 
 [deps]
 requires = [
@@ -19,6 +11,11 @@ requires = [
   "lcod://core/weather@1"
 ]
 
-[docs]
-readme = "README.md"
+[tool]
+name = "my_weather"
+description = "Get current temperature for the current city."
+inputSchema = "schema/my_weather.in.json"
+outputSchema = "schema/my_weather.out.json"
 
+[documentation]
+body = "Composite example demonstrating a three‑step flow: localisation → city extraction → weather."

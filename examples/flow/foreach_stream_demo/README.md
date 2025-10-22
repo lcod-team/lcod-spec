@@ -1,4 +1,9 @@
-# flow/foreach stream demo
+<!-- AUTO-GENERATED: edit lcp.toml and run scripts/build-component-artifacts.mjs -->
+# lcod://flow/foreach_stream_demo@0.1.0
+
+Iterate over a stream and collect echoed values.
+
+## Notes
 
 This compose iterates over a real stream handle by repeatedly invoking
 `lcod://core/stream/read@1` inside a `flow/foreach@1` loop. It illustrates how

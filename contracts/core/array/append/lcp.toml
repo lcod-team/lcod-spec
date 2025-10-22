@@ -1,7 +1,5 @@
-schemaVersion = "1.0"
+schemaVersion = "2.0"
 id = "lcod://contract/core/array/append@1.0.0"
-name = "append"
-namespace = "contract/core/array"
 version = "1.0.0"
 kind = "contract"
 summary = "Concatenate arrays or append a single value without mutating the input."
@@ -12,5 +10,7 @@ description = "Append items to an array and return the resulting array."
 inputSchema = "schema/append.in.json"
 outputSchema = "schema/append.out.json"
 
-[docs]
-readme = "README.md"
+[documentation]
+body = """
+Concatenates an existing array with additional values. This contract always
+returns a new array and leaves the inputs unchanged."""

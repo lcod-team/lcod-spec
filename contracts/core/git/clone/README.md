@@ -1,4 +1,9 @@
-# Contract: core/git/clone@1
+<!-- AUTO-GENERATED: edit lcp.toml and run scripts/build-component-artifacts.mjs -->
+# lcod://contract/core/git/clone@1.0.0
+
+Clone or update a Git repository according to project policy.
+
+## Notes
 
 Fetches a Git repository into the runtime workspace, supporting shallow clones and optional subdirectory checkout.
 

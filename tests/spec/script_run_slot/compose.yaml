@@ -1,33 +1,40 @@
 compose:
-- call: lcod://tooling/test_checker@1
-  in:
-    compose:
-      - call: lcod://tooling/script@1
-        in:
-          source: |
-            async ({ state }, api) => {
-              api.log(`script:${state.value}`);
-              const child = await api.runSlot('child', { payload: state.value });
-              return { success: true, child };
-            }
-          input:
-            value: 4
-        children:
+  - call: lcod://tooling/test_checker@1
+    in:
+      compose:
+        - call: lcod://tooling/script@1
+          in:
+            source: |
+              async ({ state }, api) => {
+                api.log(`script:${state.value}`);
+                const child = await api.runSlot('child', { payload: state.value });
+                return { success: true, child };
+              }
+            input:
+              value: 4
+          children:
+            child:
+              - call: lcod://impl/echo@1
+                in:
+                  value: $.payload
+                out:
+                  result: $
+          out:
+            report: $
+          slots:
+            child:
+              - call: lcod://impl/echo@1
+                in:
+                  value: $.payload
+                out:
+                  result: $
+      expected:
+        report:
+          success: true
           child:
-            - call: lcod://impl/echo@1
-              in:
-                value: $.payload
-              out:
-                result: $
-        out:
-          report: $
-    expected:
-      report:
-        success: true
-        child:
-          result:
-            val: 4
-        messages:
-          - "script:4"
-  out:
-    report: $
+            result:
+              val: 4
+          messages:
+            - script:4
+    out:
+      report: $

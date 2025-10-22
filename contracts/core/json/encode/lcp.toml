@@ -1,7 +1,5 @@
-schemaVersion = "1.0"
+schemaVersion = "2.0"
 id = "lcod://contract/core/json/encode@1.0.0"
-name = "encode"
-namespace = "contract/core/json"
 version = "1.0.0"
 kind = "contract"
 summary = "Serialize structured data into JSON text."
@@ -12,5 +10,7 @@ description = "Serialize LCOD data into JSON text with deterministic output."
 inputSchema = "schema/encode.in.json"
 outputSchema = "schema/encode.out.json"
 
-[docs]
-readme = "README.md"
+[documentation]
+body = """
+Serializes structured data into JSON text with deterministic output. Implementations
+must guarantee UTF-8 output and optionally support pretty-printing and key sorting."""

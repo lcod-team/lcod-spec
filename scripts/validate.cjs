@@ -65,10 +65,17 @@ function* findLcpToml(root) {
   const stack = [root];
   while (stack.length) {
     const dir = stack.pop();
+    const base = path.basename(dir);
+    if (['.git', 'node_modules', '.lcod', 'dist', 'target'].includes(base)) {
+      continue;
+    }
     for (const ent of fs.readdirSync(dir, { withFileTypes: true })) {
       const p = path.join(dir, ent.name);
-      if (ent.isDirectory()) stack.push(p);
-      else if (ent.isFile() && ent.name === 'lcp.toml') yield p;
+      if (ent.isDirectory()) {
+        stack.push(p);
+      } else if (ent.isFile() && ent.name === 'lcp.toml') {
+        yield p;
+      }
     }
   }
 }
@@ -132,7 +139,7 @@ function* findJsonFiles(root) {
     }
   }
 
-  for (const file of findLcpToml(examplesRoot)) {
+  for (const file of findLcpToml(repoRoot)) {
     const dir = path.dirname(file);
     const rel = path.relative(repoRoot, file);
     let obj = null;
@@ -146,13 +153,39 @@ function* findJsonFiles(root) {
         issues.push(`ERROR: ${rel}: schema validation failed: ${errs}`);
       }
     }
-    if (!obj.tool || !obj.tool.inputSchema || !obj.tool.outputSchema) { issues.push(`ERROR: ${rel}: missing tool.inputSchema or tool.outputSchema`); failed++; }
-    else {
+    if (obj.tool) {
       for (const key of ['inputSchema', 'outputSchema']) {
+        if (!obj.tool[key]) continue;
         const p = path.join(dir, obj.tool[key]);
         const r = path.relative(repoRoot, p);
         if (!exists(p)) { issues.push(`ERROR: ${rel}: missing ${key} file ${r}`); failed++; }
         else { const err = safeJsonParse(p); if (err) { issues.push(`ERROR: ${r}: invalid JSON: ${err}`); failed++; } }
+      }
+    }
+
+    function checkSchemaString(section, schemaString, entryName) {
+      if (typeof schemaString !== 'string') return;
+      try {
+        JSON.parse(schemaString);
+      } catch (e) {
+        issues.push(`ERROR: ${rel}: ${section}.${entryName} has invalid JSON schema: ${e.message}`);
+        failed++;
+      }
+    }
+
+    if (obj.inputs && typeof obj.inputs === 'object') {
+      for (const [name, spec] of Object.entries(obj.inputs)) {
+        checkSchemaString('inputs', spec && spec.schema, name);
+      }
+    }
+    if (obj.outputs && typeof obj.outputs === 'object') {
+      for (const [name, spec] of Object.entries(obj.outputs)) {
+        checkSchemaString('outputs', spec && spec.schema, name);
+      }
+    }
+    if (obj.slots && typeof obj.slots === 'object') {
+      for (const [name, spec] of Object.entries(obj.slots)) {
+        checkSchemaString('slots', spec && spec.schema, name);
       }
     }
     const composeYaml = path.join(dir, 'compose.yaml');
@@ -167,9 +200,10 @@ function* findJsonFiles(root) {
       else { issues.push(`WARN: ${path.relative(repoRoot, composeJson)} is deprecated; use compose.yaml`); }
     }
 
-    if (obj.docs) {
-      if (obj.docs.readme) { const p = path.join(dir, obj.docs.readme); if (!exists(p)) { issues.push(`ERROR: ${rel}: docs.readme not found: ${path.relative(repoRoot, p)}`); failed++; } }
-      if (obj.docs.logo) { const p = path.join(dir, obj.docs.logo); if (!exists(p)) { issues.push(`ERROR: ${rel}: docs.logo not found: ${path.relative(repoRoot, p)}`); failed++; } }
+    const readmePath = path.join(dir, 'README.md');
+    if (!exists(readmePath)) {
+      issues.push(`ERROR: ${rel}: missing README.md (should be generated from lcp.toml)`);
+      failed++;
     }
     if (obj.ui && obj.ui.propsSchema) {
       const p = path.join(dir, obj.ui.propsSchema);

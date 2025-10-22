@@ -1,17 +1,8 @@
-# core/array/length
+<!-- AUTO-GENERATED: edit lcp.toml and run scripts/build-component-artifacts.mjs -->
+# lcod://contract/core/array/length@1.0.0
+
+Return the number of elements in an array.
+
+## Notes
 
 Returns the number of elements contained in the provided array.
-
-## Inputs
-
-| Field | Type | Required | Description |
-| ----- | ---- | -------- | ----------- |
-| `items` | array | yes | Array whose size will be measured. |
-
-## Outputs
-
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| `length` | integer | Number of elements in `items` (always `>= 0`). |
-
-The contract is pure and has no side effects. Kernels should implement it natively for performance.

@@ -1,7 +1,5 @@
-schemaVersion = "1.0"
+schemaVersion = "2.0"
 id = "lcod://project/http_app@0.1.0"
-name = "http_app"
-namespace = "project"
 version = "0.1.0"
 kind = "contract"
 summary = "HTTP project contract that exposes sequences and API routes to a host."
@@ -12,5 +10,13 @@ description = "Register HTTP routes and execution sequences for a project."
 inputSchema = "schema/http_app.in.json"
 outputSchema = "schema/http_app.out.json"
 
-[docs]
-readme = "README.md"
+[documentation]
+body = """
+Represents a logical HTTP project. The project provides configuration metadata
+(name, base path, optional tags) and exposes two slots:
+
+- `sequences` — business logic blocks that can be invoked when a route is hit.
+- `apis` — route descriptors that bind HTTP requests to sequences.
+
+The HTTP host invokes these slots when registering the project and merges the
+returned data into its routing table."""

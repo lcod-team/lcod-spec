@@ -1,16 +1,8 @@
-schemaVersion = "1.0"
+schemaVersion = "2.0"
 id = "lcod://tests/core_parse_roundtrip@0.1.0"
-name = "core_parse_roundtrip"
-namespace = "tests"
 version = "0.1.0"
 kind = "function"
 summary = "Validate JSON/TOML/CSV parse contracts."
-
-[tool]
-name = "core_parse_roundtrip"
-description = "Parses JSON, TOML and CSV payloads and checks the resulting structures."
-inputSchema = "schema/core_parse_roundtrip.in.json"
-outputSchema = "schema/core_parse_roundtrip.out.json"
 
 [deps]
 requires = [
@@ -21,5 +13,13 @@ requires = [
   "lcod://contract/core/parse/csv@1"
 ]
 
-[docs]
-readme = "README.md"
+[tool]
+name = "core_parse_roundtrip"
+description = "Parses JSON, TOML and CSV payloads and checks the resulting structures."
+inputSchema = "schema/core_parse_roundtrip.in.json"
+outputSchema = "schema/core_parse_roundtrip.out.json"
+
+[documentation]
+body = """
+Covers the JSON, TOML and CSV parse contracts to ensure the kernels return the
+same structure for simple payloads."""

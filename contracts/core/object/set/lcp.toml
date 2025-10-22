@@ -1,7 +1,5 @@
-schemaVersion = "1.0"
+schemaVersion = "2.0"
 id = "lcod://contract/core/object/set@1.0.0"
-name = "set"
-namespace = "contract/core/object"
 version = "1.0.0"
 kind = "contract"
 summary = "Set a nested value on an object and return the updated structure."
@@ -12,5 +10,5 @@ description = "Assigns a value at the provided path, optionally cloning the obje
 inputSchema = "schema/set.in.json"
 outputSchema = "schema/set.out.json"
 
-[docs]
-readme = "README.md"
+[documentation]
+body = "Assigns a value to a nested path within an object and returns the updated structure. The contract supports immutable updates as well as in-place mutation."

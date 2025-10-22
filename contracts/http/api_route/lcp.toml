@@ -1,7 +1,5 @@
-schemaVersion = "1.0"
+schemaVersion = "2.0"
 id = "lcod://http/api_route@0.1.0"
-name = "api_route"
-namespace = "http"
 version = "0.1.0"
 kind = "contract"
 summary = "Route descriptor binding an HTTP method/path to a handler sequence."
@@ -12,5 +10,7 @@ description = "Describe a single HTTP endpoint and its handler."
 inputSchema = "schema/api_route.in.json"
 outputSchema = "schema/api_route.out.json"
 
-[docs]
-readme = "README.md"
+[documentation]
+body = """
+Defines the shape of an HTTP route descriptor. Projects use this contract to
+describe how incoming requests should be forwarded to sequence handlers."""

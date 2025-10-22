@@ -1,7 +1,5 @@
-schemaVersion = "1.0"
+schemaVersion = "2.0"
 id = "lcod://contract/core/array/push@1.0.0"
-name = "push"
-namespace = "contract/core/array"
 version = "1.0.0"
 kind = "contract"
 summary = "Append a value to an array and return the new collection."
@@ -12,5 +10,5 @@ description = "Append a value to an array, returning the new array and its lengt
 inputSchema = "schema/push.in.json"
 outputSchema = "schema/push.out.json"
 
-[docs]
-readme = "README.md"
+[documentation]
+body = "Appends a single value to the end of an array and returns the updated collection."

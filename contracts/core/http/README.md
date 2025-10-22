@@ -1,4 +1,9 @@
-# Contract: core/http/request@1
+<!-- AUTO-GENERATED: edit lcp.toml and run scripts/build-component-artifacts.mjs -->
+# lcod://contract/core/http/request@1.0.0
+
+Perform an HTTP request with configurable method, headers, body, and streaming hints.
+
+## Notes
 
 Performs an HTTP request (client-side) and returns status, headers, and either a buffered body or a reusable stream handle.
 

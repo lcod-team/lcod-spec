@@ -1,4 +1,9 @@
-# tooling/compose/normalize@1
+<!-- AUTO-GENERATED: edit lcp.toml and run scripts/build-component-artifacts.mjs -->
+# lcod://tooling/compose/normalize@0.1.0
+
+Normalize sugar syntax in compose definitions before execution.
+
+## Notes
 
 Expands author-friendly shortcuts (“sugar”) into the canonical compose shape consumed by LCOD kernels.
 

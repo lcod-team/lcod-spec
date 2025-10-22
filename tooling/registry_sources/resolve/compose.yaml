@@ -8,7 +8,6 @@ compose:
       projectRoot: projectRoot
       cacheDir: cacheDir
       downloadsRoot: downloadsRoot
-
   - call: lcod://tooling/registry_sources/load_config@0.1.0
     in:
       projectRoot: $.projectRoot
@@ -21,7 +20,6 @@ compose:
       sourcesBaseDir: sourcesBaseDir
       configWarnings: warnings
       configValid: valid
-
   - call: lcod://flow/if@1
     in:
       cond: $.configValid
@@ -46,7 +44,24 @@ compose:
     out:
       registrySources: registrySources
       collectWarnings: collectWarnings
-
+    slots:
+      then:
+        - call: lcod://tooling/registry_sources/collect_entries@0.1.0
+          in:
+            sourcesConfig: $.sourcesConfig
+            sourcesBaseDir: $.sourcesBaseDir
+            downloadsRoot: $.downloadsRoot
+          out:
+            registrySources: registrySources
+            collectWarnings: warnings
+      else:
+        - call: lcod://impl/set@1
+          in:
+            registrySources: []
+            collectWarnings: []
+          out:
+            registrySources: registrySources
+            collectWarnings: collectWarnings
   - call: lcod://impl/set@1
     in:
       projectRoot: $.projectRoot
@@ -62,14 +77,12 @@ compose:
       sourcesPath: sourcesPath
       sourcesConfig: sourcesConfig
       warnings: warnings
-
   - call: lcod://tooling/array/append@0.1.0
     in:
       items: $.warnings
       values: $.collectWarnings
     out:
       warnings: items
-
   - call: lcod://tooling/script@1
     in:
       source: |
@@ -83,7 +96,6 @@ compose:
         warnings: $.warnings
     out:
       warnings: warnings
-
   - call: lcod://impl/set@1
     in:
       registrySources: $.registrySources

@@ -1,4 +1,9 @@
-# Contract: core/parse/json@1
+<!-- AUTO-GENERATED: edit lcp.toml and run scripts/build-component-artifacts.mjs -->
+# lcod://contract/core/parse/json@1.0.0
+
+Parse JSON text into a canonical object with optional schema validation.
+
+## Notes
 
 Parses JSON content from a string, file, or stream into canonical JavaScript values.
 

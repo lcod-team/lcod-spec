@@ -2,6 +2,10 @@
 
 `tooling/log@1` defines a minimal, structured logging interface shared across runtimes. Kernels call this contract for their own diagnostics, and compositions can bind it to environment-specific sinks (stdout, files, SaaS loggers, analytics pipelines…).
 
+> **Note:** Some examples still reference `children` in compose snippets. The
+> canonical slot key is `slots`; runtime helpers populate both during the
+> migration window.
+
 ## Payload structure
 
 ```json

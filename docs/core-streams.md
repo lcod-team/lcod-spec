@@ -2,6 +2,10 @@
 
 LCOD streams model long-running or large data transfers (HTTP downloads, file reads, LLM event feeds) without forcing callers to buffer everything as base64. Producers expose a **stream handle** that consumers can poll or hand to helper contracts.
 
+> **Note:** Examples in this document may still reference the legacy `children`
+> key for slot execution. The canonical key is `slots`; kernels continue to
+> support `children` during the migration.
+
 ## Stream handle shape
 
 A stream handle is a JSON object with the following fields:

@@ -1,4 +1,9 @@
-# Contract: tooling/test_checker@1
+<!-- AUTO-GENERATED: edit lcp.toml and run scripts/build-component-artifacts.mjs -->
+# lcod://contract/tooling/test_checker@1.0.0
+
+Execute a compose with an input and validate the output against an expected value.
+
+## Notes
 
 A generic harness contract that executes a target compose and validates its
 output against an expected payload. Runtime implementations are responsible for

@@ -1,4 +1,9 @@
-# Contract: core/fs/write-file@1
+<!-- AUTO-GENERATED: edit lcp.toml and run scripts/build-component-artifacts.mjs -->
+# lcod://contract/core/fs/write-file@1.0.0
+
+Write data to the local filesystem with optional encoding and metadata controls.
+
+## Notes
 
 Writes data to the local filesystem, optionally creating parent directories.
 

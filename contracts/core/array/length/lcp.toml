@@ -1,7 +1,5 @@
-schemaVersion = "1.0"
+schemaVersion = "2.0"
 id = "lcod://contract/core/array/length@1.0.0"
-name = "length"
-namespace = "contract/core/array"
 version = "1.0.0"
 kind = "contract"
 summary = "Return the number of elements in an array."
@@ -12,5 +10,5 @@ description = "Compute the size of an array and return it as an integer."
 inputSchema = "schema/length.in.json"
 outputSchema = "schema/length.out.json"
 
-[docs]
-readme = "README.md"
+[documentation]
+body = "Returns the number of elements contained in the provided array."

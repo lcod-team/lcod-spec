@@ -101,6 +101,11 @@ Goal: deliver a runnable HTTP backend that exercises advanced composes and prepa
 
 Goal: help users discover and assemble components through a local RAG + LLM pipeline while keeping the toolchain entirely LCOD-native.
 
+- [ ] M7-00 Consolidate component metadata around `lcp.toml` as the single source of truth (spec + tooling refresh)
+  - [x] Document the new TOML structure (inputs/outputs/slots/i18n) and update the component creation guide.
+  - [x] Ship a builder compose that generates JSON Schemas, README(s), and other artefacts from `lcp.toml`.
+  - [x] Migrate existing spec components to the new layout and add validation to prevent regressions.
+  - [ ] Rename compose slot bindings from `children` to `slots`, update kernels/docs, and provide a transition plan for existing compositions.
 - [ ] M7-01 Registry-driven ingestion pipeline: compose an LCOD flow that reads `catalogues.json`, fetches manifests, fingerprints component docs, and reconciles Qdrant (add/update/delete) using embeddings generated via Ollama.
 - [ ] M7-02 Assistant service & CLI: expose `/query` and command-line entry points that call the compose-based retrieval, invoke Ollama, and return component/composition suggestions.
 - [ ] M7-03 Compose skeleton generator: assemble retrieved candidates into starter `compose.yaml` flows, validate them with `run-compose`, and keep the scaffolding 100% LCOD.

@@ -1,4 +1,9 @@
-# Contract: tooling/script@1
+<!-- AUTO-GENERATED: edit lcp.toml and run scripts/build-component-artifacts.mjs -->
+# lcod://contract/tooling/script@1.0.0
+
+Execute sandboxed JavaScript snippets and return their result.
+
+## Notes
 
 Executes a short piece of JavaScript inside a sandboxed runtime. The contract
 injects selected bindings from the input state and exposes a restricted `api`

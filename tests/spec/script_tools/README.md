@@ -1,4 +1,9 @@
-# script_tools
+<!-- AUTO-GENERATED: edit lcp.toml and run scripts/build-component-artifacts.mjs -->
+# lcod://tests/script_tools@0.1.0
+
+Validate tooling/script@1 helpers (api.run/api.config).
+
+## Notes
 
 Validates the extended sandbox API of `tooling/script@1`:
 

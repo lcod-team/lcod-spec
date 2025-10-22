@@ -1,19 +1,8 @@
+schemaVersion = "2.0"
 id = "lcod://tooling/object/clone@0.1.0"
-name = "object.clone"
 version = "0.1.0"
 kind = "component"
-
 summary = "Clone a plain object using JSON semantics."
-
-[[io.input]]
-name = "value"
-type = "object"
-description = "Object to clone; non-objects yield an empty object."
-
-[[io.output]]
-name = "clone"
-type = "object"
-description = "Deep clone of the input when possible; empty object otherwise."
 
 [deps]
 requires = [
@@ -22,3 +11,18 @@ requires = [
   "lcod://tooling/script@1",
   "lcod://tooling/value/is_object@0.1.0"
 ]
+
+[inputs.value]
+summary = "Object to clone; non-objects yield an empty object."
+required = false
+schema = """
+{
+  "type": "object"
+}"""
+
+[outputs.clone]
+summary = "Deep clone of the input when possible; empty object otherwise."
+schema = """
+{
+  "type": "object"
+}"""

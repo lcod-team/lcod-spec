@@ -1,16 +1,8 @@
-schemaVersion = "1.0"
+schemaVersion = "2.0"
 id = "lcod://flow/foreach_demo@0.1.0"
-name = "foreach_demo"
-namespace = "flow"
 version = "0.1.0"
 kind = "function"
 summary = "Demo foreach composition collecting values with else-slot."
-
-[tool]
-name = "foreach_demo"
-description = "Iterate numbers, collect values; else provides default."
-inputSchema = "schema/foreach_demo.in.json"
-outputSchema = "schema/foreach_demo.out.json"
 
 [deps]
 requires = [
@@ -20,6 +12,27 @@ requires = [
   "lcod://impl/echo@1"
 ]
 
-[docs]
-readme = "README.md"
+[tool]
+name = "foreach_demo"
+description = "Iterate numbers, collect values; else provides default."
+inputSchema = "schema/foreach_demo.in.json"
+outputSchema = "schema/foreach_demo.out.json"
 
+[documentation]
+body = """
+Minimal demo to exercise `lcod://flow/foreach@1` with value collection
+via `meta.collectPath`. Else-slot runs when the list is empty.
+
+Notes
+- Body echoes each item so `collectPath` can pick it up.
+- Else-slot runs if the list is empty (results stays empty here).
+- To run, register flow blocks (`foreach` and optionally `continue`/`break`) and a simple `impl/echo` in your runner.
+
+Suggested `impl/echo` (pseudo):
+`echo(ctx, { value }) => ({ val: value })`
+
+Sample input
+`{ "numbers": [1, 2, 3, 8, 9] }`
+
+Expected output
+`{ "results": [1, 2, 3, 8, 9] }`"""
