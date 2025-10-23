@@ -4,15 +4,15 @@ compose:
       compose:
         - call: lcod://tooling/make_component_doc@0.1.0
           in:
-            descriptorPath: "tests/spec/make_component_doc/fixtures/components/alpha/lcp.toml"
+            descriptorPath: "fixtures/components/alpha/lcp.toml"
             write: false
           out:
             componentDoc: $
 
         - call: lcod://tooling/make_package_doc@0.1.0
           in:
-            packageDescriptorPath: "tests/spec/make_component_doc/fixtures/package_example/lcp.toml"
-            componentsDir: "tests/spec/make_component_doc/fixtures/package_example/components"
+            packageDescriptorPath: "fixtures/package_example/lcp.toml"
+            componentsDir: "fixtures/package_example/components"
             write: false
             generateComponentDocs: false
           out:
