@@ -6,3 +6,6 @@ summary = "Fixture workspace package containing a single sample component."
 
 [palette]
 icon = "mdi:package-variant"
+
+[workspace]
+componentsDir = "components"

@@ -1,0 +1,39 @@
+resolverVersion = "0.1.0"
+schemaVersion = "1.0"
+
+[[components]]
+id = "lcod://tests/make_component_doc@0.1.0"
+integrity = "sha256-de23e6d69b2a57c3653b070b7e00fa48bb9ff873217ba75ae96ea8ebaa542c8e"
+resolved = "lcod://tests/make_component_doc@0.1.0"
+
+[[components.dependencies]]
+id = "lcod://tooling/test_checker@1"
+
+[components.dependencies.source]
+reference = "lcod://tooling/test_checker@1"
+type = "registry"
+
+[[components.dependencies]]
+id = "lcod://tooling/make_component_doc@0.1.0"
+
+[components.dependencies.source]
+reference = "lcod://tooling/make_component_doc@0.1.0"
+type = "registry"
+
+[[components.dependencies]]
+id = "lcod://tooling/make_package_doc@0.1.0"
+
+[components.dependencies.source]
+reference = "lcod://tooling/make_package_doc@0.1.0"
+type = "registry"
+
+[[components.dependencies]]
+id = "lcod://tooling/script@1"
+
+[components.dependencies.source]
+reference = "lcod://tooling/script@1"
+type = "registry"
+
+[components.source]
+path = "."
+type = "path"
