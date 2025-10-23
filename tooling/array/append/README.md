@@ -1,4 +1,6 @@
 <!-- AUTO-GENERATED: edit lcp.toml and run scripts/build-component-artifacts.mjs -->
+<p><img src="https://api.iconify.design/mdi:plus-box-outline.svg?height=48&width=48" alt="Append optional arrays and/or a single value to the provided items." width="48" height="48" /></p>
+
 # lcod://tooling/array/append@0.1.0
 
 Append optional arrays and/or a single value to the provided items.

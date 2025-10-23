@@ -1,0 +1,12 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "value": {
+      "type": "string",
+      "description": "Value to echo."
+    }
+  },
+  "description": "Echo the provided value; used as a documentation generator fixture."
+}

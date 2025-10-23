@@ -1,0 +1,11 @@
+schemaVersion = "2.0"
+id = "lcod://spec/core@0.1.0"
+version = "0.1.0"
+kind = "workspace-package"
+summary = "Workspace package enumerating the LCOD core axioms and helpers exposed by the specification."
+
+[palette]
+icon = "mdi:cube"
+
+[workspace]
+componentsDir = "../../core"

@@ -1,0 +1,28 @@
+schemaVersion = "2.0"
+id = "lcod://fixtures/example/component-alpha@0.1.0"
+version = "0.1.0"
+kind = "component"
+summary = "Echo the provided value; used as a documentation generator fixture."
+
+[palette]
+icon = "mdi:alpha-circle"
+
+[inputs.value]
+summary = "Value to echo."
+required = false
+schema = """
+{
+  "type": "string"
+}"""
+
+[outputs.value]
+summary = "Echoed value."
+schema = """
+{
+  "type": "string"
+}"""
+
+[tool]
+name = "component_alpha"
+inputSchema = "schema/input.json"
+outputSchema = "schema/output.json"

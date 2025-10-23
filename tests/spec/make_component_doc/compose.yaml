@@ -1,0 +1,63 @@
+compose:
+  - call: lcod://tooling/test_checker@1
+    in:
+      compose:
+        - call: lcod://tooling/make_component_doc@0.1.0
+          in:
+            descriptorPath: "tests/spec/make_component_doc/fixtures/components/alpha/lcp.toml"
+            write: false
+          out:
+            componentDoc: $
+
+        - call: lcod://tooling/make_package_doc@0.1.0
+          in:
+            packageDescriptorPath: "tests/spec/make_component_doc/fixtures/package_example/lcp.toml"
+            componentsDir: "tests/spec/make_component_doc/fixtures/package_example/components"
+            write: false
+            generateComponentDocs: false
+          out:
+            packageDoc: $
+
+        - call: lcod://tooling/script@1
+          in:
+            bindings:
+              component:
+                path: $.componentDoc
+              package:
+                path: $.packageDoc
+            source: |
+              async ({ bindings }) => {
+                const component = bindings.component || {};
+                const pkg = bindings.package || {};
+                const componentReadme = typeof component.readme === 'string' ? component.readme : '';
+                const componentOk = component.descriptor?.id === 'lcod://fixtures/example/component-alpha@0.1.0'
+                  && componentReadme.includes('# lcod://fixtures/example/component-alpha@0.1.0')
+                  && componentReadme.includes('https://api.iconify.design/mdi:alpha-circle.svg?height=48&width=48');
+                const packageReadme = typeof pkg.readme === 'string' ? pkg.readme : '';
+                const packageOk = pkg.descriptor?.id === 'lcod://fixtures/package/example@0.1.0'
+                  && packageReadme.includes('<img src="https://api.iconify.design/mdi:package-variant.svg?height=64&width=64"')
+                  && packageReadme.includes('<img src="https://api.iconify.design/mdi:alpha.svg?height=32&width=32"')
+                  && packageReadme.includes('[`lcod://fixtures/package/example/alpha@0.1.0`](')
+                  && Array.isArray(pkg.components)
+                  && pkg.components.length === 1
+                  && pkg.components[0].icon === 'mdi:alpha';
+                return {
+                  success: Boolean(componentOk && packageOk),
+                  details: {
+                    componentOk,
+                    packageOk,
+                    componentHasIcon: componentReadme.includes('mdi:alpha-circle.svg'),
+                    packageHasIconHeader: packageReadme.includes('mdi:package-variant.svg'),
+                    packageHasIconRow: packageReadme.includes('mdi:alpha.svg'),
+                    componentReadmeLength: component.readme ? component.readme.length : 0,
+                    packageReadmeLength: pkg.readme ? pkg.readme.length : 0
+                  }
+                };
+              }
+          out:
+            verification: $
+      expected:
+        verification:
+          success: true
+    out:
+      report: $

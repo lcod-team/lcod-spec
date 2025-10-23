@@ -1,0 +1,6 @@
+compose:
+  - call: lcod://impl/set@1
+    in:
+      payload: $.payload
+    out:
+      payload: payload

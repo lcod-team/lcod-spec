@@ -13,7 +13,7 @@ Expands author-friendly shortcuts (“sugar”) into the canonical compose shape
 | --- | --- |
 | Identity & optional keys | Collapse `foo: $.foo`/`foo: foo` boilerplate and allow opt-in omission via `key?`. |
 | Spreads | Merge whole objects with `...` shorthands instead of enumerating keys. |
-| Slots | Normalize slot collections so every branch is handled consistently. |
+| Children | Normalize slot collections so every branch is handled consistently. |
 
 The component accepts an object with a `compose` array and returns the normalized version. Kernels call it before executing any flow so that reviewers see the short form, while runtimes always deal with the fully expanded structure.
 

@@ -1,0 +1,8 @@
+schemaVersion = "2.0"
+id = "lcod://fixtures/package/example@0.1.0"
+version = "0.1.0"
+kind = "workspace-package"
+summary = "Fixture workspace package containing a single sample component."
+
+[palette]
+icon = "mdi:package-variant"

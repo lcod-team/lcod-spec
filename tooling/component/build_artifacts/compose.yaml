@@ -156,9 +156,37 @@ compose:
             return String(value).replace(/\r\n/g, '\n').trim();
           };
 
+          const encodeIconId = (iconId) => {
+            if (typeof iconId !== 'string') return '';
+            const trimmed = iconId.trim();
+            if (!trimmed) return '';
+            return trimmed
+              .split(':')
+              .map((part) => encodeURIComponent(part.trim()))
+              .join(':');
+          };
+
+          const buildIconMarkup = () => {
+            const iconId = descriptor.palette && typeof descriptor.palette.icon === 'string'
+              ? descriptor.palette.icon.trim()
+              : '';
+            if (!iconId) return '';
+            const encoded = encodeIconId(iconId);
+            if (!encoded) return '';
+            const size = 48;
+            const iconUrl = `https://api.iconify.design/${encoded}.svg?height=${size}&width=${size}`;
+            const alt = (descriptor.summary || descriptor.id || 'Component icon').replace(/"/g, '&quot;');
+            return `<p><img src="${iconUrl}" alt="${alt}" width="${size}" height="${size}" /></p>`;
+          };
+
           const buildReadme = () => {
             const lines = [];
             lines.push(HEADER);
+            const iconTag = buildIconMarkup();
+            if (iconTag) {
+              lines.push(iconTag);
+              lines.push('');
+            }
             lines.push(`# ${descriptor.id}`);
             lines.push('');
             if (descriptor.summary) {

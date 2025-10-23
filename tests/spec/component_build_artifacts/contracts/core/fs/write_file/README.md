@@ -3,6 +3,24 @@
 
 Write data to the local filesystem with optional encoding and metadata controls.
 
+## Inputs
+
+| Name | Type | Required | Description |
+| --- | --- | --- | --- |
+| `path` | string | Yes | Absolute or project-relative file path. |
+| `data` | string | Yes | Payload to write. Interpreted according to encoding. |
+| `encoding` | enum(utf-8, base64, hex) | No | Encoding applied to data. Defaults to utf-8. |
+| `append` | boolean | No | Append to an existing file instead of replacing it. |
+| `createParents` | boolean | No | Create missing parent directories when true. |
+| `mode` | string | No | Optional POSIX file mode (octal string). |
+
+## Outputs
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `bytesWritten` | integer | Number of bytes written to disk. |
+| `mtime` | string | Last modification timestamp after writing. |
+
 ## Notes
 
 Writes data to the local filesystem, optionally creating parent directories.

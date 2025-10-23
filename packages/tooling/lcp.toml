@@ -1,0 +1,11 @@
+schemaVersion = "2.0"
+id = "lcod://spec/tooling@0.1.0"
+version = "0.1.0"
+kind = "workspace-package"
+summary = "Workspace package aggregating LCOD tooling components shipped with the specification."
+
+[palette]
+icon = "mdi:wrench"
+
+[workspace]
+componentsDir = "../../tooling"

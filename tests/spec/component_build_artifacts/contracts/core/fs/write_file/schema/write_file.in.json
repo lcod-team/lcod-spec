@@ -1,10 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://lcod.team/schemas/contracts/core/fs/write_file/input.json",
-  "title": "Filesystem Write File Input",
   "type": "object",
   "additionalProperties": false,
-  "required": ["path", "data"],
   "properties": {
     "path": {
       "type": "string",
@@ -13,25 +10,34 @@
     },
     "data": {
       "type": "string",
-      "description": "Payload to write. Interpreted according to `encoding`."
+      "description": "Payload to write. Interpreted according to encoding."
     },
     "encoding": {
       "type": "string",
-      "enum": ["utf-8", "base64", "hex"],
-      "description": "Encoding applied to `data`. Defaults to utf-8."
+      "enum": [
+        "utf-8",
+        "base64",
+        "hex"
+      ],
+      "description": "Encoding applied to data. Defaults to utf-8."
     },
     "append": {
       "type": "boolean",
-      "description": "Append to the existing file when true; otherwise replace the contents."
+      "description": "Append to an existing file instead of replacing it."
     },
     "createParents": {
       "type": "boolean",
-      "description": "Create parent directories when they are missing."
+      "description": "Create missing parent directories when true."
     },
     "mode": {
       "type": "string",
       "pattern": "^[0-7]{3,4}$",
       "description": "Optional POSIX file mode (octal string)."
     }
-  }
+  },
+  "required": [
+    "path",
+    "data"
+  ],
+  "description": "Write data to the local filesystem with optional encoding and metadata controls."
 }

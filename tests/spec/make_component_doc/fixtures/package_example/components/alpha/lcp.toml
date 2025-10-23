@@ -1,0 +1,28 @@
+schemaVersion = "2.0"
+id = "lcod://fixtures/package/example/alpha@0.1.0"
+version = "0.1.0"
+kind = "component"
+summary = "Package-scoped component used to test package documentation generation."
+
+[palette]
+icon = "mdi:alpha"
+
+[inputs.payload]
+summary = "Arbitrary payload."
+required = false
+schema = """
+{
+  "type": "object"
+}"""
+
+[outputs.payload]
+summary = "Echoed payload."
+schema = """
+{
+  "type": "object"
+}"""
+
+[tool]
+name = "package_example_alpha"
+inputSchema = "schema/input.json"
+outputSchema = "schema/output.json"
