@@ -15,6 +15,13 @@ Product designers, engineers, and contributors who extend the LCOD catalogue or 
 3. Generate lockfiles (`lcp.lock`) and packages (`.lcpkg`).
 4. Provide resolver/axiom implementations for your runtime if needed.
 
+### Standard development cycle
+1. Align with the relevant roadmap item and open / link the tracking issue.
+2. Implement the change (spec, resolver, kernels, packages) in a focused branch.
+3. Run the associated local tests or scripts (e.g. `cargo test`, `npm run export:components`).
+4. Commit with a message referencing the issue, then push to `main` (or the PR branch).
+5. Monitor the affected CI workflows (Validate, Verify Components, Rust tests, etc.) and address regressions immediately.
+
 ## Contribution tips
 - Keep descriptors and docs in sync.
 - Add tests under `tests/unit/`.

@@ -21,7 +21,7 @@ repo-root/
 ```
 
 - `workspace.lcp.toml` defines shared metadata, the package list, and scope aliases that can be reused across packages.
-- Each package keeps its own `lcp.toml` descriptor. Workspace configuration lives under `[workspace]`, including a `components` array enumerating helper blocks.
+- Each package keeps its own `lcp.toml` descriptor. Workspace configuration lives under `[workspace]`, typically with `componentsDir = "components"` so kernels can scan helper directories automatically, plus optional alias tables.
 - Helper components stay versioned with the package: by default the package `version` is inherited, so a single publish carries all workspace-scoped helpers.
 
 See also `docs/structure.md` for the generic package layout.
@@ -38,15 +38,14 @@ Workspaces expose private helpers through short identifiers (e.g. `internal/load
 Example from `packages/resolver/lcp.toml`:
 
 ```toml
+[workspace]
+componentsDir = "components"
+
 [workspace.scopeAliases]
 internal = "internal"
-
-[[workspace.components]]
-id = "internal/load-config"
-path = "components/internal/load_config"
 ```
 
-Resolving `internal/load-config` yields `lcod://tooling/resolver/internal/load-config@0.1.0`. The helper’s own `lcp.toml` can continue to declare the canonical ID explicitly; kernels will register both the canonical ID and any aliases that already exist.
+Each helper directory under `components/` ships its own `lcp.toml` with the canonical ID (`lcod://…`). When a compose references `internal/load-config`, kernels expand the alias to `lcod://tooling/resolver/internal/load-config@0.1.0`. If the helper manifest already exposes aliases, they are registered alongside the canonical ID.
 
 Guidelines:
 
@@ -71,21 +70,21 @@ This keeps composes portable. Forks or namespace changes only require updating t
 
 Both kernels discover workspaces automatically:
 
-- **Node** (`lcod-kernel-js/src/tooling/resolver-helpers.js`) looks up `workspace.lcp.toml`, reads each package manifest, and canonicalises composes before execution so short IDs are valid everywhere.
-- **Rust** (`lcod-kernel-rs/src/tooling/mod.rs`) mirrors the same behaviour: it derives the package context, expands aliases, preserves legacy IDs as aliases, and canonicalises nested `call`/`composeRef` statements.
+- **Node** (`lcod-kernel-js/src/tooling/resolver-helpers.js`) looks up `workspace.lcp.toml`, reads each package manifest, traverses `componentsDir`, and canonicalises composes before execution so short IDs are valid everywhere.
+- **Rust** (`lcod-kernel-rs/src/tooling/mod.rs`) mirrors the same behaviour: it derives the package context, walks `componentsDir`, expands aliases, preserves legacy IDs as aliases, and canonicalises nested `call`/`composeRef` statements.
 
 The discovery order is:
 
-1. `LCOD_RESOLVER_COMPONENTS_PATH` (legacy path with plain components).
-2. `LCOD_RESOLVER_PATH` (resolver repository root).
-3. Sibling checkouts (`../lcod-resolver`; legacy `../lcod-spec/tooling/resolver` kept for pre-workspace trees) to support mono-checkouts.
+1. `LCOD_RESOLVER_PATH` (resolver repository root).
+2. Sibling checkouts (`../lcod-resolver`; legacy fallbacks under `../lcod-spec/tooling` kept for older trees).
+3. `LCOD_RESOLVER_COMPONENTS_PATH` (deprecated direct components path, still honoured as a legacy fallback).
 
 Tooling that loads composes (tests, CLIs) should mirror this canonicalisation step. See `lcod-kernel-js/test/tooling.resolver.test.js` and `lcod-kernel-rs/tests/resolver.rs` for reference implementations.
 
 ## Migration checklist
 
 1. Add `workspace.lcp.toml` at the repository root with the package list and default alias map.
-2. Move each published package under `packages/<name>/` and update its `lcp.toml` to declare workspace components.
+2. Move each published package under `packages/<name>/` and update its `lcp.toml` with `workspace.componentsDir = "components"` (plus aliases if needed).
 3. Update composes to reference helpers via short IDs.
 4. Ensure CI points tests to the new workspace structure (`npm test`, `cargo test`, etc.).
 5. Keep an eye on downstream consumers; once they run a workspace-aware kernel they can drop legacy resolver paths.
