@@ -58,3 +58,17 @@ npm run validate
 ```
 
 The validator parses `lcp.toml` with @iarna/toml, validates the descriptor against `schema/lcp.schema.json` (Ajv 2020), and ensures referenced schemas/doc files exist for all examples.
+
+Run a compose locally (for example a spec fixture) with the cross-platform helper:
+
+```
+npm run lcod-run -- --compose tests/spec/tooling_primitives/compose.yaml
+```
+On Windows set `LCOD_RUN_BIN` to the extracted `lcod-run.exe` shipped with the runtime bundle so the helper can invoke the correct binary.
+
+Windows contributors should also disable automatic CRLF conversion and renormalise the worktree after pulling the `.gitattributes` file:
+
+```
+git config core.autocrlf false
+git add --renormalize .
+```

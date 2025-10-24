@@ -1,0 +1,21 @@
+# Normalize all text files to LF on checkout and commit.
+* text eol=lf
+
+# Binary assets must keep their native encoding.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary
+*.ico binary
+*.pdf binary
+*.zip binary
+*.tar binary
+*.gz binary
+*.tgz binary
+*.7z binary
+*.exe binary
+*.dll binary
+*.so binary
+*.dylib binary
+*.wasm binary

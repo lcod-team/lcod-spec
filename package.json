@@ -7,6 +7,7 @@
   "scripts": {
     "validate": "node scripts/validate.cjs",
     "test:conformance": "node scripts/run-conformance.mjs",
+    "lcod-run": "node scripts/run-lcod-run.mjs",
     "bundle:runtime": "node scripts/package-runtime.mjs",
     "build:components": "node scripts/build-component-artifacts.mjs"
   },

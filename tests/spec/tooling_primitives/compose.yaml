@@ -54,13 +54,17 @@ compose:
             joinedFileUrl: url
         - call: lcod://tooling/script@1
           in:
+            input: "__lcod_state__"
             bindings:
               url:
                 path: $.joinedFileUrl
             source: |
               async ({ bindings }) => {
-                const raw = String(bindings.url || '');
-                const prefixed = raw.replace(/^file:\/\//, 'file:///');
+                const raw = typeof bindings.url === 'string' ? bindings.url : '';
+                let prefixed = raw;
+                if (prefixed.startsWith('file://') && !prefixed.startsWith('file:///')) {
+                  prefixed = `file:///${prefixed.slice('file://'.length)}`;
+                }
                 const normalized = prefixed.endsWith('/') ? prefixed.slice(0, -1) : prefixed;
                 return { joinedFileUrl: normalized };
               }
@@ -79,6 +83,7 @@ compose:
                 items: $.appendedItems
                 length: $.appendedLength
               joinedFileUrl: $.joinedFileUrl
+              joinedPath: $.joinedPath
           out:
             report: report
       expected:
@@ -93,6 +98,6 @@ compose:
             items: ["base", "x", "y", "z"]
             length: 4
           joinedFileUrl: "file:///root/folder/file.txt"
-          joinedPath: "root\\folder\\file.txt"
+          joinedPath: "root/folder/file.txt"
     out:
-      report: report
+      report: $
