@@ -128,7 +128,8 @@ Goal: eliminate ad-hoc scripts by providing declarative collection/object/string
 - [x] M9-02 Kernels: add supporting axioms (`object/merge`, `array/append`, `string/format`, JSON encode/decode) in JS & Rust runtimes (refs lcod-kernel-js#22, lcod-kernel-rs#20).
 - [x] M9-03 Components: publish standard collection/object/string helpers in `lcod-components` using the new primitives (core wrappers for array/object/string/json).
 - [x] M9-04 Migration: refactor existing `tooling/script@1` components to rely on the new primitives; deprecate script-heavy variants (`tooling/json.stringify`, `tooling/array.append`).
-- [ ] M9-05 Optional: expose `tooling/expression/evaluate@1` for lightweight expressions without full scripting.
+- [x] M9-05 Kernels & spec: ship scriptless tooling primitives (value checks, array helpers, path chaining, optional FS writes) with JS/Rust parity and spec/tests updates.
+- [ ] M9-06 Optional: expose `tooling/expression/evaluate@1` for lightweight expressions without full scripting.
 
 ## Future — UI & eventing
 
