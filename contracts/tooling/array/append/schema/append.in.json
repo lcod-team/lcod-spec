@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "tooling/array/append@1 input",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "items": {
+      "type": "array",
+      "description": "Base array. Defaults to an empty array when omitted."
+    },
+    "values": {
+      "type": "array",
+      "description": "Optional list of values to append."
+    },
+    "value": {
+      "description": "Optional single value appended after `values`."
+    }
+  }
+}

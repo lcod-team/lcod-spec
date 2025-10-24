@@ -1,0 +1,11 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "tooling/value/is_defined@1 input",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "value": {
+      "description": "Value to evaluate for definedness."
+    }
+  }
+}

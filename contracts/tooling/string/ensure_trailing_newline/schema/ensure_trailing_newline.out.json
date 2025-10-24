@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "tooling/string/ensure_trailing_newline@1 output",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["text"],
+  "properties": {
+    "text": {
+      "type": "string",
+      "description": "Normalised text guaranteed to end with the newline sequence."
+    }
+  }
+}

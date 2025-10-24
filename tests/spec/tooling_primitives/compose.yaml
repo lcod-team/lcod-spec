@@ -1,0 +1,84 @@
+compose:
+  - call: lcod://tooling/test_checker@1
+    in:
+      compose:
+        - call: lcod://tooling/value/is_defined@0.1.0
+          in:
+            value: 0
+          out:
+            definedZero: ok
+        - call: lcod://tooling/value/is_defined@0.1.0
+          out:
+            missingValue: ok
+        - call: lcod://tooling/string/ensure_trailing_newline@0.1.0
+          in:
+            text: line
+          out:
+            newlineText: text
+        - call: lcod://tooling/array/compact@0.1.0
+          in:
+            items: [0, null, "a"]
+          out:
+            compacted: values
+        - call: lcod://tooling/array/flatten@0.1.0
+          in:
+            items:
+              - [1, 2]
+              - null
+              - 3
+          out:
+            flattened: values
+        - call: lcod://tooling/array/find_duplicates@0.1.0
+          in:
+            items: ["a", "b", "a", "c", "b"]
+          out:
+            duplicates: duplicates
+        - call: lcod://tooling/array/append@0.1.0
+          in:
+            items: ["base"]
+            values: ["x", "y"]
+            value: "z"
+          out:
+            appendedItems: items
+            appendedLength: length
+        - call: lcod://tooling/path/join_chain@0.1.0
+          in:
+            base: root
+            segments: [folder, file.txt]
+          out:
+            joinedPath: path
+        - call: lcod://tooling/path/to_file_url@0.1.0
+          in:
+            path: $.joinedPath
+          out:
+            joinedFileUrl: url
+        - call: lcod://impl/set@1
+          in:
+            report:
+              definedZero: $.definedZero
+              missingValue: $.missingValue
+              newlineText: $.newlineText
+              compacted: $.compacted
+              flattened: $.flattened
+              duplicates: $.duplicates
+              appended:
+                items: $.appendedItems
+                length: $.appendedLength
+              joinedPath: $.joinedPath
+              joinedFileUrl: $.joinedFileUrl
+          out:
+            report: report
+      expected:
+        report:
+          definedZero: true
+          missingValue: false
+          newlineText: "line\n"
+          compacted: [0, "a"]
+          flattened: [1, 2, 3]
+          duplicates: ["a", "b"]
+          appended:
+            items: ["base", "x", "y", "z"]
+            length: 4
+          joinedFileUrl: "file:///root/folder/file.txt"
+    out:
+      report: report

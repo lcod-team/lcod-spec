@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "tooling/fs/write_if_changed@1 output",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["changed"],
+  "properties": {
+    "changed": {
+      "type": "boolean",
+      "description": "True when the file was written because the content changed."
+    }
+  }
+}

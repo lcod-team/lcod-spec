@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "tooling/fs/read_optional@1 output",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["text", "exists", "warning"],
+  "properties": {
+    "text": {
+      "oneOf": [{ "type": "string" }, { "type": "null" }],
+      "description": "File contents or fallback value when available."
+    },
+    "exists": {
+      "type": "boolean",
+      "description": "True when the file exists and was read successfully."
+    },
+    "warning": {
+      "oneOf": [{ "type": "string" }, { "type": "null" }],
+      "description": "Warning describing read failures (if any)."
+    }
+  }
+}

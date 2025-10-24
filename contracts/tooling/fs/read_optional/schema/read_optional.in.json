@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "tooling/fs/read_optional@1 input",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "path": {
+      "type": "string",
+      "description": "File path to read. When omitted or empty, no read is attempted."
+    },
+    "encoding": {
+      "type": "string",
+      "description": "Text encoding (defaults to \"utf-8\")."
+    },
+    "fallback": {
+      "type": "string",
+      "description": "Fallback text returned when the file is missing."
+    },
+    "warningMessage": {
+      "type": "string",
+      "description": "Optional warning emitted when the file cannot be read."
+    }
+  }
+}

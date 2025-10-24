@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "tooling/string/ensure_trailing_newline@1 input",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "text": {
+      "type": "string",
+      "description": "Text to normalise. Defaults to an empty string when omitted."
+    },
+    "newline": {
+      "type": "string",
+      "description": "Newline sequence to append. Defaults to \"\\n\"."
+    }
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "tooling/value/is_defined@1 output",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["ok"],
+  "properties": {
+    "ok": {
+      "type": "boolean",
+      "description": "True when the value is defined."
+    }
+  }
+}

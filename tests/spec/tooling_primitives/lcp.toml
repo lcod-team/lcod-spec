@@ -1,0 +1,29 @@
+schemaVersion = "2.0"
+id = "lcod://tests/tooling_primitives@0.1.0"
+version = "0.1.0"
+kind = "function"
+summary = "Exercise declarative tooling helpers introduced for script-less flows."
+
+[deps]
+requires = [
+  "lcod://tooling/test_checker@1",
+  "lcod://tooling/value/is_defined@0.1.0",
+  "lcod://tooling/string/ensure_trailing_newline@0.1.0",
+  "lcod://tooling/array/compact@0.1.0",
+  "lcod://tooling/array/flatten@0.1.0",
+  "lcod://tooling/array/find_duplicates@0.1.0",
+  "lcod://tooling/array/append@0.1.0",
+  "lcod://tooling/path/join_chain@0.1.0",
+  "lcod://tooling/path/to_file_url@0.1.0"
+]
+
+[tool]
+name = "tooling_primitives"
+description = "Validates the behaviour of script-free tooling helpers."
+inputSchema = "schema/tooling_primitives.in.json"
+outputSchema = "schema/tooling_primitives.out.json"
+
+[documentation]
+body = """
+Validates the behaviour of script-free tooling helpers such as value definedness
+checks, array utilities, string newline normalisation, and chained path joins."""

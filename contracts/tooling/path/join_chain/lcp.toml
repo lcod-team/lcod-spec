@@ -1,0 +1,17 @@
+schemaVersion = "2.0"
+id = "lcod://contract/tooling/path/join_chain@1.0.0"
+version = "1.0.0"
+kind = "contract"
+summary = "Join path segments sequentially starting from an optional base."
+
+[tool]
+name = "tooling_path_join_chain"
+description = "Joins a base path with a list of segments."
+inputSchema = "schema/join_chain.in.json"
+outputSchema = "schema/join_chain.out.json"
+
+[documentation]
+body = """
+Combines an initial path with additional segments using the host platform's
+filesystem semantics. Nullish or empty segments are ignored.
+"""

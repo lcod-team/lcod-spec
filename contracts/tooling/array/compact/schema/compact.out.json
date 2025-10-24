@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "tooling/array/compact@1 output",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["values"],
+  "properties": {
+    "values": {
+      "type": "array",
+      "description": "Array with nullish values removed."
+    }
+  }
+}

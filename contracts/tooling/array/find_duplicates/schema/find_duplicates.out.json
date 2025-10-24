@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "tooling/array/find_duplicates@1 output",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["duplicates"],
+  "properties": {
+    "duplicates": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Array of duplicated string values."
+    }
+  }
+}

@@ -1,0 +1,17 @@
+schemaVersion = "2.0"
+id = "lcod://contract/tooling/array/compact@1.0.0"
+version = "1.0.0"
+kind = "contract"
+summary = "Remove null and undefined entries from an array."
+
+[tool]
+name = "tooling_array_compact"
+description = "Filters out nullish values from an array."
+inputSchema = "schema/compact.in.json"
+outputSchema = "schema/compact.out.json"
+
+[documentation]
+body = """
+Produces a new array containing every non-null, non-undefined value from the
+input sequence. When no input array is provided, the contract returns an empty
+array."""

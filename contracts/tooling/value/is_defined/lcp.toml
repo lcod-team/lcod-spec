@@ -1,0 +1,16 @@
+schemaVersion = "2.0"
+id = "lcod://contract/tooling/value/is_defined@1.0.0"
+version = "1.0.0"
+kind = "contract"
+summary = "Check whether a value is neither null nor undefined."
+
+[tool]
+name = "tooling_value_is_defined"
+description = "Returns whether a value is defined (not null/undefined)."
+inputSchema = "schema/is_defined.in.json"
+outputSchema = "schema/is_defined.out.json"
+
+[documentation]
+body = """
+Determines whether the provided value is defined. The contract reports `true`
+only when the `value` input is present and not `null`."""

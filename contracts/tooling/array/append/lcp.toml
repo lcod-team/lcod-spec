@@ -1,0 +1,17 @@
+schemaVersion = "2.0"
+id = "lcod://contract/tooling/array/append@1.0.0"
+version = "1.0.0"
+kind = "contract"
+summary = "Append one or more values to an array with optional fallbacks."
+
+[tool]
+name = "tooling_array_append"
+description = "Combines an existing array with additional value(s)."
+inputSchema = "schema/append.in.json"
+outputSchema = "schema/append.out.json"
+
+[documentation]
+body = """
+Takes an initial array and returns a new array with the provided value(s)
+appended. Accepts either a single `value` or a list of `values`; both can be
+omitted. The contract also reports the resulting length."""

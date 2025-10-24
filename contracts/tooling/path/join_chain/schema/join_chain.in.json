@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "tooling/path/join_chain@1 input",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "base": {
+      "type": "string",
+      "description": "Initial path segment (optional)."
+    },
+    "segments": {
+      "type": "array",
+      "description": "Segments to append in order.",
+      "items": {
+        "anyOf": [{ "type": "string" }, { "type": "number" }]
+      }
+    }
+  }
+}

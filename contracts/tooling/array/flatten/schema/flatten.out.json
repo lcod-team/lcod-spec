@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "tooling/array/flatten@1 output",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["values"],
+  "properties": {
+    "values": {
+      "type": "array",
+      "description": "Flattened array without nullish entries."
+    }
+  }
+}

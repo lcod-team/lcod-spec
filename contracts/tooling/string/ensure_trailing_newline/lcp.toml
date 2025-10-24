@@ -1,0 +1,17 @@
+schemaVersion = "2.0"
+id = "lcod://contract/tooling/string/ensure_trailing_newline@1.0.0"
+version = "1.0.0"
+kind = "contract"
+summary = "Ensure a string ends with a trailing newline character."
+
+[tool]
+name = "tooling_string_ensure_trailing_newline"
+description = "Appends a newline to the provided text when missing."
+inputSchema = "schema/ensure_trailing_newline.in.json"
+outputSchema = "schema/ensure_trailing_newline.out.json"
+
+[documentation]
+body = """
+Returns the provided text, adding a newline suffix when it is not already
+present. The newline sequence can be customised via the optional `newline`
+input (defaults to `"\n"`)."""
