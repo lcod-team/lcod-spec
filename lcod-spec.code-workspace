@@ -23,6 +23,9 @@
 		},
 		{
 			"path": "../lcod-rag"
+		},
+		{
+			"path": "../lcod-kernel-java"
 		}
 	],
 	"settings": {}

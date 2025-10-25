@@ -1,0 +1,39 @@
+resolverVersion = "0.1.0"
+schemaVersion = "1.0"
+
+[[components]]
+id = "lcod://examples/env/http_demo@0.1.0"
+integrity = "sha256-b028972b7339cc912c684468edc069eb1405d004c8d9883247c4bbe90475592c"
+resolved = "lcod://examples/env/http_demo@0.1.0"
+
+[[components.dependencies]]
+id = "lcod://env/http_host@0.1.0"
+
+[components.dependencies.source]
+reference = "lcod://env/http_host@0.1.0"
+type = "registry"
+
+[[components.dependencies]]
+id = "lcod://project/http_app@0.1.0"
+
+[components.dependencies.source]
+reference = "lcod://project/http_app@0.1.0"
+type = "registry"
+
+[[components.dependencies]]
+id = "lcod://http/api_route@0.1.0"
+
+[components.dependencies.source]
+reference = "lcod://http/api_route@0.1.0"
+type = "registry"
+
+[[components.dependencies]]
+id = "lcod://tooling/script@1"
+
+[components.dependencies.source]
+reference = "lcod://tooling/script@1"
+type = "registry"
+
+[components.source]
+path = "."
+type = "path"
