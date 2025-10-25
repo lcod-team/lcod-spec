@@ -16,7 +16,7 @@ Specification for **LCOD Component Package (LCP)** and implementation convention
 
 See [OVERVIEW.md](OVERVIEW.md) for the ecosystem overview.
 
-Shared specification fixtures live under `tests/spec`. They are portable compose-based tests executed by each kernel via the built-in runners (`npm run test:spec`, `cargo run --bin test_specs`).
+Shared specification fixtures live under `tests/spec`. They are portable compose-based tests executed by each kernel via the built-in runners (`npm run test:spec`, `cargo run --bin test_specs`, and the upcoming Gradle harness described in `docs/runtime-java.md`).
 
 Spec docs
 
@@ -38,6 +38,8 @@ Spec docs
 - [docs/runtime-hints.md](docs/runtime-hints.md) — Execution hints (`timeout`, `retries`, `idempotent`, `pure`)
 - [docs/quickstart.md](docs/quickstart.md) — Validate and run the demo packages locally
 - [docs/tests.md](docs/tests.md) — Declarative test format
+- [docs/runtime-rust.md](docs/runtime-rust.md) — Rust substrate blueprint and conformance harness
+- [docs/runtime-java.md](docs/runtime-java.md) — Java substrate blueprint and parity plan
 - [docs/lockfile.md](docs/lockfile.md) — Lockfile (`lcp.lock`) structure and lifecycle
 - [docs/resolver.md](docs/resolver.md) — Resolver composite and required axioms
 - [docs/mcp-authoring.md](docs/mcp-authoring.md) — MCP-assisted authoring contract and backend expectations

@@ -37,7 +37,7 @@ Guidelines:
 - `lcod-resolver assemble --project path --output bundle.lcod`
   - Runs resolution, writes `lcp.lock`, copies components under `lcod_modules/`.
   - Optionally copies `compose.yaml` and project assets specified in `resolve.config.json`.
-- Kernels (`lcod-kernel-js`, `lcod-kernel-rs`) accept `--bundle bundle.lcod` to execute the compose using files from the bundle.
+- Kernels (`lcod-kernel-js`, `lcod-kernel-rs`, and `lcod-kernel-java` when the CLI parity lands) accept `--bundle bundle.lcod` to execute the compose using files from the bundle.
 
 ## 2. Ship
 
@@ -47,6 +47,7 @@ Guidelines:
 
 - **Node**: packaged as npm tarball or Docker image containing the Node kernel, the bundle, and a launcher (`node index.js`).
 - **Rust**: compiled binary with embedded `lcod_modules/` (using `include_bytes!` or runtime extraction) plus CLI flags.
+- **Java**: shaded Jar produced via the Gradle Shadow plugin (optionally followed by GraalVM native-image) bundling the compose assets alongside the runner.
 - **Generic**: Docker/OCI image with resolved bundle mounted under `/app` and entrypoint executing the kernel CLI.
 
 ### 2.2 CLI Support
@@ -72,7 +73,7 @@ The command may accept `--runtime` to select a specific kernel version, and `--e
 
 ### 3.3 JVM Target (future)
 
-- Generates a classpath with the compose bundle, wraps with GraalVM native-image if required.
+- Generates a classpath with the compose bundle, wraps with GraalVM native-image if required once the Java kernel exposes flow/core parity.
 
 ## 4. Responsibilities
 
@@ -85,5 +86,5 @@ The command may accept `--runtime` to select a specific kernel version, and `--e
 ## 5. Next Steps
 
 - Update `lcod-resolver` to implement `assemble/ship/build` commands.
-- Extend kernel docs (`docs/runtime-node.md`, `docs/runtime-rust.md`) with instructions for consuming bundles.
+- Extend kernel docs (`docs/runtime-node.md`, `docs/runtime-rust.md`, `docs/runtime-java.md`) with instructions for consuming bundles.
 - Create design tickets for optional runtime metadata (e.g. environment variables, secrets management).

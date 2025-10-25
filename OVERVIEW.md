@@ -32,6 +32,7 @@ flowchart TD
     subgraph "Runtimes"
         kernelJS["lcod-kernel-js<br/>Node kernel"]
         kernelRS["lcod-kernel-rs<br/>Rust kernel"]
+        kernelJava["lcod-kernel-java<br/>Java kernel (WIP)"]
     end
     subgraph "Tooling & Delivery"
         packaging["Packaging pipeline<br/>assemble → ship → build"]
@@ -42,6 +43,7 @@ flowchart TD
     registry --> resolver
     resolver --> kernelJS
     resolver --> kernelRS
+    resolver --> kernelJava
     kernelJS --> packaging
     kernelRS --> packaging
     packaging --> ide
@@ -53,7 +55,7 @@ flowchart TD
 
 **Resolution** — `lcod-resolver` merges local and remote catalogues (the runtime ships with a default `sources.json` pointing at the official registry, but developers can add or remove catalogues freely), applies mirrors/replacements, locks versions and feeds kernels with resolved packages. The resolver itself is an LCOD composition, so the same helpers run in CI pipelines and local scripts.
 
-**Runtimes** — portable kernels (`lcod-kernel-js`, `lcod-kernel-rs`) execute compose flows, validate schemas and expose a uniform context API. SDK layers provide axioms / native bindings per language.
+**Runtimes** — portable kernels (`lcod-kernel-js`, `lcod-kernel-rs`, `lcod-kernel-java`) execute compose flows, validate schemas and expose a uniform context API. SDK layers provide axioms / native bindings per language; the Java substrate follows the same contracts while its flow/core coverage catches up with the JS/Rust references.
 
 **Tooling & Delivery** — packaging pipelines assemble `.lcpkg` artefacts or application bundles; the future IDE and RAG layer sit on top of the same registry to help author flows and components.
 
@@ -330,6 +332,8 @@ A recommended polyrepo layout for the LCOD ecosystem:
 | ---------------- | -------------------------------------------- |
 | `lcod-spec`      | Specification, schemas, docs and shared test fixtures (`tests/spec`). |
 | `lcod-kernel-js` | JavaScript/TypeScript kernel + SDK implementation. |
+| `lcod-kernel-rs` | Rust kernel + CLI parity with the JS substrate. |
+| `lcod-kernel-java` | Java 21 kernel + CLI/API for JVM hosts (parity in progress). |
 | `lcod-registry`  | Git registry of LCP components.              |
 | `lcod-resolver`  | CLI and library to resolve and cache blocks. |
 | `lcod-adapters`  | HTTP/JSON‑RPC/MCP adapters (optional).       |

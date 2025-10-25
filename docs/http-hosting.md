@@ -42,7 +42,7 @@ catalog project into an HTTP host.
 
 ## Next steps
 
-- Node and Rust kernels will implement these contracts to provide a runnable
-  HTTP demo service (`M6-02`, `M6-03`).
+- Node, Rust, and (once parity lands) Java kernels will implement these contracts
+  to provide a runnable HTTP demo service (`M6-02`, `M6-03`, `KJ-12`).
 - The resolver will be able to surface HTTP projects from the registry using the
   same descriptors (`M6-04`, `M6-05`).

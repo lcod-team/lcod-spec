@@ -1,6 +1,6 @@
 # Rust Substrate Blueprint
 
-This note tracks the state of the Rust reference substrate (`lcod-kernel-rs`) and how it maps to the LCOD runtime contracts. It complements the Node.js substrate documentation and serves as the blueprint for Milestone **M3-04 — Rust substrate blueprint**.
+This note tracks the state of the Rust reference substrate (`lcod-kernel-rs`) and how it maps to the LCOD runtime contracts. It complements the Node.js substrate documentation and the Java blueprint (`docs/runtime-java.md`), and serves as the blueprint for Milestone **M3-04 — Rust substrate blueprint**.
 
 ## Layout
 

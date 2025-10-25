@@ -58,10 +58,12 @@ this manifest and compare runtimes:
 
 - Node kernel: `npm run test:conformance` (in `lcod-kernel-js/`)
 - Rust kernel: `cargo run --bin test_specs -- --manifest tests/conformance/manifest.json`
+- Java kernel: upcoming Gradle task (`./gradlew conformance --manifest …`), tracked in `docs/runtime-java.md`
 - Combined report: `node scripts/run-conformance.mjs` (from `lcod-spec/`)
 
 The combined script executes both kernels with `--json` output and fails if the resulting
-payloads differ, providing a concise diff when inconsistencies appear.
+payloads differ, providing a concise diff when inconsistencies appear. Once the Java harness
+exposes the same JSON payload, the script will compare all three runtimes automatically.
 
 ## Harness responsibilities
 

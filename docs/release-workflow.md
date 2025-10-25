@@ -18,10 +18,10 @@ Every package (spec helper, resolver component, registry helper) carries the sam
 
 Maintainers keep a small matrix that states which resolver/kernels support a given helper version. The matrix is stored in the release notes or README and must be updated when a new helper or contract is introduced.
 
-| Helper | Resolver | Node kernel | Rust kernel |
-| ------ | -------- | ----------- | ----------- |
-| `tooling/resolver/context@0.1.x` | `lcod-resolver >= 0.6` | `lcod-kernel-js >= 0.5` | `lcod-kernel-rs >= 0.4` |
-| `tooling/registry/index@0.1.x`  | `lcod-resolver >= 0.6` | `lcod-kernel-js >= 0.5` | `lcod-kernel-rs >= 0.4` |
+| Helper | Resolver | Node kernel | Rust kernel | Java kernel |
+| ------ | -------- | ----------- | ----------- | ------------ |
+| `tooling/resolver/context@0.1.x` | `lcod-resolver >= 0.6` | `lcod-kernel-js >= 0.5` | `lcod-kernel-rs >= 0.4` | `lcod-kernel-java` (bootstrap in progress) |
+| `tooling/registry/index@0.1.x`  | `lcod-resolver >= 0.6` | `lcod-kernel-js >= 0.5` | `lcod-kernel-rs >= 0.4` | `lcod-kernel-java` (bootstrap in progress) |
 
 When a helper bumps its MAJOR version, a new row is added and the documentation must call out the migration steps.
 
@@ -67,7 +67,7 @@ Consumers point to the Git URL or HTTP mirror; no custom API is necessary.
 Resolvers and kernels read the registry artefacts as follows:
 
 - The resolver pulls latest manifests according to the mirror/replace rules inside `resolve.config.json`.
-- Kernels load helper composes lazily (see `src/tooling/registry-components.js` for Node, `src/tooling/mod.rs` for Rust). If a helper is missing, the compatibility matrix highlights which runtime release is required.
+- Kernels load helper composes lazily (see `lcod-kernel-js/src/tooling/registry-components.js`, `lcod-kernel-rs/src/tooling/mod.rs`, and the Java blueprint in `docs/runtime-java.md`). If a helper is missing, the compatibility matrix highlights which runtime release is required.
 - Caches are stable by design: once a manifest is published, in-place edits are forbidden. New content must use a new version directory to keep hashes immutable.
 
 ## 6. Maintainer Checklist (TL;DR)

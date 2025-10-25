@@ -69,50 +69,75 @@ function normalise(value) {
   return value;
 }
 
-function compareResults(nodeResults, rustResults) {
-  const nodeMap = new Map(nodeResults.map((res) => [res.name, res]));
-  const rustMap = new Map(rustResults.map((res) => [res.name, res]));
-  const diffs = [];
+function buildResultMap(results) {
+  return new Map(results.map((res) => [res.name, res]));
+}
 
-  const allNames = new Set([...nodeMap.keys(), ...rustMap.keys()]);
-  for (const name of allNames) {
-    const node = nodeMap.get(name);
-    const rust = rustMap.get(name);
-    if (!node || !rust) {
+function compareResults(resultSets) {
+  if (resultSets.length <= 1) return [];
+  const [baseline, ...others] = resultSets;
+  const baselineMap = buildResultMap(baseline.results);
+  const otherMaps = others.map((set) => ({
+    runtime: set.runtime,
+    map: buildResultMap(set.results)
+  }));
+
+  const testNames = new Set();
+  for (const set of resultSets) {
+    for (const res of set.results) {
+      testNames.add(res.name);
+    }
+  }
+
+  const diffs = [];
+  for (const name of testNames) {
+    const baseResult = baselineMap.get(name);
+    if (!baseResult) {
       diffs.push({
         name,
-        message: !node
-          ? 'Missing result from Node runtime'
-          : 'Missing result from Rust runtime'
+        message: `Missing result from baseline runtime (${baseline.runtime})`
       });
       continue;
     }
-    if (node.success !== rust.success) {
-      diffs.push({
-        name,
-        message: `Success mismatch (node=${node.success}, rust=${rust.success})`
-      });
-      continue;
-    }
-    if (!node.success) {
-      // Both failed; include error messages for context
-      const nodeErr = node.error?.message || node.report?.messages?.join('\n') || 'unknown';
-      const rustErr = rust.error?.message || rust.report?.messages?.join('\n') || 'unknown';
-      diffs.push({
-        name,
-        message: `Both runtimes failed (node=${nodeErr}, rust=${rustErr})`
-      });
-      continue;
-    }
-    const nodeResult = normalise(cleanValue(node.result ?? null));
-    const rustResult = normalise(cleanValue(rust.result ?? null));
-    if (JSON.stringify(nodeResult) !== JSON.stringify(rustResult)) {
-      diffs.push({
-        name,
-        message: 'Result payload mismatch',
-        node: nodeResult,
-        rust: rustResult
-      });
+
+    for (const { runtime, map } of otherMaps) {
+      const otherResult = map.get(name);
+      if (!otherResult) {
+        diffs.push({
+          name,
+          message: `Missing result from runtime ${runtime}`
+        });
+        continue;
+      }
+      if (baseResult.success !== otherResult.success) {
+        diffs.push({
+          name,
+          message: `Success mismatch (${baseline.runtime}=${baseResult.success}, ${runtime}=${otherResult.success})`
+        });
+        continue;
+      }
+      if (!baseResult.success) {
+        const baseErr =
+          baseResult.error?.message || baseResult.report?.messages?.join('\n') || 'unknown';
+        const otherErr =
+          otherResult.error?.message || otherResult.report?.messages?.join('\n') || 'unknown';
+        diffs.push({
+          name,
+          message: `Both runtimes failed (${baseline.runtime}=${baseErr}, ${runtime}=${otherErr})`
+        });
+        continue;
+      }
+      const basePayload = normalise(cleanValue(baseResult.result ?? null));
+      const otherPayload = normalise(cleanValue(otherResult.result ?? null));
+      if (JSON.stringify(basePayload) !== JSON.stringify(otherPayload)) {
+        diffs.push({
+          name,
+          message: `Result payload mismatch (${baseline.runtime} vs ${runtime})`,
+          baseline: basePayload,
+          other: otherPayload,
+          otherRuntime: runtime
+        });
+      }
     }
   }
 
@@ -137,37 +162,54 @@ function compareResults(nodeResults, rustResults) {
 
   const envBase = { ...process.env, SPEC_REPO_PATH: specRoot };
 
-  const { stdout: nodeStdout } = await execFileAsync(
-    'node',
-    ['scripts/run-spec-tests.mjs', '--json', '--manifest', manifestPath],
-    { cwd: nodeRepo, env: envBase }
-  );
-  const nodeResults = parseJsonFromOutput(nodeStdout);
+  const runtimes = [
+    {
+      runtime: 'node',
+      execute: async () => {
+        const { stdout } = await execFileAsync(
+          'node',
+          ['scripts/run-spec-tests.mjs', '--json', '--manifest', manifestPath],
+          { cwd: nodeRepo, env: envBase }
+        );
+        return parseJsonFromOutput(stdout);
+      }
+    },
+    {
+      runtime: 'rust',
+      execute: async () => {
+        await execFileAsync('cargo', ['build', '--quiet', '--bin', 'test_specs'], {
+          cwd: rustRepo,
+          env: envBase
+        });
+        const { stdout } = await execFileAsync(
+          'cargo',
+          ['run', '--quiet', '--bin', 'test_specs', '--', '--json', '--manifest', manifestPath],
+          { cwd: rustRepo, env: envBase }
+        );
+        return parseJsonFromOutput(stdout);
+      }
+    }
+  ];
 
-  // Build (quietly) before running to keep JSON clean
-  await execFileAsync('cargo', ['build', '--quiet', '--bin', 'test_specs'], {
-    cwd: rustRepo,
-    env: envBase
-  });
+  const resultSets = [];
+  for (const runner of runtimes) {
+    const results = await runner.execute();
+    resultSets.push({ runtime: runner.runtime, results });
+  }
 
-  const { stdout: rustStdout } = await execFileAsync(
-    'cargo',
-    ['run', '--quiet', '--bin', 'test_specs', '--', '--json', '--manifest', manifestPath],
-    { cwd: rustRepo, env: envBase }
-  );
-  const rustResults = parseJsonFromOutput(rustStdout);
-
-  const diffs = compareResults(nodeResults, rustResults);
+  const diffs = compareResults(resultSets);
   if (diffs.length === 0) {
-    console.log(`✅ Conformance suite passed across ${manifest.length} test(s).`);
+    console.log(
+      `✅ Conformance suite passed across ${manifest.length} test(s) on ${resultSets.length} runtime(s).`
+    );
     process.exit(0);
   } else {
     console.error('❌ Conformance mismatches detected:');
     for (const diff of diffs) {
       console.error(`- ${diff.name}: ${diff.message}`);
-      if (diff.node !== undefined || diff.rust !== undefined) {
-        console.error(`  node: ${JSON.stringify(diff.node)}`);
-        console.error(`  rust: ${JSON.stringify(diff.rust)}`);
+      if (diff.baseline !== undefined || diff.other !== undefined) {
+        console.error(`  ${runtimes[0].runtime}: ${JSON.stringify(diff.baseline)}`);
+        console.error(`  ${diff.otherRuntime ?? 'other'}: ${JSON.stringify(diff.other)}`);
       }
     }
     process.exit(1);

@@ -4,11 +4,13 @@ This walkthrough uses the spec repository plus the TypeScript kernel to validate
 
 ## Prerequisites
 - Node.js 18+
-- `lcod-spec` and `lcod-kernel-js` cloned side by side
+- `lcod-spec` and `lcod-kernel-js` cloned side by side (Rust/Java kernels live next to them for parity)
 
 ```
 ~/git/lcod-spec
 ~/git/lcod-kernel-js
+~/git/lcod-kernel-rs      # optional but recommended
+~/git/lcod-kernel-java    # optional, parity in progress
 ```
 
 ## 1. Validate the example packages
@@ -49,7 +51,10 @@ The `--demo` flag registers built-in axioms/flow blocks so that the compose file
 - Create your own package following `docs/create-component.md`
 - Validate with `npm run validate:lcp -- <path>`
 - Run it via `bin/run-compose.mjs`
-- Execute the shared spec fixtures: `npm run test:spec` (Node kernel) or `cargo run --bin test_specs` (Rust kernel) to ensure behaviour parity
+- Execute the shared spec fixtures:
+  - `npm run test:spec` inside `lcod-kernel-js/`
+  - `cargo run --bin test_specs` inside `lcod-kernel-rs/`
+  - Java harness (Gradle task) is being wired; track progress in `docs/runtime-java.md`
 - Capture resolver bindings and lockfiles for reproducible builds (planned in M2)
 
 ## 5. Resolve & package (prototype)
