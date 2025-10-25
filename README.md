@@ -16,7 +16,7 @@ Specification for **LCOD Component Package (LCP)** and implementation convention
 
 See [OVERVIEW.md](OVERVIEW.md) for the ecosystem overview.
 
-Shared specification fixtures live under `tests/spec`. They are portable compose-based tests executed by each kernel via the built-in runners (`npm run test:spec`, `cargo run --bin test_specs`, and the upcoming Gradle harness described in `docs/runtime-java.md`).
+Shared specification fixtures live under `tests/spec`. They are portable compose-based tests executed by each kernel via the built-in runners (`npm run test:spec`, `cargo run --bin test_specs`, and the Gradle harness documented in `docs/runtime-java.md` — set `INCLUDE_JAVA_RUNTIME=1` when invoking `npm run test:conformance` to include it).
 
 Spec docs
 

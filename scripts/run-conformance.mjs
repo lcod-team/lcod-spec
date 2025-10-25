@@ -7,6 +7,21 @@ import process from 'node:process';
 
 const execFileAsync = promisify(execFile);
 
+function escapeForDoubleQuotes(value) {
+  return value.replace(/(["$`\\])/g, '\\$1');
+}
+
+async function runCommand(command, args, options = {}) {
+  try {
+    return await execFileAsync(command, args, options);
+  } catch (err) {
+    if (err && (err.stdout !== undefined || err.stderr !== undefined)) {
+      return { stdout: err.stdout || '', stderr: err.stderr || '' };
+    }
+    throw err;
+  }
+}
+
 const specRoot = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
 const manifestPath = path.join(specRoot, 'tests/conformance/manifest.json');
 
@@ -29,10 +44,11 @@ async function locateRepo(envVar, candidates) {
 function parseJsonFromOutput(output) {
   const trimmed = output.trim();
   const startIdx = trimmed.indexOf('[');
-  if (startIdx === -1) {
+  const endIdx = trimmed.lastIndexOf(']');
+  if (startIdx === -1 || endIdx === -1 || endIdx <= startIdx) {
     throw new Error('Expected JSON array in process output');
   }
-  return JSON.parse(trimmed.slice(startIdx));
+  return JSON.parse(trimmed.slice(startIdx, endIdx + 1));
 }
 
 function cleanValue(value) {
@@ -159,6 +175,19 @@ function compareResults(resultSets) {
     '../lcod-kernel-rs',
     '../../lcod-kernel-rs'
   ]);
+  const includeJava = ['1', 'true', 'yes'].includes(
+    (process.env.INCLUDE_JAVA_RUNTIME || '').toLowerCase()
+  );
+  let javaRepo = null;
+  if (includeJava) {
+    javaRepo = await locateRepo('JAVA_KERNEL_PATH', [
+      '../lcod-kernel-java',
+      '../../lcod-kernel-java'
+    ]);
+    if (!javaRepo) {
+      console.warn('⚠️  INCLUDE_JAVA_RUNTIME set but Java kernel repo not found. Skipping.');
+    }
+  }
 
   const envBase = { ...process.env, SPEC_REPO_PATH: specRoot };
 
@@ -188,7 +217,24 @@ function compareResults(resultSets) {
         );
         return parseJsonFromOutput(stdout);
       }
-    }
+    },
+    ...(includeJava && javaRepo
+      ? [
+          {
+            runtime: 'java',
+            execute: async () => {
+              const gradleCmd = `./gradlew specTests -PspecArgs="--manifest ${escapeForDoubleQuotes(
+                manifestPath
+              )} --json"`;
+              const { stdout } = await runCommand('bash', ['-lc', gradleCmd], {
+                cwd: javaRepo,
+                env: envBase
+              });
+              return parseJsonFromOutput(stdout);
+            }
+          }
+        ]
+      : [])
   ];
 
   const resultSets = [];

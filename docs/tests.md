@@ -58,7 +58,7 @@ this manifest and compare runtimes:
 
 - Node kernel: `npm run test:conformance` (in `lcod-kernel-js/`)
 - Rust kernel: `cargo run --bin test_specs -- --manifest tests/conformance/manifest.json`
-- Java kernel: upcoming Gradle task (`./gradlew conformance --manifest …`), tracked in `docs/runtime-java.md`
+- Java kernel: Gradle task (`./gradlew specTests -PspecArgs="--manifest … --json"`); include it in the combined report with `INCLUDE_JAVA_RUNTIME=1 npm run test:conformance`
 - Combined report: `node scripts/run-conformance.mjs` (from `lcod-spec/`)
 
 The combined script executes both kernels with `--json` output and fails if the resulting
