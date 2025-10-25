@@ -52,6 +52,8 @@ Delivered:
 
 Next:
 - [x] M3-06 Registry scope tooling: ensure `tooling/registry/scope@1` isolates child compose registry state in both kernels (scoped bindings/helpers cleaned up afterward).
+- [ ] M3-07 Java kernel bootstrap: scaffold `lcod-kernel-java` (Gradle wrapper, Java 21 toolchain pin, minimal compose runner wiring) and document the runtime contracts it must expose.
+- [ ] M3-08 Java conformance plan: port the shared conformance suite to the Java kernel, ensure foreach/stream/slot parity with JS & Rust, and wire the new runner into `scripts/run-conformance.mjs`.
 
 ## M4 — Observability & debugging
 - [x] M4-00 Define structured logging contract (`lcod://tooling/log@1`) for components and kernels (levels, context propagation).
