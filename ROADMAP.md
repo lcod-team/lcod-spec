@@ -137,3 +137,16 @@ Goal: eliminate ad-hoc scripts by providing declarative collection/object/string
 
 - [ ] Define UI component conventions (`[ui]` annex) once backend patterns stabilise.
 - [ ] Document AsyncAPI/CloudEvents integration after the registry and backend pipelines are finalised.
+- [ ] Instrument release artefacts with provenance metadata once the orchestrator and CLI land.
+
+## M10 — Orchestration & developer tooling
+
+Goal: centralise versioning, ensure kernels stay in sync after upstream changes, and deliver a unified CLI for developers.
+
+Tickets:
+- [ ] M10-01 Stand up `lcod-release` with a single version manifest, shared release notes, and scripts to sync versions across spec/resolver/kernels.
+- [ ] M10-02 Configure cascade CI so spec/resolver code changes automatically trigger kernel test matrices (Node, Rust, Java) before merging.
+- [ ] M10-03 Ship `lcod-cli` bootstrap scripts (Bash + PowerShell) with one-line installation, daily/weekly self-update, and manifest-backed kernel inventory under `~/.lcod`.
+- [ ] M10-04 Expose kernel management commands (`kernel ls/update/delete/default`) and cache maintenance (`cache clean`, `cache status`) that wrap the existing runtimes.
+- [ ] M10-05 Provide `lcod run` that forwards inputs to the selected kernel, honours defaults, and emits consistent logging/exit codes.
+- [ ] M10-06 Automate post-release benchmarks (compose suites, timing/memory capture, Markdown + JSON summary) across all kernels and attach the report to the release.

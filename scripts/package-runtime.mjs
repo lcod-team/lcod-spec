@@ -213,6 +213,7 @@ async function copySpecContents(stagingDir) {
   const entries = [
     { source: 'core', target: 'core' },
     { source: 'tooling', target: 'tooling' },
+    { source: 'resources', target: 'resources' },
     { source: path.join('tests', 'spec'), target: path.join('tests', 'spec') },
     {
       source: path.join('tests', 'conformance'),
@@ -285,6 +286,10 @@ async function writeManifest(stagingDir, context) {
       {
         path: 'tooling',
         description: 'Spec helper components (resolver/registry/std tooling)',
+      },
+      {
+        path: 'resources',
+        description: 'Auxiliary resources (compose normalizer, manifests, etc.)',
       },
       { path: 'tests/spec', description: 'Shared spec fixtures' },
       {
