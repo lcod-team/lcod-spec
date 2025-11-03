@@ -2,11 +2,11 @@ schemaVersion = "2.0"
 id = "lcod://tooling/registry_sources/collect_queue@0.1.0"
 version = "0.1.0"
 kind = "component"
-summary = "Traverse the catalogue pointer queue breadth-first and emit inline contributions."
+summary = "Traverse registry catalogue pointers breadth-first and emit inline contributions."
 
 [deps]
 requires = [
-  "lcod://tooling/queue/bfs@0.1.0",
+  "lcod://contract/tooling/queue/bfs@1",
   "lcod://flow/foreach@1",
   "lcod://flow/if@1",
   "lcod://impl/set@1",
@@ -17,8 +17,6 @@ requires = [
   "lcod://tooling/value/is_string_nonempty@0.1.0",
   "lcod://tooling/hash/to_key@0.1.0",
   "lcod://tooling/json/stable_stringify@0.1.0",
-  "lcod://tooling/object/has@0.1.0",
-  "lcod://tooling/object/set@0.1.0",
   "lcod://tooling/registry_sources/build_inline_entry@0.1.0",
   "lcod://tooling/registry_sources/normalize_pointer@0.1.0",
   "lcod://tooling/registry_sources/partition_normalized@0.1.0",

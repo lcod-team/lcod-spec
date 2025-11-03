@@ -4,7 +4,7 @@ compose:
       value: $.queue
     out:
       initialQueue: resolved
-  - call: lcod://tooling/queue/bfs@0.1.0
+  - call: lcod://contract/tooling/queue/bfs@1
     in:
       items: $.initialQueue
       state:
@@ -27,7 +27,7 @@ compose:
             pointerHasId: ok
         - call: lcod://core/string/format@0.1.0
           in:
-            template: id:{id}
+            template: "id:{id}"
             values:
               id: $slot.item.id
           out:
