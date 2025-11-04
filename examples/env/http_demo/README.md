@@ -17,4 +17,4 @@ and canonicalizes the route using `http/api_route@0.1.0`.
 
 This compose is declarative and does not start a server on its own. The Node,
 Rust, and Java kernels will provide implementations of the contracts to turn
-this compose into a running service as their HTTP adapters land.
+this compose into a running service.

@@ -6,6 +6,7 @@ compose:
           const ensureString = (value) => (typeof value === 'string' && value.length ? value : null);
           const ensureObject = (value) => (value && typeof value === 'object' && !Array.isArray(value) ? value : null);
           const isAbsolutePath = (value) => /^(?:[A-Za-z]:[\\/]|\/)/.test(value || '');
+          const isHttpUrl = (value) => /^https?:\/\//i.test(value || '');
 
           const joinPaths = async (...segments) => {
             if (!segments.length) return '';
@@ -22,6 +23,20 @@ compose:
           const dirname = async (target) => {
             const parent = await imports.pathJoin({ base: target, segment: '..' });
             return parent?.path ?? target;
+          };
+
+          const relativize = (fromDir, target) => {
+            if (!fromDir || !target) return target;
+            const base = fromDir.replace(/\\/g, '/').replace(/\/+$/, '');
+            const value = target.replace(/\\/g, '/');
+            if (!value.startsWith(base)) return target;
+            let sliced = value.slice(base.length).replace(/^\//, '');
+            if (!sliced.length) {
+              const parts = value.split('/');
+              sliced = parts[parts.length - 1] || 'lcod.sources.jsonl';
+            }
+            if (sliced.startsWith('./') || sliced.startsWith('../')) return sliced;
+            return `./${sliced}`;
           };
 
           const warnings = [];
@@ -41,29 +56,104 @@ compose:
 
           const projectRoot = ensureString(state.projectRoot) || '.';
           const explicitSourcesPath = ensureString(state.sourcesPath);
-
-          let resolvedSourcesPath;
-          if (explicitSourcesPath) {
-            resolvedSourcesPath = isAbsolutePath(explicitSourcesPath)
-              ? explicitSourcesPath
-              : await joinPaths(projectRoot, explicitSourcesPath);
-          } else {
-            resolvedSourcesPath = await joinPaths(projectRoot, 'sources.json');
-          }
-
-          let sourcesText = ensureString(state.sourcesText);
+          let jsonlText = null;
           let defaultSpec = ensureObject(state.defaultSourcesSpec);
           if (!defaultSpec || Object.keys(defaultSpec).length === 0) {
             defaultSpec = builtinDefault;
           }
-          if (!sourcesText) {
+
+          const pickExplicit = async (candidate) => {
+            if (!candidate) return null;
+            if (isHttpUrl(candidate) || isAbsolutePath(candidate)) {
+              return candidate;
+            }
+            return await joinPaths(projectRoot, candidate);
+          };
+
+          let resolvedSourcesPath = null;
+          let usingJsonl = false;
+
+          if (explicitSourcesPath) {
+            resolvedSourcesPath = await pickExplicit(explicitSourcesPath);
+            const lowered = (explicitSourcesPath || '').toLowerCase();
+            const resolvedLower = resolvedSourcesPath ? resolvedSourcesPath.toLowerCase() : '';
+            usingJsonl = lowered.endsWith('.jsonl') || resolvedLower.endsWith('.jsonl');
+            if (usingJsonl && resolvedSourcesPath && !isHttpUrl(resolvedSourcesPath)) {
+              try {
+                const result = await imports.fsReadFile({ path: resolvedSourcesPath, encoding: 'utf-8' });
+                jsonlText = result?.data ?? null;
+              } catch (err) {
+                warnings.push(`Sources manifest ${resolvedSourcesPath} is not accessible (${err?.message || err}); using default registry catalogue (lcod-registry).`);
+                usingJsonl = false;
+                resolvedSourcesPath = 'builtin:default';
+              }
+            }
+          } else {
+            const jsonlCandidate = await joinPaths(projectRoot, 'lcod.sources.jsonl');
             try {
-              const result = await imports.fsReadFile({ path: resolvedSourcesPath, encoding: 'utf-8' });
-              sourcesText = result?.data ?? null;
-            } catch (err) {
-              warnings.push(`sources.json missing at ${resolvedSourcesPath}; falling back to default registry catalogue (lcod-registry). (${err?.message || err})`);
+              const result = await imports.fsReadFile({ path: jsonlCandidate, encoding: 'utf-8' });
+              jsonlText = result?.data ?? null;
+              resolvedSourcesPath = jsonlCandidate;
+              usingJsonl = true;
+            } catch (_) {
+              resolvedSourcesPath = await joinPaths(projectRoot, 'sources.json');
+            }
+          }
+
+          if (usingJsonl) {
+            const baseDir = isHttpUrl(resolvedSourcesPath)
+              ? projectRoot
+              : await dirname(resolvedSourcesPath);
+
+            let pointerPath = resolvedSourcesPath;
+            if (!isHttpUrl(pointerPath)) {
+              pointerPath = relativize(baseDir, pointerPath);
+            }
+
+            const pointerEntry = isHttpUrl(resolvedSourcesPath)
+              ? {
+                  id: 'lcod-manifest',
+                  entrypoint: { type: 'https', url: resolvedSourcesPath }
+                }
+              : {
+                  id: 'lcod-manifest',
+                  entrypoint: { type: 'file', path: pointerPath }
+                };
+
+            const sourcesConfig = {
+              schema: 'lcod-resolver/sources@1',
+              sources: [pointerEntry]
+            };
+
+            return {
+              sourcesConfig,
+              sourcesPath: resolvedSourcesPath,
+              sourcesBaseDir: baseDir,
+              warnings,
+              valid: true
+            };
+          }
+
+          const manifestLabel = resolvedSourcesPath || 'sources.json';
+          let sourcesText = ensureString(state.sourcesText);
+          if (!sourcesText) {
+            if (isHttpUrl(resolvedSourcesPath) || resolvedSourcesPath === 'builtin:default') {
+              if (isHttpUrl(resolvedSourcesPath)) {
+                warnings.push(`Unable to read sources manifest from remote URL ${resolvedSourcesPath}; using default registry catalogue (lcod-registry).`);
+              } else {
+                warnings.push('No sources manifest provided; using default registry catalogue (lcod-registry).');
+              }
               resolvedSourcesPath = 'builtin:default';
               sourcesText = JSON.stringify(defaultSpec);
+            } else {
+              try {
+                const result = await imports.fsReadFile({ path: resolvedSourcesPath, encoding: 'utf-8' });
+                sourcesText = result?.data ?? null;
+              } catch (err) {
+                warnings.push(`Sources manifest missing at ${manifestLabel}; falling back to default registry catalogue (lcod-registry). (${err?.message || err})`);
+                resolvedSourcesPath = 'builtin:default';
+                sourcesText = JSON.stringify(defaultSpec);
+              }
             }
           }
 
@@ -73,7 +163,7 @@ compose:
             sourcesConfig = JSON.parse(sourcesText);
             valid = true;
           } catch (err) {
-            warnings.push(`Invalid sources.json: ${err.message}`);
+            warnings.push(`Invalid sources manifest: ${err.message}`);
             sourcesConfig = JSON.parse(JSON.stringify(defaultSpec));
             valid = true;
             resolvedSourcesPath = 'builtin:default';
@@ -87,7 +177,7 @@ compose:
               if (typeof next.schema !== 'string' || !next.schema.length) {
                 next.schema = defaultSpec.schema;
               }
-              warnings.push('sources.json has no sources entries; using default lcod-registry catalogue.');
+              warnings.push('Sources manifest has no sources entries; using default lcod-registry catalogue.');
             }
             return next;
           };

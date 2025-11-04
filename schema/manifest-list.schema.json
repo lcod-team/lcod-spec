@@ -1,0 +1,95 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.lcod.dev/manifest/list-entry.json",
+  "title": "LCOD Manifest List Entry",
+  "description": "Single line entry for JSONL manifest lists.  Each line in a manifest file MUST validate against this schema.",
+  "type": "object",
+  "additionalProperties": true,
+  "required": ["type"],
+  "properties": {
+    "type": {
+      "type": "string",
+      "enum": ["manifest", "component", "list"]
+    },
+    "schema": {
+      "type": "string",
+      "description": "For the first line: identifier of the manifest format (e.g. lcod-manifest/list@1)."
+    },
+    "description": {
+      "type": "string"
+    },
+    "id": {
+      "type": "string",
+      "description": "Component identifier (lcod://…)"
+    },
+    "compose": {
+      "type": "string",
+      "description": "Relative or absolute path to compose.yaml"
+    },
+    "lcp": {
+      "type": "string",
+      "description": "Optional path to the matching lcp.toml"
+    },
+    "url": {
+      "type": "string",
+      "format": "uri"
+    },
+    "path": {
+      "type": "string",
+      "description": "Relative path to another manifest"
+    },
+    "package": {
+      "type": "string"
+    },
+    "namespace": {
+      "type": "string",
+      "description": "Component id prefix handled by this entry"
+    },
+    "version": {
+      "type": "string",
+      "description": "Exact or semver expression"
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": { "type": { "const": "manifest" } }
+      },
+      "then": {
+        "required": ["schema"],
+        "properties": {
+          "schema": {
+            "pattern": "^lcod-manifest/list@[0-9]+(\\.[0-9]+)*$"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": { "type": { "const": "component" } }
+      },
+      "then": {
+        "required": ["id"],
+        "oneOf": [
+          { "required": ["compose"] },
+          { "required": ["url"] }
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": { "type": { "const": "list" } }
+      },
+      "then": {
+        "not": {
+          "required": ["path", "url"],
+          "description": "Exactly one of path or url must be supplied"
+        },
+        "oneOf": [
+          { "required": ["path"], "not": { "required": ["url"] } },
+          { "required": ["url"], "not": { "required": ["path"] } }
+        ]
+      }
+    }
+  ]
+}

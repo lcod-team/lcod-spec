@@ -1,5 +1,12 @@
 # LCOD Registry Architecture (Federated)
 
+> **Status — Transitioning to JSONL manifests**
+>
+> The registry is moving to the streaming JSONL list format described in
+> [`docs/resolver/manifest-lists.md`](resolver/manifest-lists.md).  The sections below
+> reflect the legacy catalogue layout.  During the transition, producers should export the
+> new JSONL manifests in parallel; consumers will prefer JSONL when available.
+
 This document describes the **federated registry** model used to publish and consume LCOD
 components. The goal is to keep registries light, composable and verifiable, so that any
 organisation can expose its own catalogue without relying on a central server.
@@ -13,8 +20,8 @@ organisation can expose its own catalogue without relying on a central server.
 - **Composable sources** – clients merge several registries (official, company-specific,
   project-specific). The lookup order is explicit in the resolver configuration.
 - **Verifiable** – every catalogue entry carries the information needed to check provenance:
-  repository URL, commit SHA, optional signature. Clients refuse entries that do not match
-  their trust policy.
+  repository URL, commit SHA and optional integrity metadata. Signature support will return
+  once the JSONL format settles; today we rely on transport security plus checksums.
 - **Opt-in aggregation** – an “official” registry may curate a list of other catalogues, but
   each catalogue remains autonomous. Removing the aggregator does not break consumers who
   reference catalogues directly.
@@ -78,27 +85,31 @@ to fetch the catalogue, how to authenticate it, and how it should be merged loca
       "url": "https://raw.githubusercontent.com/lcod-team/lcod-components/main/registry/components.std.json",
       "kind": "git",
       "commit": "4a569e82930c784d2b4f2a40a39e85daea774a80",
-      "publicKey": "keys/tooling/lcod-team.pem",
-      "priority": 50
+      "publicKey": "keys/tooling/lcod-team.pem"
     },
     {
       "id": "acme/payments",
       "description": "Acme Corp payment building blocks",
       "url": "https://git.acme.com/platform/payments/registry/components.json",
       "kind": "https",
-      "checksum": "sha256-…",
-      "priority": 90
+      "checksum": "sha256-…"
     }
   ]
 }
 ```
 
+> **Note**: `priority` remains part of the legacy `sources.json` format so
+> down-level resolvers can decide merge order. JSONL manifests rely purely on
+> list ordering, so recent tooling ignores the field once catalogues are
+> converted.
+
 - `kind` indicates how the resolver should interpret `url` (`git`, `https`, `file`).
 - `commit` or `checksum` pins the catalogue to an immutable revision.
-- `publicKey` is optional. When present, the resolver expects a detached signature next to the
-  catalogue and verifies it with the provided key.
-- `priority` controls merge order when several catalogues expose the same component ID (lower
-  numbers win).
+- `publicKey` is a legacy field carried by some catalogues. Signature
+  verification is currently disabled; consumers should rely on transport-level
+  trust until signature support returns.
+- Catalogue precedence follows the order in which lists are consumed; lower identifiers are not
+  treated specially.
 
 A registry may publish `catalogues.json` at the repository root or rely on documentation only.
 Consumers can also ignore it entirely and point directly to the catalogues they trust.
@@ -217,10 +228,11 @@ file at any time.
 At runtime the resolver:
 
 1. Loads the local configuration (project overrides + user defaults).
-2. Fetches each pointer in priority order and expands it into individual catalogues.
-3. Verifies optional checksums/signatures for each pointer.
-4. Fetches referenced catalogues (and their signatures/checksums when required).
-5. Merges component entries (first match wins).
+2. Fetches each pointer in configuration order and expands it into individual catalogues.
+3. Verifies optional checksums for each pointer (signature verification is temporarily
+   disabled).
+4. Fetches referenced catalogues (and their checksums when provided).
+5. Merges component entries; the first match wins based on manifest order.
 6. Resolves dependencies by downloading the referenced manifests and verifying hashes.
 
 ### Direct references
@@ -255,7 +267,8 @@ just less ergonomic.
 
 ## 7. Security Checklist
 
-- Ship `catalogues.json` with checksums or signatures.
+- Include checksums for pointer files. Signature support is currently
+  suspended while the JSONL format settles.
 - Keep a text log of catalogue revisions (Git commit history is enough).
 - Validate `source.commit` in manifests when importing catalogues.
 - Prefer immutable URLs (tagged releases, commit archives) over mutable branches.

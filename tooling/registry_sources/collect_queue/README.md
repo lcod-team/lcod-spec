@@ -1,7 +1,7 @@
 <!-- AUTO-GENERATED: edit lcp.toml and run scripts/build-component-artifacts.mjs -->
 # lcod://tooling/registry_sources/collect_queue@0.1.0
 
-Traverse the catalogue pointer queue breadth-first and emit inline contributions.
+Traverse registry catalogue pointers breadth-first and emit inline contributions.
 
 ## Inputs
 

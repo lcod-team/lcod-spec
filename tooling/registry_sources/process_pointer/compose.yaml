@@ -147,15 +147,19 @@ compose:
             }
           }
 
-          let parsed;
+          let parsed = null;
+          let parseError = null;
           try {
             parsed = JSON.parse(payload.text);
           } catch (err) {
-            warnings.push(`Invalid catalogue payload for ${pointer.id || 'catalogue'}: ${err.message}`);
-            return { entry: null, children: [], warnings };
+            parseError = err;
           }
 
-          const schema = await ensureString(parsed.schema);
+          let schema = null;
+          if (parsed && typeof parsed === 'object' && parsed !== null) {
+            schema = await ensureString(parsed.schema);
+          }
+
           const children = [];
           let entry = null;
 
@@ -183,6 +187,130 @@ compose:
             });
             if (processed?.warnings?.length) warnings.push(...processed.warnings);
             entry = processed?.entry || null;
+          } else if (!schema) {
+            const sourcePath = await ensureString(payload.originPath);
+            let manifestEntries = null;
+            if (sourcePath) {
+              const readResult = await imports.readJsonl({ path: sourcePath, encoding: 'utf-8' });
+              if (Array.isArray(readResult?.warnings)) warnings.push(...readResult.warnings);
+              if (Array.isArray(readResult?.entries)) manifestEntries = readResult.entries;
+            }
+            if (!manifestEntries) {
+              manifestEntries = [];
+              const rawLines = typeof payload.text === 'string' ? payload.text.split(/\r?\n/) : [];
+              for (const rawLine of rawLines) {
+                const trimmed = rawLine.trim();
+                if (!trimmed.length) continue;
+                try {
+                  manifestEntries.push(JSON.parse(trimmed));
+                } catch (lineErr) {
+                  warnings.push(`Failed to parse manifest line for ${pointer.id || 'catalogue'}: ${lineErr.message}`);
+                }
+              }
+            }
+
+            if (!manifestEntries.length) {
+              const message = parseError ? parseError.message : 'empty manifest';
+              warnings.push(`Invalid manifest payload for ${pointer.id || 'catalogue'}: ${message}`);
+              return { entry: null, children: [], warnings };
+            }
+
+            const [rawHeader, ...rawEntries] = manifestEntries;
+            const header = rawHeader && typeof rawHeader === 'object' ? rawHeader : null;
+            if (!header || (typeof header.type !== 'string') || header.type.toLowerCase() !== 'manifest') {
+              warnings.push(`JSONL manifest for ${pointer.id || 'catalogue'} is missing a manifest header`);
+              return { entry: null, children: [], warnings };
+            }
+
+            const manifestId = typeof header.id === 'string' && header.id.length ? header.id : pointer.id || 'catalogue';
+            const manifestPriority = Number.isFinite(header.priority) ? Math.trunc(header.priority) : pointer.priority ?? basePriority ?? null;
+            const manifestDefaults = header.defaults && typeof header.defaults === 'object' && !Array.isArray(header.defaults) ? header.defaults : null;
+            const manifestMetadata = header.metadata && typeof header.metadata === 'object' && !Array.isArray(header.metadata)
+              ? header.metadata
+              : pointer.metadata || null;
+
+            const manifestLines = [];
+            for (const raw of rawEntries) {
+              if (!raw || typeof raw !== 'object') continue;
+              const entryType = typeof raw.type === 'string' ? raw.type.toLowerCase() : null;
+              if (entryType === 'component') {
+                const componentId = typeof raw.id === 'string' && raw.id.length ? raw.id : null;
+                if (!componentId) {
+                  warnings.push(`JSONL manifest ${manifestId} skipped component without id`);
+                  continue;
+                }
+                const line = {
+                  kind: 'component',
+                  id: componentId,
+                  registryId: manifestId
+                };
+                if (typeof raw.version === 'string' && raw.version.length) line.version = raw.version;
+                if (typeof raw.compose === 'string' && raw.compose.length) line.manifest = raw.compose;
+                else if (typeof raw.manifest === 'string' && raw.manifest.length) line.manifest = raw.manifest;
+                if (typeof raw.lcp === 'string' && raw.lcp.length) line.lcp = raw.lcp;
+                if (typeof raw.url === 'string' && raw.url.length) line.url = raw.url;
+                if (typeof raw.package === 'string' && raw.package.length) line.package = raw.package;
+                if (typeof raw.namespace === 'string' && raw.namespace.length) line.namespace = raw.namespace;
+                if (raw.metadata && typeof raw.metadata === 'object' && !Array.isArray(raw.metadata)) line.metadata = raw.metadata;
+                if (raw.sha256) line.sha256 = raw.sha256;
+                if (raw.integrity) line.integrity = raw.integrity;
+                if (raw.artifact && typeof raw.artifact === 'object' && !Array.isArray(raw.artifact)) line.artifact = raw.artifact;
+                if (Number.isFinite(raw.priority)) line.priority = Math.trunc(raw.priority);
+                manifestLines.push(line);
+              } else if (entryType === 'list') {
+                const childEntry = {
+                  id: typeof raw.id === 'string' && raw.id.length ? raw.id : manifestId,
+                  priority: Number.isFinite(raw.priority) ? Math.trunc(raw.priority) : null,
+                  metadata: raw.metadata && typeof raw.metadata === 'object' && !Array.isArray(raw.metadata) ? raw.metadata : null,
+                  entrypoint: {}
+                };
+                if (typeof raw.url === 'string' && raw.url.length) {
+                  childEntry.entrypoint.type = raw.url.startsWith('http:') ? 'http' : 'https';
+                  childEntry.entrypoint.url = raw.url;
+                }
+                if (typeof raw.path === 'string' && raw.path.length) {
+                  childEntry.entrypoint.type = 'file';
+                  childEntry.entrypoint.path = raw.path;
+                }
+                if (!childEntry.entrypoint.type) {
+                  warnings.push(`JSONL manifest ${manifestId} list entry is missing path or url`);
+                  continue;
+                }
+                if (typeof raw.package === 'string' && raw.package.length) {
+                  childEntry.metadata = childEntry.metadata || {};
+                  childEntry.metadata.package = raw.package;
+                }
+                if (typeof raw.namespace === 'string' && raw.namespace.length) {
+                  childEntry.metadata = childEntry.metadata || {};
+                  childEntry.metadata.namespace = raw.namespace;
+                }
+                if (typeof raw.version === 'string' && raw.version.length) {
+                  childEntry.metadata = childEntry.metadata || {};
+                  childEntry.metadata.version = raw.version;
+                }
+                const normalized = await imports.normalizePointer({
+                  entry: childEntry,
+                  inherited: pointer,
+                  baseDir: payload.baseDir,
+                  sourcesBaseDir: payload.baseDir || pointer.baseDir || '.',
+                  defaultEntrypoint,
+                  basePriority,
+                  catalogueBaseDir: payload.baseDir
+                });
+                if (normalized?.warnings?.length) warnings.push(...normalized.warnings);
+                if (normalized?.pointer) children.push(normalized.pointer);
+              } else if (entryType) {
+                warnings.push(`JSONL manifest ${manifestId} encountered unsupported entry type ${entryType}`);
+              }
+            }
+
+            entry = {
+              id: manifestId,
+              lines: manifestLines
+            };
+            if (Number.isFinite(manifestPriority)) entry.priority = manifestPriority;
+            if (manifestDefaults) entry.defaults = manifestDefaults;
+            if (manifestMetadata) entry.metadata = manifestMetadata;
           } else {
             warnings.push(`Unsupported catalogue schema ${schema || '<missing>'} for ${pointer.id || 'catalogue'}`);
           }
@@ -206,6 +334,7 @@ compose:
         normalizePointer: lcod://tooling/registry_sources/normalize_pointer@0.1.0
         processCatalogue: lcod://tooling/registry_sources/process_catalogue@0.1.0
         isStringNonEmpty: lcod://tooling/value/is_string_nonempty@0.1.0
+        readJsonl: lcod://tooling/jsonl/read@0.1.0
     out:
       entry: entry
       children: children

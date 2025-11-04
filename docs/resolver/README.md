@@ -10,9 +10,9 @@ lockfiles are discovered.
 - **Resolver (`lcod-resolver`)**
   - Consume a descriptor (`compose.yaml` + `lcp.toml`) and optional resolver
     configuration.
-  - Merge catalogue pointers declared in `sources.json` into inline registry
-    sources (defaults to the official LCOD catalogue; see
-    `docs/resolver/config/README.md`).
+  - Merge catalogue pointers declared in the JSONL manifest lists (default
+    `lcod.sources.jsonl` chain; see
+    [`docs/resolver/manifest-lists.md`](manifest-lists.md)).
   - Produce an `lcp.lock` with fully resolved component sources and integrity
     metadata.
   - Materialise component artefacts into a cache directory (filesystem, Git,
@@ -34,7 +34,7 @@ IDs:
 
 - `internal/load-descriptor` — locate and parse `lcp.toml` from a project directory.
 - `internal/load-config` — fetch `resolve.config.json`, apply defaults, emit warnings.
-- `internal/load-sources` — parse `sources.json`, download catalogue pointers and
+- `internal/load-sources` — parse manifest lists (`lcod.sources.jsonl` or legacy `sources.json`), download catalogue pointers and
   materialise inline registry sources (see `tests/spec/resolver_sources` fixture).
 - `internal/lock-path` — derive the destination of `lcp.lock` from project/output hints.
 - `internal/build-lock` — assemble the final lock payload and its TOML representation.
@@ -90,8 +90,8 @@ nothing is found.
   - `--cache <dir>` override cache root.
   - `--config <path>` explicit resolver configuration file (default:
     `resolve.config.json` at project root, then `~/.config/lcod/resolver.json`).
-  - `--sources <path>` explicit catalogue pointer file (`sources.json` by default,
-    falling back to the official LCOD registry catalogue).
+  - `--sources <path>` explicit manifest list (`lcod.sources.jsonl` by default,
+    falling back to the official LCOD registry manifest).
 
 ### Kernel
 

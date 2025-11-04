@@ -1,0 +1,9 @@
+compose:
+  - call: lcod://contract/tooling/jsonl/read@1.0.0
+    in:
+      path: $.path
+      url: $.url
+      encoding: $.encoding
+    out:
+      entries: entries
+      warnings: warnings

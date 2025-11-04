@@ -9,6 +9,10 @@ Guidelines:
 - Use explicit required fields; avoid permissive `additionalProperties: true` unless necessary.
 - Model domain errors via transport (throw) or by returning a discriminated union at the schema level.
 - Favor primitive, serializable types and stable field names.
+- Prefer streaming-friendly formats when possible.  The new
+  [`schema/manifest-list.schema.json`](../schema/manifest-list.schema.json) validates the JSONL
+  registry entries used by the resolver.  Producers should run the schema against each line before
+  publishing manifests.
 
 Example input schema:
 ```json
@@ -39,4 +43,3 @@ Example output schema:
   }
 }
 ```
-

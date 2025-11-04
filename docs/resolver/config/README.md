@@ -3,12 +3,19 @@
 Resolvers keep their runtime configuration alongside the project. Two files work
 together:
 
-- `sources.json` — declares which registry catalogues should be merged and how
-  they are authenticated.
+- `lcod.sources.jsonl` — JSONL manifest list that enumerates components or
+  other manifest lists. See [`manifest-lists.md`](../manifest-lists.md) for the new format.
+- `sources.json` — legacy pointer file declaring how catalogues should be merged
+  and authenticated. It will be replaced by the JSONL manifests once all projects
+  migrate.
 - `resolve.config.json` — optional overrides that tweak resolution after the
   catalogues are loaded (mirrors, replacements, bindings).
 
 ## `sources.json`
+
+> **Legacy format** — the resolver still understands `sources.json` during the JSONL
+> transition. New projects should prefer `lcod.sources.jsonl` manifest lists; existing
+> deployments can keep using `sources.json` until the kernels switch entirely.
 
 The resolver ships with a default `sources.json` pointing at the official LCOD
 registry. Projects can add their own file at the workspace root to override or
@@ -61,9 +68,12 @@ append sources. The schema identifier is `lcod-resolver/sources@1`.
 
 - `schema` — must be `lcod-resolver/sources@1`.
 - `defaults` — optional shared values applied to every entry when the field is
-  omitted (most commonly `priority` or retry settings).
-- `sources` — ordered list of catalogue sources. Lower priority wins; when
-  priorities match the first entry in the array takes precedence.
+  omitted (most commonly retry/backoff settings). The legacy `priority` field is
+  still honoured for `sources.json`, but JSONL manifests rely solely on list
+  order.
+- `sources` — ordered list of catalogue sources. For `sources.json`, lower
+  priority wins; when priorities match the first entry takes precedence. JSONL
+  manifests are resolved strictly in array order.
 - `entrypoint` — transport used to fetch the pointer file:
   - `https` / `http`: simple download. Provide `url` and optional HTTP headers
     in `transport.headers`.
@@ -72,8 +82,6 @@ append sources. The schema identifier is `lcod-resolver/sources@1`.
   - `file`: resolve `path` relative to the configuration file (or use an
     absolute path).
 - `checksum` — optional SHA-256 digest (`sha256-…`) used to verify integrity.
-- `signature` / `publicKey` — optional detached signature support. When set,
-  the resolver downloads the signature and verifies it with the provided key.
 - `metadata` — free-form object preserved for tooling (for instance, IDE badges
   or UI labels).
 
@@ -82,8 +90,8 @@ append sources. The schema identifier is `lcod-resolver/sources@1`.
 Each entrypoint resolves to a JSON payload. The resolver understands:
 
 - `lcod-registry/catalogues@1` — a catalogue of catalogues. Entries are
-  expanded recursively, inheriting priority, signature and public-key metadata
-  from the parent entry when not overridden.
+  expanded recursively, inheriting `priority` (legacy JSON only) and retry
+  metadata from the parent entry when not overridden.
 - `lcod-registry/catalogue@1` — a concrete list of components and versions. The
   resolver converts each component version into inline records compatible with
   the legacy `tooling/registry/source/load@0.1.0` pipeline.
@@ -91,8 +99,9 @@ Each entrypoint resolves to a JSON payload. The resolver understands:
 Pointer downloads honour optional `checksum` fields (using base64 encoded
 SHA-256). Mismatches produce warnings surfaced alongside the resolver report
 instead of hard failures so hosts can triage drift. A missing `sources.json`
-falls back to the official LCOD registry catalogue
-(`https://raw.githubusercontent.com/lcod-team/lcod-registry/main/catalogues.json`).
+falls back to the JSONL defaults (`~/.lcod/sources.jsonl`, then the official
+LCOD registry manifest at
+`https://raw.githubusercontent.com/lcod-team/lcod-registry/main/catalogues.jsonl`).
 
 ## `resolve.config.json`
 

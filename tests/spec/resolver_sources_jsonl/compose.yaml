@@ -7,7 +7,7 @@ compose:
             source: |
               async ({ state, imports }) => {
                 const pathJoin = imports.pathJoin;
-                const project = await pathJoin({ base: state.cwd, segment: 'fixtures/basic' });
+                const project = await pathJoin({ base: state.cwd, segment: 'fixtures/jsonl' });
                 const cache = await pathJoin({ base: state.cwd, segment: '.cache' });
                 return {
                   projectPath: project.path,
@@ -63,10 +63,12 @@ compose:
 
                 const expected = {
                   'fixture/core': {
+                    priority: 50,
                     packages: ['lcod://fixture/core@0.1.0'],
                     defaultsUrlSuffix: '/registry/manifests/core/'
                   },
                   'fixture/extra': {
+                    priority: 75,
                     packages: ['lcod://fixture/extra@1.0.0'],
                     defaultsUrlSuffix: '/registry/manifests/extra/'
                   }
@@ -79,6 +81,7 @@ compose:
                   const entry = summaryMap.get(id);
                   if (!entry) return false;
                   const expectedMeta = expected[id];
+                  if (entry.priority !== expectedMeta.priority) return false;
                   const packages = Array.isArray(entry.packages) ? entry.packages.slice().sort() : [];
                   const expectedPackages = expectedMeta.packages.slice().sort();
                   if (JSON.stringify(packages) !== JSON.stringify(expectedPackages)) return false;

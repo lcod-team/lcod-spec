@@ -150,3 +150,4 @@ Tickets:
 - [ ] M10-04 Expose kernel management commands (`kernel ls/update/delete/default`) and cache maintenance (`cache clean`, `cache status`) that wrap the existing runtimes.
 - [ ] M10-05 Provide `lcod run` that forwards inputs to the selected kernel, honours defaults, and emits consistent logging/exit codes.
 - [ ] M10-06 Automate post-release benchmarks (compose suites, timing/memory capture, Markdown + JSON summary) across all kernels and attach the report to the release.
+- [ ] M10-07 Unify registry manifests: document the JSONL list format, add schemas, and update resolver/spec so kernels can stream component lists locally or remotely.

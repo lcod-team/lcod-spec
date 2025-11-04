@@ -1,0 +1,38 @@
+schemaVersion = "2.0"
+id = "lcod://contract/tooling/jsonl/read@1.0.0"
+version = "1.0.0"
+kind = "contract"
+summary = "Read a JSON Lines source and return the parsed entries."
+
+[inputs.path]
+summary = "Path to the JSONL file on disk."
+required = false
+schema = """
+{ "type": "string" }
+"""
+
+[inputs.url]
+summary = "URL to a JSONL resource (reserved for future use)."
+required = false
+schema = """
+{ "type": "string", "format": "uri" }
+"""
+
+[inputs.encoding]
+summary = "Optional text encoding (defaults to utf-8)."
+required = false
+schema = """
+{ "type": "string" }
+"""
+
+[outputs.entries]
+summary = "Parsed JSON values (one per non-empty line)."
+schema = """
+{ "type": "array" }
+"""
+
+[outputs.warnings]
+summary = "Optional warnings emitted while reading the file."
+schema = """
+{ "type": "array", "items": { "type": "string" } }
+"""
