@@ -1,0 +1,20 @@
+{
+  "schema": "lcod-registry/catalogue@1",
+  "id": "fixture/extra",
+  "origin": {
+    "type": "file",
+    "url": "./manifests/extra"
+  },
+  "components": [
+    {
+      "id": "lcod://fixture/extra",
+      "versions": [
+        {
+          "version": "1.0.0",
+          "manifest": "extra/1.0.0/manifest.json",
+          "sha256": "sha256-placeholder"
+        }
+      ]
+    }
+  ]
+}

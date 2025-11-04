@@ -1,0 +1,2 @@
+{"type":"manifest","schema":"lcod-manifest/list@1","id":"fixture/root"}
+{"type":"list","path":"./registry/catalogues.jsonl","id":"fixture/catalogues"}
