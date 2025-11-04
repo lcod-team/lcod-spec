@@ -1,38 +1,32 @@
 {
   "schema": "lcod-resolver/sources@1",
   "description": "Sample resolver sources combining the official registry with local overrides.",
-  "defaults": {
-    "priority": 100
-  },
   "sources": [
     {
       "id": "official",
       "description": "Official LCOD registry aggregator served over HTTPS.",
-      "priority": 50,
       "entrypoint": {
         "type": "https",
-        "url": "https://raw.githubusercontent.com/lcod-team/lcod-registry/main/catalogues.json"
+        "url": "https://raw.githubusercontent.com/lcod-team/lcod-registry/main/catalogues.jsonl"
       },
       "checksum": "sha256-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
     },
     {
       "id": "local-dev",
       "description": "Local registry checkout living next to the project root.",
-      "priority": 10,
       "entrypoint": {
         "type": "file",
-        "path": "../lcod-registry/catalogues.json"
+        "path": "../lcod-registry/catalogues.jsonl"
       }
     },
     {
       "id": "partner-payments",
       "description": "Partner catalogue hosted in a Git repository.",
-      "priority": 80,
       "entrypoint": {
         "type": "git",
         "url": "https://github.com/example/payments-registry.git",
         "commit": "1234567abcdef8901234567abcdef8901234567",
-        "subpath": "registry/catalogues.json"
+        "subpath": "registry/catalogues.jsonl"
       },
       "publicKey": "keys/partners/payments.pem"
     }

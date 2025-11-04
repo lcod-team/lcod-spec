@@ -197,7 +197,7 @@
               "path": {
                 "type": "string",
                 "minLength": 1,
-                "description": "Path to the file inside the git repository. Defaults to catalogues.json."
+        "description": "Path to the file inside the git repository. Defaults to catalogues.jsonl."
               },
               "url": {
                 "type": "string",

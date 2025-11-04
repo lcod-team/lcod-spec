@@ -1,0 +1,3 @@
+{"type":"manifest","schema":"lcod-manifest/list@1","id":"fixture/catalogues"}
+{"type":"list","id":"fixture/core","path":"./catalogue.core.json"}
+{"type":"list","id":"fixture/extra","path":"./catalogue.extra.json"}

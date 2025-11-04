@@ -31,7 +31,7 @@ organisation can expose its own catalogue without relying on a central server.
 A registry repository is intentionally small:
 
 ```
-catalogues.json                 # list of external catalogues (optional)
+catalogues.jsonl                # list of external catalogues (JSON Lines)
 keys/<namespace>/<owner>.pem    # trusted public keys (optional)
 README.md / docs/               # human documentation
 ```
@@ -42,10 +42,10 @@ catalogues maintained by upstream projects.
 ```mermaid
 flowchart LR
     subgraph "lcod-registry (optional curator)"
-        catalogues["catalogues.json"]
+        catalogues["catalogues.jsonl"]
     end
     subgraph "Upstream catalogue (tooling/std)"
-        manifestsStd["components.std.json"]
+        manifestsStd["components.std.jsonl"]
         repoStd["lcod-components repo"]
         repoStd --> manifestsStd
     end
@@ -70,49 +70,30 @@ flowchart LR
     runtime -- downloads manifests/artefacts --> repoAcme
 ```
 
-### 2.1 `catalogues.json`
+### 2.1 `catalogues.jsonl`
 
-This file lists the catalogues curated by the registry. Each entry tells the resolver where
-to fetch the catalogue, how to authenticate it, and how it should be merged locally.
+This file lists the catalogues curated by the registry as a streaming JSON
+Lines manifest. The first line documents the manifest; each subsequent line is a
+`list` entry pointing at another manifest (usually a catalogue exported by a
+package repository).
 
-```json
-{
-  "schema": "lcod-registry/catalogues@1",
-  "catalogues": [
-    {
-      "id": "tooling/std",
-      "description": "Standard tooling components maintained by the LCOD team",
-      "url": "https://raw.githubusercontent.com/lcod-team/lcod-components/main/registry/components.std.json",
-      "kind": "git",
-      "commit": "4a569e82930c784d2b4f2a40a39e85daea774a80",
-      "publicKey": "keys/tooling/lcod-team.pem"
-    },
-    {
-      "id": "acme/payments",
-      "description": "Acme Corp payment building blocks",
-      "url": "https://git.acme.com/platform/payments/registry/components.json",
-      "kind": "https",
-      "checksum": "sha256-…"
-    }
-  ]
-}
+```
+{"type":"manifest","schema":"lcod-manifest/list@1","id":"lcod-registry/catalogues","description":"Official LCOD catalogue pointers"}
+{"type":"list","id":"tooling/std","url":"https://raw.githubusercontent.com/lcod-team/lcod-components/main/registry/components.std.jsonl","metadata":{"sourceRepo":"https://github.com/lcod-team/lcod-components","manifestPath":"registry/components.std.jsonl","commit":"4a569e82930c784d2b4f2a40a39e85daea774a80","checksum":"sha256-…"}}
+{"type":"list","id":"acme/payments","url":"https://git.acme.com/platform/payments/registry/catalogue.jsonl"}
 ```
 
-> **Note**: `priority` remains part of the legacy `sources.json` format so
-> down-level resolvers can decide merge order. JSONL manifests rely purely on
-> list ordering, so recent tooling ignores the field once catalogues are
-> converted.
+- The manifest header (`type = "manifest"`) declares the schema and optional
+  description.
+- `list` entries identify downstream catalogues. The resolver processes entries
+  in order and stops at the first catalogue that provides the requested
+  component.
+- `metadata` is optional. Registries typically record the source repository,
+  pinned commit, and expected checksum so consumers can verify integrity.
 
-- `kind` indicates how the resolver should interpret `url` (`git`, `https`, `file`).
-- `commit` or `checksum` pins the catalogue to an immutable revision.
-- `publicKey` is a legacy field carried by some catalogues. Signature
-  verification is currently disabled; consumers should rely on transport-level
-  trust until signature support returns.
-- Catalogue precedence follows the order in which lists are consumed; lower identifiers are not
-  treated specially.
-
-A registry may publish `catalogues.json` at the repository root or rely on documentation only.
-Consumers can also ignore it entirely and point directly to the catalogues they trust.
+A registry may publish `catalogues.jsonl` at the repository root or rely on
+documentation only. Consumers can also ignore it entirely and point directly to
+the catalogues they trust.
 
 ## 3. Catalogue Format
 
@@ -206,7 +187,7 @@ file at any time.
       "priority": 50,
       "entrypoint": {
         "type": "https",
-        "url": "https://raw.githubusercontent.com/lcod-team/lcod-registry/main/catalogues.json"
+      "url": "https://raw.githubusercontent.com/lcod-team/lcod-registry/main/catalogues.jsonl"
       },
       "checksum": "sha256-…",
       "publicKey": "keys/tooling/lcod-team.pem"
@@ -218,7 +199,7 @@ file at any time.
         "type": "git",
         "url": "https://git.acme.com/platform/registry.git",
         "commit": "a79e…",
-        "subpath": "catalogues.json"
+      "subpath": "catalogues.jsonl"
       }
     }
   ]

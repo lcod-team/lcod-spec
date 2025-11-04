@@ -25,39 +25,32 @@ append sources. The schema identifier is `lcod-resolver/sources@1`.
 ```json
 {
   "schema": "lcod-resolver/sources@1",
-  "defaults": {
-    "priority": 100
-  },
   "sources": [
     {
       "id": "lcod-default",
       "description": "Official LCOD registry catalogues",
-      "priority": 50,
       "entrypoint": {
         "type": "https",
-        "url": "https://raw.githubusercontent.com/lcod-team/lcod-registry/main/catalogues.json"
+        "url": "https://raw.githubusercontent.com/lcod-team/lcod-registry/main/catalogues.jsonl"
       },
-      "checksum": "sha256-…",
-      "publicKey": "keys/tooling/lcod-team.pem"
+      "checksum": "sha256-…"
     },
     {
       "id": "local-checkout",
       "description": "Local registry next to the project",
-      "priority": 10,
       "entrypoint": {
         "type": "file",
-        "path": "../lcod-registry/catalogues.json"
+        "path": "../lcod-registry/catalogues.jsonl"
       }
     },
     {
       "id": "partners/payments",
       "description": "Partner catalogue hosted in a Git repository",
-      "priority": 80,
       "entrypoint": {
         "type": "git",
         "url": "https://github.com/acme/payments-registry.git",
         "commit": "c7afef2038cf4aa3b1cf076a5f62b143b3b7c56e",
-        "subpath": "registry/catalogues.json"
+        "subpath": "registry/catalogues.jsonl"
       }
     }
   ]
@@ -68,17 +61,14 @@ append sources. The schema identifier is `lcod-resolver/sources@1`.
 
 - `schema` — must be `lcod-resolver/sources@1`.
 - `defaults` — optional shared values applied to every entry when the field is
-  omitted (most commonly retry/backoff settings). The legacy `priority` field is
-  still honoured for `sources.json`, but JSONL manifests rely solely on list
-  order.
-- `sources` — ordered list of catalogue sources. For `sources.json`, lower
-  priority wins; when priorities match the first entry takes precedence. JSONL
-  manifests are resolved strictly in array order.
+  omitted (most commonly retry/backoff settings).
+- `sources` — ordered list of catalogue sources. Entries are resolved strictly in
+  array order; the first matching component wins.
 - `entrypoint` — transport used to fetch the pointer file:
   - `https` / `http`: simple download. Provide `url` and optional HTTP headers
     in `transport.headers`.
   - `git`: clone the repository, restrict to `commit` (or `ref`), then read
-    `subpath` (defaults to `catalogues.json`).
+    `subpath` (defaults to `catalogues.jsonl`).
   - `file`: resolve `path` relative to the configuration file (or use an
     absolute path).
 - `checksum` — optional SHA-256 digest (`sha256-…`) used to verify integrity.
@@ -90,8 +80,8 @@ append sources. The schema identifier is `lcod-resolver/sources@1`.
 Each entrypoint resolves to a JSON payload. The resolver understands:
 
 - `lcod-registry/catalogues@1` — a catalogue of catalogues. Entries are
-  expanded recursively, inheriting `priority` (legacy JSON only) and retry
-  metadata from the parent entry when not overridden.
+  expanded recursively, inheriting retry metadata from the parent entry when not
+  overridden.
 - `lcod-registry/catalogue@1` — a concrete list of components and versions. The
   resolver converts each component version into inline records compatible with
   the legacy `tooling/registry/source/load@0.1.0` pipeline.

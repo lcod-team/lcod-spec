@@ -5,10 +5,9 @@ compose:
         schema: "lcod-resolver/sources@1"
         sources:
           - id: "lcod-official"
-            priority: 50
             entrypoint:
               type: "https"
-              url: "https://raw.githubusercontent.com/lcod-team/lcod-registry/main/catalogues.json"
+              url: "https://raw.githubusercontent.com/lcod-team/lcod-registry/main/catalogues.jsonl"
     out:
       defaultSourcesSpec: defaultSourcesSpec
 

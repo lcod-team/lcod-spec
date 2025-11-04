@@ -1,14 +1,11 @@
 {
   "schema": "lcod-resolver/sources@1",
-  "defaults": {
-    "priority": 75
-  },
   "sources": [
     {
       "id": "fixture",
       "entrypoint": {
         "type": "file",
-        "path": "./registry/catalogues.json"
+        "path": "./registry/catalogues.jsonl"
       }
     }
   ]

@@ -37,7 +37,6 @@ compose:
               async ({ state, imports }) => {
                 const makeSummary = (entry) => ({
                   id: entry.id,
-                  priority: Number.isFinite(entry.priority) ? entry.priority : null,
                   defaults: entry.defaults || null,
                   packages: Array.from(new Set(
                       Array.isArray(entry.lines)

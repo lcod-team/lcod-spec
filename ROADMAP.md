@@ -84,7 +84,7 @@ Goal: prepare public releases once workspace/package layout is stable.
 - [x] M5-07 Automate bundle publication alongside spec releases (GitHub Releases + checksums/signatures) and document install steps (`docs/runtime-bundle.md`).
 - [x] M5-08 Ship a minimal verification compose/tests so kernels and CI pipelines can validate a downloaded bundle before execution.
 - [ ] M5-09 Deliver the standalone `lcod-run` CLI (embedded runtime bundle, resolver, cache UX) — see `docs/lcod-run-cli.md`.
-- [x] M5-F1 Document the federated registry format (catalogues, catalogues.json, resolver sources) in `docs/registry.md`.
+- [x] M5-F1 Document the federated registry format (catalogues, catalogues.jsonl, resolver sources) in `docs/registry.md`.
 - [x] M5-F2 Specify resolver configuration schema (`sources.json`) and validation rules (refs #54).
 
 ## M6 — Backend service POC
@@ -108,7 +108,7 @@ Goal: help users discover and assemble components through a local RAG + LLM pipe
   - [x] Ship a builder compose that generates JSON Schemas, README(s), and other artefacts from `lcp.toml`.
   - [x] Migrate existing spec components to the new layout and add validation to prevent regressions.
   - [x] Rename compose slot bindings from `children` to `slots`, update kernels/docs, and provide a transition plan for existing compositions (legacy alias kept temporarily; see TODO in kernels).
-- [ ] M7-01 Registry-driven ingestion pipeline: compose an LCOD flow that reads `catalogues.json`, fetches manifests, fingerprints component docs, and reconciles Qdrant (add/update/delete) using embeddings generated via Ollama.
+- [ ] M7-01 Registry-driven ingestion pipeline: compose an LCOD flow that reads `catalogues.jsonl`, fetches manifests, fingerprints component docs, and reconciles Qdrant (add/update/delete) using embeddings generated via Ollama.
 - [ ] M7-02 Assistant service & CLI: expose `/query` and command-line entry points that call the compose-based retrieval, invoke Ollama, and return component/composition suggestions.
 - [ ] M7-03 Compose skeleton generator: assemble retrieved candidates into starter `compose.yaml` flows, validate them with `run-compose`, and keep the scaffolding 100% LCOD.
 - [ ] M7-04 Feedback loop & analytics: persist session hints, surface user corrections to improve ranking, and emit usage metrics for IDEs and agents.
