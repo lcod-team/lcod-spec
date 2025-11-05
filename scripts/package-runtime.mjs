@@ -19,6 +19,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import tar from 'tar';
+import TOML from '@iarna/toml';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(__dirname, '..');
@@ -59,6 +60,13 @@ async function main() {
     await copyResolverWorkspace(stagingDir, resolverRoot);
     await copyResolverSnapshot(stagingDir, resolverSnapshot);
     await writeManifest(stagingDir, {
+      label,
+      specVersion,
+      specCommit,
+      resolverSnapshot,
+    });
+
+    await writeListManifest(stagingDir, {
       label,
       specVersion,
       specCommit,
@@ -309,6 +317,10 @@ async function writeManifest(stagingDir, context) {
         path: 'metadata/lcod-resolver-runtime.json',
         description: 'Resolver component snapshot (see resolver repo)',
       },
+      {
+        path: 'manifest.jsonl',
+        description: 'Component catalogue (JSON Lines manifest)',
+      },
     ],
   };
 
@@ -320,6 +332,128 @@ async function writeManifest(stagingDir, context) {
   );
 }
 
+async function writeListManifest(stagingDir, context) {
+  const { label, specVersion, specCommit, resolverSnapshot } = context;
+  const header = {
+    type: 'manifest',
+    schema: 'lcod-manifest/list@1',
+    label,
+    generatedAt: new Date().toISOString(),
+    spec: {
+      version: specVersion,
+      commit: specCommit,
+    },
+    resolver: {
+      commit: resolverSnapshot.commit ?? null,
+      ref: resolverSnapshot.ref ?? null,
+    },
+  };
+
+  const components = await collectComponents(stagingDir);
+  components.sort((a, b) => a.id.localeCompare(b.id));
+
+  const lines = [JSON.stringify(header)];
+  for (const entry of components) {
+    lines.push(JSON.stringify(entry));
+  }
+
+  const manifestPath = path.join(stagingDir, 'manifest.jsonl');
+  await fs.writeFile(manifestPath, lines.join('\n') + '\n', 'utf-8');
+}
+
+async function collectComponents(stagingDir) {
+  const results = [];
+  const seen = new Set();
+
+  await walk(stagingDir, async (dir, entries) => {
+    const hasCompose = entries.some(
+      (entry) => entry.isFile() && entry.name === 'compose.yaml'
+    );
+    const hasLcp = entries.some(
+      (entry) => entry.isFile() && entry.name === 'lcp.toml'
+    );
+
+    if (!hasCompose || !hasLcp) {
+      return;
+    }
+
+    const composePath = path.join(dir, 'compose.yaml');
+    const lcpPath = path.join(dir, 'lcp.toml');
+
+    let metadata;
+    try {
+      const raw = await fs.readFile(lcpPath, 'utf-8');
+      metadata = TOML.parse(raw);
+    } catch (err) {
+      console.warn(`Skipping component at ${lcpPath}: unable to parse TOML (${err.message})`);
+      return;
+    }
+
+    if (metadata && metadata.kind && metadata.kind !== 'component') {
+      return;
+    }
+
+    if (!metadata || !metadata.id) {
+      console.warn(`Skipping component at ${lcpPath}: missing id`);
+      return;
+    }
+
+    if (seen.has(metadata.id)) {
+      return;
+    }
+
+    seen.add(metadata.id);
+
+    const relativeCompose = toPosix(path.relative(stagingDir, composePath));
+    const relativeLcp = toPosix(path.relative(stagingDir, lcpPath));
+
+    const entry = {
+      type: 'component',
+      id: metadata.id,
+      compose: relativeCompose,
+      lcp: relativeLcp,
+    };
+
+    if (metadata.version) {
+      entry.version = metadata.version;
+    }
+
+    if (metadata.package) {
+      entry.package = metadata.package;
+    }
+
+    entry.source = classifyComponentSource(relativeCompose);
+
+    results.push(entry);
+  });
+
+  return results;
+}
+
+function classifyComponentSource(relativePath) {
+  if (relativePath.startsWith('resolver/')) return 'resolver';
+  if (relativePath.startsWith('packages/')) return 'resolver-packages';
+  if (relativePath.startsWith('tests/')) return 'spec-tests';
+  if (relativePath.startsWith('resources/')) return 'resources';
+  if (relativePath.startsWith('core/')) return 'core';
+  if (relativePath.startsWith('tooling/')) return 'tooling';
+  return 'unknown';
+}
+
+async function walk(dir, visitor) {
+  const entries = await fs.readdir(dir, { withFileTypes: true });
+  await visitor(dir, entries);
+  for (const entry of entries) {
+    if (entry.isDirectory()) {
+      await walk(path.join(dir, entry.name), visitor);
+    }
+  }
+}
+
+function toPosix(filePath) {
+  return filePath.split(path.sep).join('/');
+}
+
 async function verifyRequiredFiles(stagingDir) {
   const required = [
     path.join(stagingDir, 'tooling', 'resolver', 'register_components', 'compose.yaml'),
@@ -328,6 +462,7 @@ async function verifyRequiredFiles(stagingDir) {
     path.join(stagingDir, 'metadata', 'lcod-resolver-runtime.json'),
     path.join(stagingDir, 'resolver', 'packages', 'resolver', 'compose.yaml'),
     path.join(stagingDir, 'manifest.json'),
+    path.join(stagingDir, 'manifest.jsonl'),
   ];
 
   for (const filePath of required) {
