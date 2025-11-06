@@ -36,6 +36,7 @@ Tickets:
 - [x] M2-04 `.lcpkg` archive format (+ integrity manifest)
 - [x] M2-05 End-to-end example: resolve → lockfile → package
 - [x] M2-06 Compose-first resolver pipeline (move recursion/caching to `lcod-resolver`, propose missing axioms for kernels)
+- [ ] M2-07 Enforce contract outputs at runtime: kernels must filter sub-component results to the outputs declared in LCP to prevent scope exfiltration.
 
 ## M3 — Runtime parity
 
