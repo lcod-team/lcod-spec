@@ -16,6 +16,69 @@ description = "Read sources.json, fetch referenced catalogues, and emit registry
 inputSchema = "schema/input.json"
 outputSchema = "schema/output.json"
 
+[inputs.projectPath]
+summary = "Base directory of the project invoking the resolver."
+required = true
+schema = """
+{ "type": "string", "minLength": 1 }
+"""
+
+[inputs.cacheDir]
+summary = "Directory used to cache downloaded catalogues."
+required = false
+schema = """
+{ "type": "string", "minLength": 1 }
+"""
+
+[inputs.sourcesPath]
+summary = "Explicit path to a sources.json file. Defaults to <projectPath>/sources.json."
+required = false
+schema = """
+{ "type": "string", "minLength": 1 }
+"""
+
+[inputs.resolverConfig]
+summary = "Resolved resolver configuration (resolve.config.json) used for fallbacks."
+required = false
+schema = """
+{ "type": "object" }
+"""
+
+[outputs.registrySources]
+summary = "Inline registry entries ready for indexing."
+schema = """
+{
+  "type": "array",
+  "items": {
+    "type": "object",
+    "required": ["id", "type"],
+    "properties": {
+      "id": { "type": "string" },
+      "type": { "type": "string" },
+      "priority": { "type": "integer" },
+      "defaults": { "type": "object" },
+      "lines": { "type": "array", "items": { "type": "object" } },
+      "jsonl": { "type": "string" }
+    },
+    "additionalProperties": true
+  }
+}
+"""
+
+[outputs.warnings]
+summary = "Resolved warnings while gathering catalogues."
+schema = """
+{ "type": "array", "items": { "type": "string" } }
+"""
+
+[outputs.sourcesPath]
+summary = "Path to the sources.json file used for this run."
+schema = """
+{ "type": ["string", "null"] }
+"""
+
+[slots]
+
 [documentation]
 body = """
 Loads a resolver `sources.json`, fetches the referenced catalogues, and emits

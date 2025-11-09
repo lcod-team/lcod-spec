@@ -20,3 +20,5 @@ schema = """{}"""
 [outputs.value]
 summary = "Normalized structure (value/warnings/error) when available."
 schema = """{}"""
+
+[slots]
