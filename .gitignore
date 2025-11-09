@@ -30,3 +30,4 @@ coverage/
 .continue
 tests/spec/resolver_sources/.cache/
 .lcod/
+**/lcp.lock

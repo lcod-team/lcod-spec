@@ -29,7 +29,7 @@ schema = """
   "type": "object"
 }"""
 
-[outputs.value]
+[outputs.resolved]
 summary = "Normalized object."
 schema = """
 {

@@ -29,7 +29,7 @@ schema = """
   "type": "array"
 }"""
 
-[outputs.value]
+[outputs.resolved]
 summary = "Normalized array."
 schema = """
 {

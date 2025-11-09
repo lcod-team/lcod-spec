@@ -16,7 +16,7 @@ Return the value when it is an object, otherwise fallback to a default.
 
 | Name | Type | Description |
 | --- | --- | --- |
-| `value` | object | Normalized object. |
+| `resolved` | object | Normalized object. |
 
 ## Notes
 

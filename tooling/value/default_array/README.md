@@ -16,7 +16,7 @@ Return the value when it is an array, otherwise fallback to a default array.
 
 | Name | Type | Description |
 | --- | --- | --- |
-| `value` | array | Normalized array. |
+| `resolved` | array | Normalized array. |
 
 ## Notes
 

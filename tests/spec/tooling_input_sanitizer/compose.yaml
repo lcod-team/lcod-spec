@@ -1,0 +1,30 @@
+compose:
+  - call: lcod://tooling/test_checker@1
+    in:
+      compose:
+        - call: lcod://tooling/sanitizer/probe@0.1.0
+          in:
+            expect:
+              value:
+                ok: true
+          out:
+            probe: result
+        - call: lcod://impl/set@1
+          in:
+            report: $.probe
+          out:
+            report: report
+      expected:
+        report:
+          rawInput:
+            expect:
+              value:
+                ok: true
+          valueExpect:
+            value:
+              ok: true
+          declaredExpect:
+            value:
+              ok: true
+    out:
+      report: $

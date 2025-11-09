@@ -32,6 +32,7 @@ compose:
             { id: 'lcod://tooling/path/dirname@0.1.0', path: 'tooling/path/dirname/compose.yaml' },
             { id: 'lcod://tooling/path/is_absolute@0.1.0', path: 'tooling/path/is_absolute/compose.yaml' },
             { id: 'lcod://tooling/path/to_file_url@0.1.0', path: 'tooling/path/to_file_url/compose.yaml' },
+            { id: 'lcod://tooling/sanitizer/probe@0.1.0', path: 'tooling/sanitizer/probe/compose.yaml' },
             { id: 'lcod://core/array/append@0.1.0', path: 'core/array/append/compose.yaml' },
             { id: 'lcod://core/json/decode@0.1.0', path: 'core/json/decode/compose.yaml' },
             { id: 'lcod://core/json/encode@0.1.0', path: 'core/json/encode/compose.yaml' },

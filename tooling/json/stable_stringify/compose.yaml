@@ -3,8 +3,28 @@ compose:
     in:
       source: |
         async ({ state }) => {
+          const normalize = (value) => {
+            if (value === null || value === undefined) {
+              return null;
+            }
+            if (typeof value !== "object") {
+              return value;
+            }
+            if (Array.isArray(value)) {
+              return value.map(normalize);
+            }
+            const entries = Object.keys(value)
+              .sort()
+              .map((key) => [key, normalize(value[key])]);
+            return entries.reduce((acc, [key, val]) => {
+              acc[key] = val;
+              return acc;
+            }, {});
+          };
+
           try {
-            const text = JSON.stringify(state.value, Object.keys(state.value || {}).sort(), 0);
+            const normalized = normalize(state.value);
+            const text = JSON.stringify(normalized);
             return { text };
           } catch (err) {
             return { text: null, warning: err?.message || String(err) };

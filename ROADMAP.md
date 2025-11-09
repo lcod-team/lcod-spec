@@ -36,7 +36,9 @@ Tickets:
 - [x] M2-04 `.lcpkg` archive format (+ integrity manifest)
 - [x] M2-05 End-to-end example: resolve → lockfile → package
 - [x] M2-06 Compose-first resolver pipeline (move recursion/caching to `lcod-resolver`, propose missing axioms for kernels)
-- [ ] M2-07 Enforce contract outputs at runtime: kernels must filter sub-component results to the outputs declared in LCP to prevent scope exfiltration.
+- [x] M2-07 Enforce contract outputs at runtime: kernels must filter sub-component results to the outputs declared in LCP to prevent scope exfiltration. (refs lcod-spec#69)
+- [ ] M2-08 Expose slot execution as a contract (`lcod://contract/compose/run_slot@1`) so composes can drive their own slots without scripting. (refs lcod-spec#72)
+- [ ] M2-09 Provide declarative scope helpers (`lcod://contract/scope/push@1`, etc.) and inline compose helpers to avoid falling back to `tooling/script` for scope isolation or reuse. (refs lcod-spec#72)
 
 ## M3 — Runtime parity
 
@@ -55,6 +57,7 @@ Next:
 - [x] M3-06 Registry scope tooling: ensure `tooling/registry/scope@1` isolates child compose registry state in both kernels (scoped bindings/helpers cleaned up afterward).
 - [ ] M3-07 Java kernel bootstrap: scaffold `lcod-kernel-java` (Gradle wrapper, Java 21 toolchain pin, minimal compose runner wiring) and document the runtime contracts it must expose.
 - [ ] M3-08 Java conformance plan: port the shared conformance suite to the Java kernel, ensure foreach/stream/slot parity with JS & Rust, and wire the new runner into `scripts/run-conformance.mjs`.
+- [ ] M3-09 Kernel metadata propagation: when registering components (resolver helpers, workspace composes, direct YAML paths) load their `lcp.toml` alongside the compose, store declared inputs/outputs/slots in the registry, and ensure the sanitize step preserves those fields (e.g. `tooling/testkit.unit` must keep `expect` so equality checks work).
 
 ## M4 — Observability & debugging
 - [x] M4-00 Define structured logging contract (`lcod://tooling/log@1`) for components and kernels (levels, context propagation).
