@@ -18,3 +18,4 @@ requires = [
 
 [outputs.report]
 summary = "Result forwarded from tooling/test_checker@1"
+schema = """{"type":"object"}"""
