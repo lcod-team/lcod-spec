@@ -3,7 +3,6 @@ id = "lcod://contract/compose/run_slot@1.0.0"
 version = "1.0.0"
 kind = "contract"
 summary = "Invoke a named slot within the current compose scope and return its result."
-generated = "scripts/build-component-artifacts.mjs"
 
 [documentation]
 body = """
