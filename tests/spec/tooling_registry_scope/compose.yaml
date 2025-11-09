@@ -8,6 +8,10 @@ compose:
               lcod://contract/testing/value@1: lcod://impl/testing/base@1
             components:
               - id: lcod://impl/testing/base@1
+                inputs:
+                  payload: { type: string }
+                outputs:
+                  value: { type: string }
                 compose:
                   - call: lcod://tooling/script@1
                     in:
@@ -27,6 +31,10 @@ compose:
                   lcod://contract/testing/value@1: lcod://impl/testing/override@1
                 components:
                   - id: lcod://impl/testing/override@1
+                    inputs:
+                      payload: { type: string }
+                    outputs:
+                      value: { type: string }
                     compose:
                       - call: lcod://tooling/script@1
                         in:
@@ -36,6 +44,13 @@ compose:
                         out:
                           value: $
                   - id: lcod://helper/testing/echo@1
+                    inputs:
+                      value: { type: string }
+                    outputs:
+                      result: {
+                        type: object,
+                        properties: { echoed: { type: [ string, "null" ] } }
+                      }
                     compose:
                       - call: lcod://tooling/script@1
                         in:
