@@ -15,6 +15,13 @@ compose:
               lcod://contract/tooling/log@1: lcod://impl/testing/log-capture@1
             components:
               - id: lcod://impl/testing/log-capture@1
+                inputs:
+                  level: { type: string }
+                  message: { type: string }
+                  tags: { type: object }
+                  meta: { type: object }
+                outputs:
+                  entry: { type: object }
                 compose:
                   - call: lcod://tooling/script@1
                     in:
@@ -24,6 +31,9 @@ compose:
                     out:
                       entry: $
               - id: lcod://impl/testing/log-captured@1
+                inputs: {}
+                outputs:
+                  captured: { type: array }
           out:
             logs: logs
             snapshot: snapshot
