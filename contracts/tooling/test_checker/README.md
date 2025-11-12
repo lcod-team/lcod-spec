@@ -3,6 +3,29 @@
 
 Execute a compose with an input and validate the output against an expected value.
 
+## Inputs
+
+| Name | Type | Required | Description |
+| --- | --- | --- | --- |
+| `input` | object | No | State injected before running the compose. |
+| `compose` | array<object> | No | Inline compose definition to execute. |
+| `composeRef` | object | No | Reference to an on-disk compose when `compose` is omitted. |
+| `expected` | any | Yes | Expected output payload. |
+| `bindings` | array<object> | No | Optional bindings overrides applied before execution. |
+| `streams` | array<object> | No | Synthetic streams registered before running the compose. |
+| `failFast` | boolean | No | When false, collect all diffs instead of stopping at the first mismatch. |
+
+## Outputs
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `success` | boolean | Whether the actual output matched the expectation. |
+| `actual` | any | Actual output returned by the compose. |
+| `expected` | any | Mirror of the expected payload for convenience. |
+| `durationMs` | number | Execution time in milliseconds. |
+| `messages` | array<string> | Diagnostic messages collected during execution. |
+| `diffs` | array<object> | Optional diff information when the assertion fails. |
+
 ## Notes
 
 A generic harness contract that executes a target compose and validates its

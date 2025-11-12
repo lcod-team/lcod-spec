@@ -4,6 +4,110 @@ version = "1.0.0"
 kind = "contract"
 summary = "Execute a compose with an input and validate the output against an expected value."
 
+[inputs.input]
+summary = "State injected before running the compose."
+required = false
+schema = """{
+  "type": "object",
+  "description": "Initial state passed to the compose.",
+  "additionalProperties": true
+}"""
+
+[inputs.compose]
+summary = "Inline compose definition to execute."
+required = false
+schema = """{
+  "type": "array",
+  "description": "Compose steps executed by the checker.",
+  "items": { "type": "object" }
+}"""
+
+[inputs.composeRef]
+summary = "Reference to an on-disk compose when `compose` is omitted."
+required = false
+schema = """{
+  "type": "object",
+  "description": "Path to a compose.yaml file to execute.",
+  "properties": {
+    "path": { "type": "string" }
+  },
+  "required": ["path"]
+}"""
+
+[inputs.expected]
+summary = "Expected output payload."
+required = true
+schema = """{}"""
+
+[inputs.bindings]
+summary = "Optional bindings overrides applied before execution."
+required = false
+schema = """{
+  "type": "array",
+  "items": {
+    "type": "object",
+    "properties": {
+      "contract": { "type": "string" },
+      "implementation": { "type": "string" }
+    },
+    "required": ["contract", "implementation"]
+  }
+}"""
+
+[inputs.streams]
+summary = "Synthetic streams registered before running the compose."
+required = false
+schema = """{
+  "type": "array",
+  "items": {
+    "type": "object",
+    "properties": {
+      "target": { "type": "string" },
+      "chunks": {
+        "type": "array",
+        "items": { "type": "string" }
+      },
+      "encoding": { "type": "string" }
+    },
+    "required": ["target", "chunks"]
+  }
+}"""
+
+[inputs.failFast]
+summary = "When false, collect all diffs instead of stopping at the first mismatch."
+required = false
+schema = """{ "type": "boolean" }"""
+
+[outputs.success]
+summary = "Whether the actual output matched the expectation."
+schema = """{ "type": "boolean" }"""
+
+[outputs.actual]
+summary = "Actual output returned by the compose."
+schema = """{}"""
+
+[outputs.expected]
+summary = "Mirror of the expected payload for convenience."
+schema = """{}"""
+
+[outputs.durationMs]
+summary = "Execution time in milliseconds."
+schema = """{ "type": "number" }"""
+
+[outputs.messages]
+summary = "Diagnostic messages collected during execution."
+schema = """{
+  "type": "array",
+  "items": { "type": "string" }
+}"""
+
+[outputs.diffs]
+summary = "Optional diff information when the assertion fails."
+schema = """{
+  "type": "array",
+  "items": { "type": "object" }
+}"""
+
 [documentation]
 body = """
 A generic harness contract that executes a target compose and validates its
