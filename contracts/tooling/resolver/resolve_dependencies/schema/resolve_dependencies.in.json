@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {
+    "projectPath": { "type": "string" },
+    "cacheRoot": { "type": "string" },
+    "normalizedConfig": { "type": "object" },
+    "config": { "type": "object" },
+    "rootId": { "type": ["string", "null"] },
+    "rootDescriptor": { "type": "object" },
+    "rootDescriptorText": { "type": "string" },
+    "warnings": { "type": "array", "items": { "type": "string" } }
+  },
+  "required": ["projectPath", "normalizedConfig", "rootDescriptor"]
+}

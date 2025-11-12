@@ -1,0 +1,9 @@
+schemaVersion = "2.0"
+id = "lcod://contract/tooling/resolver/resolve_dependencies@1"
+version = "1.0.0"
+kind = "contract"
+summary = "Resolve dependency graph for lcod-resolver."
+
+[documentation]
+inputSchema = "schema/resolve_dependencies.in.json"
+outputSchema = "schema/resolve_dependencies.out.json"
