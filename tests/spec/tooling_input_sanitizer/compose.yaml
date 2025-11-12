@@ -22,6 +22,7 @@ compose:
                 ok: true
           sanitized:
             expect:
-              ok: true
+              value:
+                ok: true
     out:
       report: $
