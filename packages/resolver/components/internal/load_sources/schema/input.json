@@ -1,8 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "tooling/resolver/internal/load-sources input",
   "type": "object",
-  "required": ["projectPath"],
+  "additionalProperties": false,
   "properties": {
     "projectPath": {
       "type": "string",
@@ -21,8 +20,11 @@
     },
     "resolverConfig": {
       "type": "object",
-      "description": "Raw resolver configuration (resolve.config.json) used for fallbacks."
+      "description": "Resolved resolver configuration (resolve.config.json) used for fallbacks."
     }
   },
-  "additionalProperties": false
+  "required": [
+    "projectPath"
+  ],
+  "description": "Resolve resolver sources.json into inline registry catalogue entries."
 }

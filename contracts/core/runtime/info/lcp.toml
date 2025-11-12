@@ -1,0 +1,30 @@
+schemaVersion = "2.0"
+id = "lcod://contract/core/runtime/info@1.0.0"
+version = "1.0.0"
+kind = "contract"
+summary = "Expose basic runtime details such as cwd, home, temp directory, and platform."
+
+[hints]
+timeoutMs = 1_000
+
+[tool]
+name = "runtime_info"
+description = "Return standard runtime directories and identifiers for the current process."
+inputSchema = "schema/info.in.json"
+outputSchema = "schema/info.out.json"
+
+[documentation]
+body = """
+Expose the current process context (cwd, home directory, temp directory, platform).
+
+## Input (`schema/info.in.json`)
+- `includePlatform` (boolean, optional): include the `platform` field (default true).
+- `includePid` (boolean, optional): include `pid` (default false).
+
+## Output (`schema/info.out.json`)
+- `cwd` (string): normalized absolute working directory.
+- `homeDir` (string|null): home directory when resolvable.
+- `tmpDir` (string): OS temporary directory.
+- `platform` (string, optional): OS/platform identifier when requested.
+- `pid` (integer|null, optional): process identifier when requested.
+"""

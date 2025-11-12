@@ -1,28 +1,18 @@
 compose:
-  - call: lcod://tooling/script@1
-    in:
-      input: "__lcod_state__"
-      source: |
-        async ({ state }) => {
-          const root = state && typeof state === 'object' ? state : {};
-          const rawInput = root.__lcod_input__ ?? null;
-          const declared = root.expect ?? null;
-          const value = root.value && typeof root.value === 'object' ? root.value.expect ?? null : null;
-          return {
-            rawInput,
-            declaredExpect: declared,
-            valueExpect: value
-          };
-        }
+  - call: lcod://axiom/state/raw_input@1
     out:
-      rawInput: rawInput
-      declaredExpect: declaredExpect
-      valueExpect: valueExpect
+      rawInput: value
+
+  - call: lcod://tooling/value/default_object@0.1.0
+    in:
+      value: $.rawInput
+    out:
+      safeRaw: resolved
+
   - call: lcod://impl/set@1
     in:
       result:
-        rawInput: $.rawInput
-        declaredExpect: $.declaredExpect
-        valueExpect: $.valueExpect
+        rawInput: $.safeRaw
+        sanitized: $
     out:
       result: result

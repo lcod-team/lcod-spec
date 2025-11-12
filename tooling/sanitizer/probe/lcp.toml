@@ -11,7 +11,8 @@ tags = ["sanitizer", "debug"]
 
 [deps]
 requires = [
-  "lcod://tooling/script@1",
+  "lcod://axiom/state/raw_input@1",
+  "lcod://tooling/value/default_object@0.1.0",
   "lcod://impl/set@1"
 ]
 

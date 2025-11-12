@@ -1,0 +1,29 @@
+schemaVersion = "2.0"
+id = "lcod://contract/core/string/split@1.0.0"
+version = "1.0.0"
+kind = "contract"
+summary = "Split a string by a literal separator."
+
+[hints]
+timeoutMs = 1_000
+
+[tool]
+name = "string_split"
+description = "Split a string using a literal separator (optionally trimming and filtering segments)."
+inputSchema = "schema/split.in.json"
+outputSchema = "schema/split.out.json"
+
+[documentation]
+body = """
+Split a string using a literal separator.
+
+## Input (`schema/split.in.json`)
+- `text` (string, required): source text.
+- `separator` (string, required): literal delimiter.
+- `limit` (integer, optional): maximum number of segments.
+- `trim` (boolean, optional): trim whitespace around segments (default false).
+- `removeEmpty` (boolean, optional): drop empty results (default false).
+
+## Output (`schema/split.out.json`)
+- `segments` (array): ordered list of resulting substrings.
+"""

@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Environment variable name."
+    },
+    "default": {
+      "type": ["string", "null"],
+      "description": "Fallback value when the variable is undefined."
+    },
+    "required": {
+      "type": "boolean",
+      "description": "When true, error if the variable is missing.",
+      "default": false
+    },
+    "expand": {
+      "type": "boolean",
+      "description": "Expand ${VAR} tokens inside the resolved value (simple replacement).",
+      "default": false
+    }
+  },
+  "required": ["name"]
+}

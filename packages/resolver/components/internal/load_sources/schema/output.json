@@ -1,34 +1,57 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "tooling/resolver/internal/load-sources output",
   "type": "object",
-  "required": ["registrySources", "warnings"],
+  "additionalProperties": false,
   "properties": {
     "registrySources": {
       "type": "array",
       "items": {
         "type": "object",
-        "required": ["id", "type"],
+        "required": [
+          "id",
+          "type"
+        ],
         "properties": {
-          "id": { "type": "string", "minLength": 1 },
-          "type": { "type": "string" },
-          "priority": { "type": "integer" },
-          "defaults": { "type": "object" },
-          "lines": { "type": "array", "items": { "type": "object" } },
-          "jsonl": { "type": "string" }
+          "id": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "priority": {
+            "type": "integer"
+          },
+          "defaults": {
+            "type": "object"
+          },
+          "lines": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "jsonl": {
+            "type": "string"
+          }
         },
         "additionalProperties": true
       },
-      "description": "Registry sources normalised to inline/jsonl entries understood by tooling/registry/source/load."
+      "description": "Inline registry entries ready for indexing."
     },
     "warnings": {
       "type": "array",
-      "items": { "type": "string" }
+      "items": {
+        "type": "string"
+      },
+      "description": "Resolved warnings while gathering catalogues."
     },
     "sourcesPath": {
-      "type": ["string", "null"],
-      "description": "Resolved path to the sources.json file used for this run."
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Path to the sources.json file used for this run."
     }
   },
-  "additionalProperties": false
+  "description": "Resolve resolver sources.json into inline registry catalogue entries."
 }

@@ -1,0 +1,26 @@
+schemaVersion = "2.0"
+id = "lcod://contract/core/string/trim@1.0.0"
+version = "1.0.0"
+kind = "contract"
+summary = "Trim whitespace from the start/end of a string."
+
+[hints]
+timeoutMs = 500
+
+[tool]
+name = "string_trim"
+description = "Trim whitespace from a string with optional mode."
+inputSchema = "schema/trim.in.json"
+outputSchema = "schema/trim.out.json"
+
+[documentation]
+body = """
+Remove leading and/or trailing ASCII whitespace.
+
+## Input (`schema/trim.in.json`)
+- `text` (string, required): text to trim.
+- `mode` (string, optional): `both` (default), `start`, or `end`.
+
+## Output (`schema/trim.out.json`)
+- `value` (string): trimmed result.
+"""

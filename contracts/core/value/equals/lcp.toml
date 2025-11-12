@@ -1,0 +1,24 @@
+schemaVersion = "2.0"
+id = "lcod://contract/core/value/equals@1.0.0"
+version = "1.0.0"
+kind = "contract"
+summary = "Compare two JSON values using deep equality."
+
+[inputs.left]
+summary = "First value."
+required = false
+schema = "{}"
+
+[inputs.right]
+summary = "Second value."
+required = false
+schema = "{}"
+
+[outputs.equal]
+summary = "True when both values are identical."
+schema = """
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "boolean"
+}
+"""

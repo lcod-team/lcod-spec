@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "text": {
+      "type": "string",
+      "description": "Input string to trim."
+    },
+    "mode": {
+      "type": "string",
+      "enum": ["both", "start", "end"],
+      "description": "Which side to trim (default both)."
+    }
+  },
+  "required": ["text"]
+}

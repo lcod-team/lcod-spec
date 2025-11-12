@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "value": {
+      "type": ["string", "null"],
+      "description": "Resolved value or default/null when missing."
+    },
+    "exists": {
+      "type": "boolean",
+      "description": "Indicates whether the variable was defined in the process environment."
+    }
+  },
+  "required": ["exists", "value"]
+}

@@ -1,7 +1,18 @@
+<!-- AUTO-GENERATED: edit lcp.toml and run scripts/build-component-artifacts.mjs -->
+<p><img src="https://api.iconify.design/mdi:beaker.svg?height=48&width=48" alt="Normalize slot outputs for testkit reports." width="48" height="48" /></p>
+
 # lcod://tooling/testkit/normalize_output@0.1.0
 
-Normalize values produced during a test run so reports always expose a
-predictable shape. The helper unwraps nested `{ result: {...} }` objects and
-ensures the canonical `{ value, warnings, error }` fields are present when
-available. It is primarily used by `tooling/testkit/unit@0.1.0` before storing a
-slot result inside the test report.
+Normalize slot outputs for testkit reports.
+
+## Inputs
+
+| Name | Type | Required | Description |
+| --- | --- | --- | --- |
+| `value` | any | No | Raw value returned by a test slot. |
+
+## Outputs
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `value` | any | Normalized structure (value/warnings/error) when available. |

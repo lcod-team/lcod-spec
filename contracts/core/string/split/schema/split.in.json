@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "text": { "type": "string", "description": "Input string to split." },
+    "separator": { "type": "string", "description": "Separator string (treated literally)." },
+    "limit": { "type": "integer", "minimum": 1, "description": "Maximum number of segments to return." },
+    "trim": { "type": "boolean", "default": false, "description": "Trim whitespace around each segment." },
+    "removeEmpty": { "type": "boolean", "default": false, "description": "Drop empty segments from the result." }
+  },
+  "required": ["text", "separator"]
+}

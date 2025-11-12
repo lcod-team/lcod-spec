@@ -1,0 +1,35 @@
+schemaVersion = "2.0"
+id = "lcod://contract/tooling/registry/normalize_sources@1.0.0"
+version = "1.0.0"
+kind = "contract"
+summary = "Normalize an array of registry sources, returning warnings for invalid entries."
+
+[inputs.entries]
+summary = "Array of raw registry source entries."
+required = true
+schema = """
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "array"
+}
+"""
+
+[outputs.entries]
+summary = "Normalized registry entries (invalid entries omitted)."
+schema = """
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "array",
+  "items": { "type": "object" }
+}
+"""
+
+[outputs.warnings]
+summary = "Warnings emitted while processing the entries."
+schema = """
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "array",
+  "items": { "type": "string" }
+}
+"""

@@ -1,21 +1,18 @@
+<!-- AUTO-GENERATED: edit lcp.toml and run scripts/build-component-artifacts.mjs -->
+<p><img src="https://api.iconify.design/mdi:shield-search.svg?height=48&width=48" alt="Observes sanitised inputs to ensure declared payloads remain reachable." width="48" height="48" /></p>
+
 # lcod://tooling/sanitizer/probe@0.1.0
 
-Observes what the kernel passes into a component after sanitisation so we can
-assert that declared payloads remain reachable. The probe inspects the special
-`__lcod_input__` field as well as the fully sanitised scope and returns a simple
-report describing what it found.
+Observes sanitised inputs to ensure declared payloads remain reachable.
 
 ## Inputs
 
-| Name | Type | Description |
-| --- | --- | --- |
-| `expect` | object | Structure declared by the caller that should round‑trip through the sanitiser. |
+| Name | Type | Required | Description |
+| --- | --- | --- | --- |
+| `expect` | any | No | Payload expected to be echoed by the sanitiser |
 
 ## Outputs
 
 | Name | Type | Description |
 | --- | --- | --- |
-| `result` | object | Report containing `rawInput`, `declaredExpect`, and `valueExpect` mirrors from the current scope. |
-
-Use this component from spec checks (or local debugging flows) to ensure the
-input sanitiser does not drop declared fields.
+| `result` | object | Probe report |

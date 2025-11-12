@@ -1,0 +1,26 @@
+schemaVersion = "2.0"
+id = "lcod://contract/core/value/kind@1.0.0"
+version = "1.0.0"
+kind = "contract"
+summary = "Return the JSON kind (null, boolean, number, string, array, object) for a value."
+
+[inputs.value]
+summary = "Value to inspect."
+required = false
+schema = """
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "Any JSON value.",
+  "type": ["object", "array", "string", "number", "boolean", "null"]
+}
+"""
+
+[outputs.kind]
+summary = "Kind string describing the value."
+schema = """
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "string",
+  "enum": ["null", "boolean", "number", "string", "array", "object"]
+}
+"""

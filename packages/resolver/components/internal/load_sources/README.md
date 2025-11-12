@@ -3,6 +3,23 @@
 
 Resolve resolver sources.json into inline registry catalogue entries.
 
+## Inputs
+
+| Name | Type | Required | Description |
+| --- | --- | --- | --- |
+| `projectPath` | string | Yes | Base directory of the project invoking the resolver. |
+| `cacheDir` | string | No | Directory used to cache downloaded catalogues. |
+| `sourcesPath` | string | No | Explicit path to a sources.json file. Defaults to <projectPath>/sources.json. |
+| `resolverConfig` | object | No | Resolved resolver configuration (resolve.config.json) used for fallbacks. |
+
+## Outputs
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `registrySources` | array<object> | Inline registry entries ready for indexing. |
+| `warnings` | array<string> | Resolved warnings while gathering catalogues. |
+| `sourcesPath` | string | null | Path to the sources.json file used for this run. |
+
 ## Notes
 
 Loads a resolver `sources.json`, fetches the referenced catalogues, and emits

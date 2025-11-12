@@ -1,0 +1,29 @@
+schemaVersion = "2.0"
+id = "lcod://contract/core/env/get@1.0.0"
+version = "1.0.0"
+kind = "contract"
+summary = "Read an environment variable from the current process."
+
+[hints]
+timeoutMs = 1_000
+
+[tool]
+name = "env_get"
+description = "Return the value of an environment variable, optionally expanding simple ${VAR} placeholders."
+inputSchema = "schema/get.in.json"
+outputSchema = "schema/get.out.json"
+
+[documentation]
+body = """
+Resolve an environment variable and optionally fall back to a provided default.
+
+## Input (`schema/get.in.json`)
+- `name` (string, required): variable name.
+- `default` (string|null, optional): value to use when the variable is not defined.
+- `required` (boolean, optional): when true, throw an error if the variable is missing.
+- `expand` (boolean, optional): expand `${VAR}` tokens inside the resolved value by looking up additional variables (single-pass).
+
+## Output (`schema/get.out.json`)
+- `exists` (boolean): indicates whether the variable was present in the environment.
+- `value` (string|null): resolved value, default, or `null`.
+"""

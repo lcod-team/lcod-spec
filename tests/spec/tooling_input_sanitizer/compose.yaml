@@ -20,11 +20,8 @@ compose:
             expect:
               value:
                 ok: true
-          valueExpect:
-            value:
-              ok: true
-          declaredExpect:
-            value:
+          sanitized:
+            expect:
               ok: true
     out:
       report: $

@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "cwd": {
+      "type": "string",
+      "description": "Current working directory for the process."
+    },
+    "homeDir": {
+      "type": ["string", "null"],
+      "description": "Home directory if resolvable."
+    },
+    "tmpDir": {
+      "type": "string",
+      "description": "Directory used for temporary files."
+    },
+    "platform": {
+      "type": "string",
+      "description": "Host platform identifier (e.g. linux, darwin, win32)."
+    },
+    "pid": {
+      "type": ["integer", "null"],
+      "description": "Process identifier when requested."
+    }
+  },
+  "required": ["cwd", "tmpDir"]
+}
