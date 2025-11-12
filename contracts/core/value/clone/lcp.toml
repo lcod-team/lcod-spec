@@ -1,0 +1,9 @@
+schemaVersion = "2.0"
+id = "lcod://contract/core/value/clone@1"
+version = "1.0.0"
+kind = "contract"
+summary = "Deep clone a JSON value."
+
+[documentation]
+inputSchema = "schema/clone.in.json"
+outputSchema = "schema/clone.out.json"

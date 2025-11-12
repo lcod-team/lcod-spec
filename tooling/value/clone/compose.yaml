@@ -1,0 +1,6 @@
+compose:
+  - call: lcod://contract/core/value/clone@1
+    in:
+      value: $.value
+    out:
+      value: value

@@ -25,6 +25,7 @@ This note tracks the core contracts that anchor the runtime substrates milestone
 | `core/string` | `lcod://contract/core/string/trim@1` | Trim whitespace from strings (start/end/both). | ✅ |
 | `core/value` | `lcod://contract/core/value/kind@1` | Report the JSON kind (null, boolean, number, string, array, object). | ✅ |
 | `core/value` | `lcod://contract/core/value/equals@1` | Deep equality comparison between two JSON values. | ✅ |
+| `core/value` | `lcod://contract/core/value/clone@1` | Produce a deep clone of a JSON value. | ✅ |
 | `core/number` | `lcod://contract/core/number/trunc@1` | Truncate numbers toward zero (integer coercion). | ✅ |
 | `core/string` | `lcod://contract/core/string/split@1` | Split strings by literal separators (with trimming/filtering options). | ✅ |
 | `core/json` | `lcod://contract/core/json/encode@1` | Serialize structured data into JSON text. | ✅ |
