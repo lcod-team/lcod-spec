@@ -11,9 +11,8 @@ tags = [ "validation" ]
 
 [deps]
 requires = [
-  "lcod://flow/try@1",
-  "lcod://impl/set@1",
-  "lcod://core/object/merge@0.1.0"
+  "lcod://contract/core/value/kind@1",
+  "lcod://contract/core/value/equals@1"
 ]
 
 [inputs.value]
