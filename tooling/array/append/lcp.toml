@@ -33,6 +33,11 @@ summary = "Single value appended when provided."
 required = false
 schema = "{}"
 
+[inputs.clone]
+summary = "When true (default), returns a new array; set to false to mutate the provided array."
+required = false
+schema = "{\n  \"type\": \"boolean\"\n}"
+
 [outputs.items]
 summary = "Updated array including the appended value."
 schema = """

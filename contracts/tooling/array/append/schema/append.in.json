@@ -14,6 +14,10 @@
     },
     "value": {
       "description": "Optional single value appended after `values`."
+    },
+    "clone": {
+      "type": "boolean",
+      "description": "When true (default), returns a new array; set to false to mutate the provided array before returning it."
     }
   }
 }

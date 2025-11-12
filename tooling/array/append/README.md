@@ -12,6 +12,7 @@ Append optional arrays and/or a single value to the provided items.
 | `items` | array | No | Source array (defaults to an empty list). |
 | `values` | array | No | Additional items appended before `value`. |
 | `value` | any | No | Single value appended when provided. |
+| `clone` | boolean | No | When true (default), returns a new array; set to false to mutate the provided array. |
 
 ## Outputs
 
