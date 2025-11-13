@@ -1,37 +1,28 @@
 compose:
-  - call: lcod://tooling/script@1
-    in:
-      source: |
-        async ({ state }) => {
-          const normalize = (value) => {
-            if (value === null || value === undefined) {
-              return null;
-            }
-            if (typeof value !== "object") {
-              return value;
-            }
-            if (Array.isArray(value)) {
-              return value.map(normalize);
-            }
-            const entries = Object.keys(value)
-              .sort()
-              .map((key) => [key, normalize(value[key])]);
-            return entries.reduce((acc, [key, val]) => {
-              acc[key] = val;
-              return acc;
-            }, {});
-          };
-
-          try {
-            const normalized = normalize(state.value);
-            const text = JSON.stringify(normalized);
-            return { text };
-          } catch (err) {
-            return { text: null, warning: err?.message || String(err) };
-          }
-        }
-      input:
-        value: $.value
+  - call: lcod://flow/try@1
     out:
       text: text
       warning: warning
+    slots:
+      body:
+        - call: lcod://contract/core/json/encode@1
+          in:
+            value: $.value
+            sortKeys: true
+          out:
+            text: encodedText
+        - call: lcod://impl/set@1
+          in:
+            text: $.encodedText
+            warning: null
+          out:
+            text: text
+            warning: warning
+      catch:
+        - call: lcod://impl/set@1
+          in:
+            text: null
+            warning: "Failed to encode JSON value"
+          out:
+            text: text
+            warning: warning

@@ -1,0 +1,28 @@
+schemaVersion = "2.0"
+id = "lcod://contract/core/path/dirname@1.0.0"
+version = "1.0.0"
+kind = "contract"
+summary = "Return the parent directory of a path."
+
+[hints]
+timeoutMs = 500
+
+[tool]
+name = "path_dirname"
+description = "Compute the dirname of a path (POSIX/Windows aware)."
+inputSchema = "schema/dirname.in.json"
+outputSchema = "schema/dirname.out.json"
+
+[documentation]
+body = """
+Compute the parent directory of a POSIX/Windows-like path.
+
+Trailing separators (except for the root itself) are ignored. When the path
+has no parent directory, the contract returns ".".
+
+## Input (`schema/dirname.in.json`)
+- `path` (string, optional): path to evaluate (defaults to the empty string).
+
+## Output (`schema/dirname.out.json`)
+- `dirname` (string): parent directory or "." when none exists.
+"""

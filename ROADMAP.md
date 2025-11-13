@@ -139,7 +139,8 @@ Goal: eliminate ad-hoc scripts by providing declarative collection/object/string
 - [ ] M9-07 Scriptless resolver pipeline: remove the remaining `tooling/script@1` blocks from `resources/compose/resolver` and `packages/resolver/components/internal/*` (notably `load_config`, `load_sources`, `build_sources_spec`, `resolve_paths`, and the JSONL summarizers) by introducing the missing primitives (path utils, JSONL readers, manifest filters).
 - [ ] M9-08 Scriptless std toolbox: convert the legacy convenience helpers (e.g. `tooling/path/dirname`, `tooling/array/shift`, `tooling/json/stable_stringify`, `tooling/object/set`, `tooling/registry_*` preprocessors, `tooling/testkit.normalize_output`) to pure compose. Track progress in this section; mark each component as it drops its script.
   - [x] `tooling/hash/to_key@0.1.0`
-  - [ ] `tooling/path/dirname@0.1.0`
+  - [x] `tooling/json/stable_stringify@0.1.0`
+  - [x] `tooling/path/dirname@0.1.0`
   - [ ] `tooling/json/stable_stringify@0.1.0`
   - [ ] `tooling/array/shift@0.1.0`
   - [ ] `tooling/object/set@0.1.0`
