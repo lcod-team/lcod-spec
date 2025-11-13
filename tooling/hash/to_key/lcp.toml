@@ -7,7 +7,11 @@ summary = "Build a key from text content with optional prefix using SHA-256."
 [deps]
 requires = [
   "lcod://tooling/hash/sha256_base64@0.1.0",
-  "lcod://tooling/script@1"
+  "lcod://contract/core/string/format@1",
+  "lcod://contract/core/string/trim@1",
+  "lcod://tooling/value/is_string_nonempty@0.1.0",
+  "lcod://flow/if@1",
+  "lcod://impl/set@1"
 ]
 
 [inputs.text]

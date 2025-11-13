@@ -136,6 +136,14 @@ Goal: eliminate ad-hoc scripts by providing declarative collection/object/string
 - [x] M9-04 Migration: refactor existing `tooling/script@1` components to rely on the new primitives; deprecate script-heavy variants (`tooling/json.stringify`, `tooling/array.append`).
 - [x] M9-05 Kernels & spec: ship scriptless tooling primitives (value checks, array helpers, path chaining, optional FS writes) with JS/Rust parity and spec/tests updates.
 - [ ] M9-06 Optional: expose `tooling/expression/evaluate@1` for lightweight expressions without full scripting.
+- [ ] M9-07 Scriptless resolver pipeline: remove the remaining `tooling/script@1` blocks from `resources/compose/resolver` and `packages/resolver/components/internal/*` (notably `load_config`, `load_sources`, `build_sources_spec`, `resolve_paths`, and the JSONL summarizers) by introducing the missing primitives (path utils, JSONL readers, manifest filters).
+- [ ] M9-08 Scriptless std toolbox: convert the legacy convenience helpers (e.g. `tooling/path/dirname`, `tooling/array/shift`, `tooling/json/stable_stringify`, `tooling/object/set`, `tooling/registry_*` preprocessors, `tooling/testkit.normalize_output`) to pure compose. Track progress in this section; mark each component as it drops its script.
+  - [x] `tooling/hash/to_key@0.1.0`
+  - [ ] `tooling/path/dirname@0.1.0`
+  - [ ] `tooling/json/stable_stringify@0.1.0`
+  - [ ] `tooling/array/shift@0.1.0`
+  - [ ] `tooling/object/set@0.1.0`
+  - [ ] `tooling/testkit.normalize_output@0.1.0`
 
 ## Future — UI & eventing
 

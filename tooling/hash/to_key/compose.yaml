@@ -5,18 +5,51 @@ compose:
     out:
       digest: base64
 
-  - call: lcod://tooling/script@1
+  - call: lcod://contract/core/string/format@1
     in:
-      source: |
-        async ({ state }) => {
-          const prefix = typeof state.prefix === 'string' && state.prefix.length > 0 ? state.prefix : '';
-          const hash = typeof state.digest === 'string' ? state.digest : '';
-          return {
-            key: prefix ? `${prefix}${hash}` : hash
-          };
-        }
-      input:
-        prefix: $.prefix
-        digest: $.digest
+      template: "{value}"
+      values:
+        value: $.prefix
+      fallback: ""
+    out:
+      prefixTemplate: value
+
+  - call: lcod://contract/core/string/trim@1
+    in:
+      text: $.prefixTemplate
+    out:
+      prefixNormalized: value
+
+  - call: lcod://tooling/value/is_string_nonempty@0.1.0
+    in:
+      value: $.prefixNormalized
+    out:
+      prefixHasValue: ok
+
+  - call: lcod://flow/if@1
+    in:
+      cond: $.prefixHasValue
     out:
       key: key
+    slots:
+      then:
+        - call: lcod://contract/core/string/format@1
+          in:
+            template: "{prefix}{digest}"
+            values:
+              prefix: $.prefixNormalized
+              digest: $.digest
+            fallback: ""
+          out:
+            prefixedKey: value
+        - call: lcod://impl/set@1
+          in:
+            key: $.prefixedKey
+          out:
+            key: key
+      else:
+        - call: lcod://impl/set@1
+          in:
+            key: $.digest
+          out:
+            key: key
