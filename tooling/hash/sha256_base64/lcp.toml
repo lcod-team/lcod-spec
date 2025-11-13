@@ -11,8 +11,8 @@ tags = [ "hash", "sha256" ]
 
 [deps]
 requires = [
-  "lcod://tooling/script@1",
-  "lcod://contract/core/hash/sha256@1"
+  "lcod://contract/core/hash/sha256@1",
+  "lcod://impl/set@1"
 ]
 
 [inputs.data]
