@@ -141,6 +141,7 @@ Goal: eliminate ad-hoc scripts by providing declarative collection/object/string
   - [x] `tooling/hash/to_key@0.1.0`
   - [x] `tooling/json/stable_stringify@0.1.0`
   - [x] `tooling/path/dirname@0.1.0`
+  - [x] `tooling/array/shift@0.1.0`
   - [ ] `tooling/json/stable_stringify@0.1.0`
   - [ ] `tooling/array/shift@0.1.0`
   - [ ] `tooling/object/set@0.1.0`

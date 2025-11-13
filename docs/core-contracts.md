@@ -18,6 +18,7 @@ This note tracks the core contracts that anchor the runtime substrates milestone
 | `core/array` | `lcod://contract/core/array/length@1` | Return the number of elements in an array. | ✅ |
 | `core/array` | `lcod://contract/core/array/push@1` | Append a value to an array. | ✅ |
 | `core/array` | `lcod://contract/core/array/append@1` | Concatenate arrays or append a single value (immutable). | ✅ |
+| `core/array` | `lcod://contract/core/array/shift@1` | Remove the first element and return head/rest. | ✅ |
 | `core/object` | `lcod://contract/core/object/get@1` | Retrieve a nested value from an object. | ✅ |
 | `core/object` | `lcod://contract/core/object/set@1` | Assign a nested value on an object. | ✅ |
 | `core/object` | `lcod://contract/core/object/merge@1` | Merge two objects (optional deep merge). | ✅ |

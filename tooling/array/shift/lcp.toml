@@ -5,7 +5,7 @@ kind = "component"
 summary = "Extract the first element of an array and return the remaining items."
 
 [deps]
-requires = [ "lcod://tooling/script@1" ]
+requires = [ "lcod://contract/core/array/shift@1" ]
 
 [inputs.items]
 summary = "Array to shift from; non-arrays are treated as empty."

@@ -1,0 +1,15 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "head": {
+      "description": "First element or null"
+    },
+    "rest": {
+      "type": "array",
+      "description": "Remaining elements after removing the head"
+    }
+  },
+  "required": ["head", "rest"],
+  "additionalProperties": false
+}

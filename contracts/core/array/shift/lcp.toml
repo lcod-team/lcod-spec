@@ -1,0 +1,29 @@
+schemaVersion = "2.0"
+id = "lcod://contract/core/array/shift@1.0.0"
+version = "1.0.0"
+kind = "contract"
+summary = "Return the first element of an array along with the remainder."
+
+[hints]
+timeoutMs = 500
+
+[tool]
+name = "array_shift"
+description = "Shift the first element out of an array."
+inputSchema = "schema/shift.in.json"
+outputSchema = "schema/shift.out.json"
+
+[documentation]
+body = """
+Remove the first element of an array and return the head/tail pair.
+
+The contract never mutates the provided array. When the array is empty, the
+`head` is `null` and `rest` is an empty array.
+
+## Input (`schema/shift.in.json`)
+- `items` (array, optional): source array (defaults to `[]`).
+
+## Output (`schema/shift.out.json`)
+- `head` (any): first element (or `null` when absent).
+- `rest` (array): the remaining items after removing the head.
+"""
