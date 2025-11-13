@@ -1,39 +1,93 @@
 compose:
-  - call: lcod://tooling/script@1
+  - call: lcod://tooling/value/default_object@0.1.0
     in:
-      source: |
-        async ({ state }) => {
-          const text = typeof state.text === 'string' ? state.text : '';
-          const fallback = state.fallback && typeof state.fallback === 'object' && !Array.isArray(state.fallback)
-            ? state.fallback
-            : {};
-          const warningMessage = typeof state.warningMessage === 'string' && state.warningMessage.length > 0
-            ? state.warningMessage
-            : 'Invalid JSON payload – using fallback object.';
+      value: $.fallback
+    out:
+      fallbackObject: resolved
 
-          try {
-            const value = JSON.parse(text);
-            if (value && typeof value === 'object' && !Array.isArray(value)) {
-              return { value, warnings: [], error: null };
-            }
-            return {
-              value: fallback,
-              warnings: [warningMessage],
-              error: { message: 'Decoded value is not an object' }
-            };
-          } catch (err) {
-            return {
-              value: fallback,
-              warnings: [warningMessage],
-              error: { message: err?.message || String(err) }
-            };
-          }
-        }
-      input:
-        text: $.text
-        fallback: $.fallback
-        warningMessage: $.warningMessage
+  - call: lcod://tooling/value/is_string_nonempty@0.1.0
+    in:
+      value: $.warningMessage
+    out:
+      warningProvided: ok
+
+  - call: lcod://flow/if@1
+    in:
+      cond: $.warningProvided
+    out:
+      resolvedWarning: warning
+    slots:
+      then:
+        - call: lcod://impl/set@1
+          in:
+            warning: $.warningMessage
+          out:
+            warning: warning
+      else:
+        - call: lcod://impl/set@1
+          in:
+            warning: "Invalid JSON payload – using fallback object."
+          out:
+            warning: warning
+
+  - call: lcod://flow/try@1
+    in:
+      text: $.text
     out:
       value: value
       warnings: warnings
       error: error
+    slots:
+      body:
+        - call: lcod://contract/core/json/decode@1
+          in:
+            text: $.text
+          out:
+            decoded: value
+        - call: lcod://tooling/value/is_object@0.1.0
+          in:
+            value: $.decoded
+          out:
+            isObject: ok
+        - call: lcod://flow/if@1
+          in:
+            cond: $.isObject
+          out:
+            normalizedValue: value
+            normalizedWarnings: warnings
+            normalizedError: error
+          slots:
+            then:
+              - call: lcod://impl/set@1
+                in:
+                  value: $.decoded
+                  warnings: []
+                  error: null
+                out:
+                  value: value
+                  warnings: warnings
+                  error: error
+            else:
+              - call: lcod://impl/set@1
+                in:
+                  value: $.fallbackObject
+                  warnings:
+                    - $.resolvedWarning
+                  error:
+                    message: "Decoded value is not an object"
+                out:
+                  value: value
+                  warnings: warnings
+                  error: error
+      catch:
+        - call: lcod://impl/set@1
+          in:
+            value: $.fallbackObject
+            warnings:
+              - $.resolvedWarning
+            error:
+              message: $.error.message
+          out:
+            value: value
+            warnings: warnings
+            error: error
