@@ -8,7 +8,8 @@ summary = "Clone an object and assign a value at a path."
 requires = [
   "lcod://flow/if@1",
   "lcod://impl/set@1",
-  "lcod://tooling/script@1",
+  "lcod://contract/core/array/length@1",
+  "lcod://contract/core/object/set@1",
   "lcod://tooling/value/default_array@0.1.0",
   "lcod://tooling/value/default_object@0.1.0"
 ]

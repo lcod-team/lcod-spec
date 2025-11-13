@@ -11,50 +11,49 @@ compose:
     out:
       keyPath: resolved
 
-  - call: lcod://tooling/script@1
+  - call: lcod://contract/core/array/length@1
     in:
-      source: |
-        async ({ state }) => {
-          const target = state.object && typeof state.object === 'object' && !Array.isArray(state.object)
-            ? JSON.parse(JSON.stringify(state.object))
-            : {};
-          const path = Array.isArray(state.path) ? state.path : [];
-          if (path.length === 0) {
-            return {
-              updated: state.value,
-              previous: target
-            };
-          }
-          let cursor = target;
-          for (let i = 0; i < path.length - 1; i++) {
-            const segment = path[i];
-            if (typeof segment !== 'string' || !segment.length) continue;
-            if (!cursor[segment] || typeof cursor[segment] !== 'object' || Array.isArray(cursor[segment])) {
-              cursor[segment] = {};
-            }
-            cursor = cursor[segment];
-          }
-          const last = path[path.length - 1];
-          if (typeof last === 'string' && last.length) {
-            cursor[last] = state.value;
-          }
-          return {
-            updated: target,
-            previous: state.object
-          };
-        }
-      input:
-        object: $.baseObject
-        path: $.keyPath
-        value: $.value
+      items: $.keyPath
     out:
-      updatedObject: updated
-      previousObject: previous
+      pathLength: length
+
+  - call: lcod://flow/if@1
+    in:
+      cond: $.pathLength
+    out:
+      object: object
+      previous: previous
+    slots:
+      then:
+        - call: lcod://contract/core/object/set@1
+          in:
+            object: $.baseObject
+            path: $.keyPath
+            value: $.value
+            clone: true
+            createMissing: true
+          out:
+            updatedObject: object
+        - call: lcod://impl/set@1
+          in:
+            object: $.updatedObject
+            previous: $.baseObject
+          out:
+            object: object
+            previous: previous
+      else:
+        - call: lcod://impl/set@1
+          in:
+            object: $.value
+            previous: $.baseObject
+          out:
+            object: object
+            previous: previous
 
   - call: lcod://impl/set@1
     in:
-      object: $.updatedObject
-      previous: $.previousObject
+      object: $.object
+      previous: $.previous
     out:
       object: object
       previous: previous
