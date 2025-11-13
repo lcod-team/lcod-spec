@@ -11,41 +11,18 @@ compose:
     out:
       keyPath: resolved
 
-  - call: lcod://tooling/script@1
+  - call: lcod://contract/core/object/get@1
     in:
-      source: |
-        async ({ state }) => {
-          const object = state.object && typeof state.object === 'object' && !Array.isArray(state.object)
-            ? state.object
-            : {};
-          const path = Array.isArray(state.path) ? state.path : [];
-          if (path.length === 0) {
-            return { hasKey: false, value: undefined };
-          }
-          let cursor = object;
-          for (let i = 0; i < path.length; i++) {
-            const segment = path[i];
-            if (typeof segment !== 'string' || !segment.length) {
-              return { hasKey: false, value: undefined };
-            }
-            if (!cursor || typeof cursor !== 'object' || Array.isArray(cursor) || !Object.prototype.hasOwnProperty.call(cursor, segment)) {
-              return { hasKey: false, value: undefined };
-            }
-            cursor = cursor[segment];
-          }
-          return { hasKey: true, value: cursor };
-        }
-      input:
-        object: $.baseObject
-        path: $.keyPath
+      object: $.baseObject
+      path: $.keyPath
     out:
-      hasKey: hasKey
-      value: value
+      foundValue: value
+      foundFlag: found
 
   - call: lcod://impl/set@1
     in:
-      hasKey: $.hasKey
-      value: $.value
+      hasKey: $.foundFlag
+      value: $.foundValue
     out:
       hasKey: hasKey
       value: value
