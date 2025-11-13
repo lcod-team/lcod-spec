@@ -10,7 +10,7 @@ icon = "mdi:sign-direction"
 tags = [ "path", "absolute" ]
 
 [deps]
-requires = [ "lcod://tooling/script@1" ]
+requires = [ "lcod://contract/core/path/is_absolute@1" ]
 
 [inputs.path]
 summary = "Path to analyse."

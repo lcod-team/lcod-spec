@@ -25,6 +25,7 @@ This note tracks the core contracts that anchor the runtime substrates milestone
 | `core/string` | `lcod://contract/core/string/format@1` | Format a template string using named placeholders. | ✅ |
 | `core/string` | `lcod://contract/core/string/trim@1` | Trim whitespace from strings (start/end/both). | ✅ |
 | `core/path` | `lcod://contract/core/path/dirname@1` | Return the parent directory of a POSIX/Windows path. | ✅ |
+| `core/path` | `lcod://contract/core/path/is_absolute@1` | Check whether a path string is absolute. | ✅ |
 | `core/value` | `lcod://contract/core/value/kind@1` | Report the JSON kind (null, boolean, number, string, array, object). | ✅ |
 | `core/value` | `lcod://contract/core/value/equals@1` | Deep equality comparison between two JSON values. | ✅ |
 | `core/value` | `lcod://contract/core/value/clone@1` | Produce a deep clone of a JSON value. | ✅ |

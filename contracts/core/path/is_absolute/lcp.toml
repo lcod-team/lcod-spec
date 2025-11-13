@@ -1,0 +1,26 @@
+schemaVersion = "2.0"
+id = "lcod://contract/core/path/is_absolute@1.0.0"
+version = "1.0.0"
+kind = "contract"
+summary = "Report whether a path string is absolute (POSIX/Windows)."
+
+[hints]
+timeoutMs = 500
+
+[tool]
+name = "path_is_absolute"
+description = "Detect whether the provided path is absolute."
+inputSchema = "schema/is_absolute.in.json"
+outputSchema = "schema/is_absolute.out.json"
+
+[documentation]
+body = """
+Return `true` when the provided path string is absolute. This mirrors
+Node's `path.isAbsolute` semantics (POSIX `/foo`, Windows `C:\foo`, `\\host`).
+
+## Input (`schema/is_absolute.in.json`)
+- `path` (string, optional): value to check (defaults to "").
+
+## Output (`schema/is_absolute.out.json`)
+- `absolute` (boolean): true if absolute, false otherwise.
+"""

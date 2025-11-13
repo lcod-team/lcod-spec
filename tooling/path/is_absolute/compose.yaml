@@ -1,13 +1,6 @@
 compose:
-  - call: lcod://tooling/script@1
+  - call: lcod://contract/core/path/is_absolute@1
     in:
-      source: |
-        async ({ state }) => {
-          const value = typeof state.path === 'string' ? state.path : '';
-          const absolute = /^(?:[A-Za-z]:[\\/]|\/)/.test(value);
-          return { absolute };
-        }
-      input:
-        path: $.path
+      path: $.path
     out:
       absolute: absolute
