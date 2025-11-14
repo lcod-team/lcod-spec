@@ -10,7 +10,14 @@ icon = "mdi:folder-cog"
 tags = [ "registry", "paths" ]
 
 [deps]
-requires = [ "lcod://tooling/script@1", "lcod://axiom/path/join@1" ]
+requires = [
+  "lcod://flow/if@1",
+  "lcod://impl/set@1",
+  "lcod://tooling/value/is_string_nonempty@0.1.0",
+  "lcod://tooling/path/is_absolute@0.1.0",
+  "lcod://contract/tooling/path/join_chain@1",
+  "lcod://contract/core/runtime/info@1"
+]
 
 [inputs.projectPath]
 summary = "Optional project root path (relative paths are resolved from cwd)."

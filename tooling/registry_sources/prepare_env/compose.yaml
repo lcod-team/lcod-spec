@@ -1,69 +1,149 @@
 compose:
-  - call: lcod://tooling/script@1
+  - call: lcod://contract/core/runtime/info@1
+    out:
+      runtimeInfo: runtime
+
+  - call: lcod://tooling/value/is_string_nonempty@0.1.0
     in:
-      source: |
-        async ({ state }, { imports }) => {
-          const ensureString = (value) => (typeof value === 'string' && value.length ? value : null);
-          const isAbsolutePath = (value) => /^(?:[A-Za-z]:[\\/]|\/)/.test(value || '');
+      value: $.cwd
+    out:
+      hasExplicitCwd: ok
 
-          const joinPaths = async (...segments) => {
-            if (!segments.length) return '';
-            let current = segments[0];
-            for (let i = 1; i < segments.length; i += 1) {
-              const segment = segments[i];
-              if (segment == null) continue;
-              const joined = await imports.pathJoin({ base: current, segment });
-              current = joined?.path ?? current;
-            }
-            return current;
-          };
+  - call: lcod://tooling/value/is_string_nonempty@0.1.0
+    in:
+      value: $.runtime.cwd
+    out:
+      runtimeHasCwd: ok
 
-          const detectCwd = () => {
-            const explicitCwd = ensureString(state.cwd);
-            if (explicitCwd) return explicitCwd;
-            if (typeof process !== 'undefined' && process && typeof process.cwd === 'function') {
-              try {
-                return process.cwd();
-              } catch (_err) {
-                // ignore and fall back to '.'
-              }
-            }
-            return '.';
-          };
+  - call: lcod://flow/if@1
+    in:
+      cond: $.hasExplicitCwd
+    out:
+      baseCwd: baseCwd
+    slots:
+      then:
+        - call: lcod://impl/set@1
+          in:
+            baseCwd: $.cwd
+          out:
+            baseCwd: baseCwd
+      else:
+        - call: lcod://flow/if@1
+          in:
+            cond: $.runtimeHasCwd
+          out:
+            baseCwd: baseCwd
+          slots:
+            then:
+              - call: lcod://impl/set@1
+                in:
+                  baseCwd: $.runtime.cwd
+                out:
+                  baseCwd: baseCwd
+            else:
+              - call: lcod://impl/set@1
+                in:
+                  baseCwd: '.'
+                out:
+                  baseCwd: baseCwd
 
-          const baseCwd = detectCwd();
-          const projectInput = ensureString(state.projectPath);
-          let projectRoot;
-          if (!projectInput) {
-            projectRoot = baseCwd;
-          } else if (isAbsolutePath(projectInput)) {
-            projectRoot = projectInput;
-          } else {
-            projectRoot = await joinPaths(baseCwd, projectInput);
-          }
+  - call: lcod://tooling/value/is_string_nonempty@0.1.0
+    in:
+      value: $.projectPath
+    out:
+      hasProjectPath: ok
 
-          let cacheDir = ensureString(state.cacheDir);
-          if (!cacheDir) {
-            cacheDir = await joinPaths(projectRoot, '.lcod', 'cache');
-          } else if (!isAbsolutePath(cacheDir)) {
-            cacheDir = await joinPaths(projectRoot, cacheDir);
-          }
-
-          const downloadsRoot = await joinPaths(cacheDir, 'catalogues');
-
-          return {
-            projectRoot,
-            cacheDir,
-            downloadsRoot
-          };
-        }
-      input:
-        projectPath: $.projectPath
-        cacheDir: $.cacheDir
-        cwd: $.cwd
-      imports:
-        pathJoin: lcod://axiom/path/join@1
+  - call: lcod://flow/if@1
+    in:
+      cond: $.hasProjectPath
     out:
       projectRoot: projectRoot
+    slots:
+      then:
+        - call: lcod://tooling/path/is_absolute@0.1.0
+          in:
+            path: $.projectPath
+          out:
+            projectIsAbsolute: ok
+        - call: lcod://flow/if@1
+          in:
+            cond: $.projectIsAbsolute
+          out:
+            projectRoot: projectRoot
+          slots:
+            then:
+              - call: lcod://impl/set@1
+                in:
+                  projectRoot: $.projectPath
+                out:
+                  projectRoot: projectRoot
+            else:
+              - call: lcod://contract/tooling/path/join_chain@1
+                in:
+                  base: $.baseCwd
+                  segments:
+                    - $.projectPath
+                out:
+                  path: projectRoot
+      else:
+        - call: lcod://impl/set@1
+          in:
+            projectRoot: $.baseCwd
+          out:
+            projectRoot: projectRoot
+
+  - call: lcod://tooling/value/is_string_nonempty@0.1.0
+    in:
+      value: $.cacheDir
+    out:
+      hasCacheDir: ok
+
+  - call: lcod://flow/if@1
+    in:
+      cond: $.hasCacheDir
+    out:
       cacheDir: cacheDir
-      downloadsRoot: downloadsRoot
+    slots:
+      then:
+        - call: lcod://tooling/path/is_absolute@0.1.0
+          in:
+            path: $.cacheDir
+          out:
+            cacheIsAbsolute: ok
+        - call: lcod://flow/if@1
+          in:
+            cond: $.cacheIsAbsolute
+          out:
+            cacheDir: cacheDir
+          slots:
+            then:
+              - call: lcod://impl/set@1
+                in:
+                  cacheDir: $.cacheDir
+                out:
+                  cacheDir: cacheDir
+            else:
+              - call: lcod://contract/tooling/path/join_chain@1
+                in:
+                  base: $.projectRoot
+                  segments:
+                    - $.cacheDir
+                out:
+                  path: cacheDir
+      else:
+        - call: lcod://contract/tooling/path/join_chain@1
+          in:
+            base: $.projectRoot
+            segments:
+              - '.lcod'
+              - 'cache'
+          out:
+            path: cacheDir
+
+  - call: lcod://contract/tooling/path/join_chain@1
+    in:
+      base: $.cacheDir
+      segments:
+        - 'catalogues'
+    out:
+      path: downloadsRoot
