@@ -1,9 +1,15 @@
+<!-- AUTO-GENERATED: edit lcp.toml and run scripts/build-component-artifacts.mjs -->
 # lcod://contract/core/path/is_absolute@1.0.0
 
-Determine whether a string represents an absolute path (POSIX or Windows semantics).
+Report whether a path string is absolute (POSIX/Windows).
+
+## Notes
+
+Return `true` when the provided path string is absolute. This mirrors
+Node's `path.isAbsolute` semantics (POSIX `/foo`, Windows `C:oo`, `\host`).
 
 ## Input (`schema/is_absolute.in.json`)
-- `path` (string, optional): path candidate. Defaults to the empty string.
+- `path` (string, optional): value to check (defaults to "").
 
 ## Output (`schema/is_absolute.out.json`)
-- `absolute` (boolean): `true` when the path is absolute, otherwise `false`.
+- `absolute` (boolean): true if absolute, false otherwise.

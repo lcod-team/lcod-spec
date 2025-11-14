@@ -1,20 +1,15 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "type": "object",
-  "additionalProperties": true,
+  "additionalProperties": false,
   "properties": {
-    "projectPath": { "type": "string" },
-    "cacheRoot": { "type": "string" },
-    "normalizedConfig": { "type": "object" },
-    "config": { "type": "object" },
-    "rootId": { "type": ["string", "null"] },
-    "rootDescriptor": { "type": "object" },
-    "rootDescriptorText": { "type": "string" },
     "specSources": {
       "type": "object",
-      "additionalProperties": { "type": "object" }
-    },
-    "warnings": { "type": "array", "items": { "type": "string" } }
+      "additionalProperties": {
+        "type": "object"
+      },
+      "description": "Optional map of component IDs to source descriptors injected by register_components."
+    }
   },
-  "required": ["projectPath", "normalizedConfig", "rootDescriptor"]
+  "description": "Resolve dependency graph for lcod-resolver."
 }

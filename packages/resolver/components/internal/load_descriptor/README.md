@@ -1,13 +1,23 @@
-# load-descriptor
+<!-- AUTO-GENERATED: edit lcp.toml and run scripts/build-component-artifacts.mjs -->
+# lcod://tooling/resolver/internal/load-descriptor@0.1.0
 
-Loads the canonical `lcp.toml` descriptor of a project. It joins the incoming `projectPath` with `lcp.toml`, reads the file as UTF-8, parses it via the TOML axiom, and exposes the parsed `descriptor` together with the raw `descriptorText` and absolute `descriptorPath`.
+Load the project descriptor (`lcp.toml`) and expose its parsed contents.
 
 ## Inputs
 
-- `projectPath` (string, required): Root directory of the LCOD project.
+| Name | Type | Required | Description |
+| --- | --- | --- | --- |
+| `projectPath` | string | Yes | Absolute or relative path to the project root containing `lcp.toml`. |
+| `configPath` | string | null | No | Optional resolve.config.json path (propagated downstream). |
+| `outputPath` | string | null | No | Optional explicit lockfile output path (propagated downstream). |
 
 ## Outputs
 
-- `descriptorPath` (string): Absolute path to `lcp.toml`.
-- `descriptorText` (string): Raw descriptor contents.
-- `descriptor` (object): Parsed TOML payload.
+| Name | Type | Description |
+| --- | --- | --- |
+| `descriptorPath` | string | Absolute path to the descriptor that was loaded. |
+| `descriptorText` | string | Raw TOML contents of the project descriptor. |
+| `descriptor` | object | Parsed descriptor object. |
+| `projectPath` | string | null | Passthrough of the project root path. |
+| `configPath` | string | null | Passthrough of the resolve.config.json path. |
+| `outputPath` | string | null | Passthrough of the explicit output path. |

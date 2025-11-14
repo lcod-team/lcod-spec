@@ -1,14 +1,22 @@
-# load-config
+<!-- AUTO-GENERATED: edit lcp.toml and run scripts/build-component-artifacts.mjs -->
+# lcod://tooling/resolver/internal/load-config@0.1.0
 
-Loads the resolver configuration JSON file, applies sensible defaults, and surfaces any warnings produced while reading the file.
+Load `resolve.config.json`, merge fallbacks, and expose a normalised resolver configuration.
 
 ## Inputs
 
-- `projectPath` (string, required): Project root used to resolve the default `resolve.config.json`.
-- `configPath` (string, optional): Custom configuration file path.
+| Name | Type | Required | Description |
+| --- | --- | --- | --- |
+| `projectPath` | string | Yes | Root directory of the project being resolved. |
+| `configPath` | string | No | Explicit path to the resolver configuration file. |
+| `outputPath` | string | No | Optional explicit destination for `lcp.lock` (propagated downstream). |
 
 ## Outputs
 
-- `configPath` (string): Path that was used to load the configuration (default or custom).
-- `config` (object): Normalised configuration with `sources`, `replace`, and `allowlist` fields.
-- `warnings` (array of strings): Messages emitted during loading (e.g. missing file).
+| Name | Type | Description |
+| --- | --- | --- |
+| `configPath` | string | Resolved path of the configuration that was loaded. |
+| `config` | object | Normalised resolver configuration. |
+| `warnings` | array<string> | Warnings emitted while loading the configuration. |
+| `projectPath` | string | null | Passthrough of the project root path. |
+| `outputPath` | string | null | Passthrough of the optional output path. |

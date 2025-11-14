@@ -3,6 +3,12 @@
 
 Compute the final component id after applying resolver replacement rules.
 
+## Inputs
+
+| Name | Type | Required | Description |
+| --- | --- | --- | --- |
+| `visited` | array<string> | No | Internal recursion guard; callers should omit. |
+
 ## Notes
 
 Utility component that resolves the effective component identifier according to the resolver configuration:

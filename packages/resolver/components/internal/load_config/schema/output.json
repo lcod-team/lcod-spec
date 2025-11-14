@@ -1,17 +1,20 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "type": "object",
-  "required": ["configPath", "config", "warnings"],
+  "additionalProperties": false,
   "properties": {
     "configPath": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
       "type": "string",
       "description": "Resolved path that was loaded."
     },
     "config": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
       "type": "object",
       "description": "Normalised configuration object."
     },
     "warnings": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
       "type": "array",
       "items": {
         "type": "string"
@@ -19,13 +22,21 @@
       "description": "Warnings produced while loading the configuration."
     },
     "projectPath": {
-      "type": ["string", "null"],
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "type": [
+        "string",
+        "null"
+      ],
       "description": "Passthrough of the project root path."
     },
     "outputPath": {
-      "type": ["string", "null"],
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "type": [
+        "string",
+        "null"
+      ],
       "description": "Passthrough of the optional output path."
     }
   },
-  "additionalProperties": true
+  "description": "Load `resolve.config.json`, merge fallbacks, and expose a normalised resolver configuration."
 }

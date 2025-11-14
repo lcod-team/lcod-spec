@@ -1,22 +1,28 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "type": "object",
-  "required": ["projectPath"],
+  "additionalProperties": false,
   "properties": {
     "projectPath": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
       "type": "string",
       "minLength": 1,
       "description": "Root path of the project being resolved."
     },
     "configPath": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
       "type": "string",
       "minLength": 1,
       "description": "Optional explicit path to the resolver configuration."
     },
     "outputPath": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
       "type": "string",
-      "description": "Optional explicit destination for the generated lockfile."
+      "description": "Absolute or relative path passed through to downstream steps."
     }
   },
-  "additionalProperties": true
+  "required": [
+    "projectPath"
+  ],
+  "description": "Load `resolve.config.json`, merge fallbacks, and expose a normalised resolver configuration."
 }

@@ -19,5 +19,7 @@ Return the parent directory of a given path.
 
 ## Notes
 
-Return the parent directory of a given path. This is a lightweight wrapper
-around `tooling/path/join_chain` that appends `..` to the provided path.
+Return the parent directory of a given path.
+
+This component delegates to `lcod://contract/core/path/dirname@1`, which
+handles both POSIX and Windows separators.

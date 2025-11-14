@@ -7,25 +7,42 @@ compose:
             source: |
               async ({ state, imports }) => {
                 const pathJoin = imports.pathJoin;
-                const project = await pathJoin({ base: state.cwd, segment: 'fixtures/basic' });
-                const cache = await pathJoin({ base: state.cwd, segment: '.cache' });
+                const envGet = imports.envGet;
+
+                const specRootResult = await envGet({ name: 'SPEC_REPO_PATH' });
+                const specRoot = specRootResult && typeof specRootResult.value === 'string' && specRootResult.value.trim().length > 0
+                  ? specRootResult.value
+                  : state.cwd;
+
+                const baseDir = (await pathJoin({ base: specRoot, segment: state.specRelativePath })).path;
+                const project = await pathJoin({ base: baseDir, segment: state.fixtureRelativePath });
+                const cache = await pathJoin({ base: baseDir, segment: '.cache' });
+                const sources = await pathJoin({ base: project.path, segment: state.sourcesRelativePath });
+
                 return {
                   projectPath: project.path,
-                  cacheDir: cache.path
+                  cacheDir: cache.path,
+                  sourcesPath: sources.path
                 };
               }
             input:
               cwd: '.'
+              specRelativePath: 'tests/spec/resolver_sources'
+              fixtureRelativePath: 'fixtures/basic'
+              sourcesRelativePath: 'sources.json'
             imports:
               pathJoin: lcod://axiom/path/join@1
+              envGet: lcod://contract/core/env/get@1
           out:
             projectPath: projectPath
             cacheDir: cacheDir
+            sourcesPath: sourcesPath
 
         - call: lcod://tooling/resolver/internal/load-sources@0.1.0
           in:
             projectPath: $.projectPath
             cacheDir: $.cacheDir
+            sourcesPath: $.sourcesPath
           out:
             registrySources: registrySources
             warnings: warnings
@@ -56,7 +73,7 @@ compose:
                   return `file://${normalized.endsWith('/') ? normalized : `${normalized}/`}`;
                 };
 
-                const projectAbsolute = (await imports.pathJoin({ base: '.', segment: state.projectPath })).path;
+                const projectAbsolute = state.projectPath;
                 const coreDir = (await imports.pathJoin({ base: projectAbsolute, segment: 'registry/manifests/core' })).path;
                 const extraDir = (await imports.pathJoin({ base: projectAbsolute, segment: 'registry/manifests/extra' })).path;
 

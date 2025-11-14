@@ -1,21 +1,33 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "type": "object",
-  "required": ["projectPath"],
+  "additionalProperties": false,
   "properties": {
     "projectPath": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
       "type": "string",
       "minLength": 1,
       "description": "Absolute or relative path to the project root containing lcp.toml."
     },
     "configPath": {
-      "type": ["string", "null"],
-      "description": "Optional resolve.config.json path forwarded downstream."
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Optional explicit resolve.config.json path."
     },
     "outputPath": {
-      "type": ["string", "null"],
-      "description": "Optional explicit lockfile output path forwarded downstream."
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Optional explicit lockfile output path."
     }
   },
-  "additionalProperties": true
+  "required": [
+    "projectPath"
+  ],
+  "description": "Load the project descriptor (`lcp.toml`) and expose its parsed contents."
 }

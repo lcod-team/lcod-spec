@@ -1,10 +1,18 @@
+<!-- AUTO-GENERATED: edit lcp.toml and run scripts/build-component-artifacts.mjs -->
 # lcod://contract/core/array/shift@1.0.0
 
-Remove the first element of an array and return the head/tail pair without mutating the original list.
+Return the first element of an array along with the remainder.
+
+## Notes
+
+Remove the first element of an array and return the head/tail pair.
+
+The contract never mutates the provided array. When the array is empty, the
+`head` is `null` and `rest` is an empty array.
 
 ## Input (`schema/shift.in.json`)
-- `items` (array, optional): source array. Defaults to an empty array.
+- `items` (array, optional): source array (defaults to `[]`).
 
 ## Output (`schema/shift.out.json`)
-- `head` (any): the first element (or `null` when the array is empty).
-- `rest` (array): the remaining elements after removing the head.
+- `head` (any): first element (or `null` when absent).
+- `rest` (array): the remaining items after removing the head.

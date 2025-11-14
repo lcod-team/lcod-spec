@@ -1,17 +1,15 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "tooling/resolver/replace/apply input",
   "type": "object",
-  "required": ["id"],
+  "additionalProperties": false,
   "properties": {
-    "id": { "type": "string", "minLength": 1 },
-    "replaceAlias": { "type": "object" },
-    "replaceSpec": { "type": "object" },
     "visited": {
       "type": "array",
-      "items": { "type": "string" },
-      "description": "Internal recursion guard."
+      "items": {
+        "type": "string"
+      },
+      "description": "Internal recursion guard; callers should omit."
     }
   },
-  "additionalProperties": false
+  "description": "Compute the final component id after applying resolver replacement rules."
 }

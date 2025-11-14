@@ -1,60 +1,90 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "type": "object",
-  "required": ["projectPath", "cacheRoot", "normalizedConfig", "rootDescriptor", "rootDescriptorText"],
+  "additionalProperties": false,
   "properties": {
     "projectPath": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
       "type": "string",
       "description": "Base project directory."
     },
     "cacheRoot": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
       "type": "string",
       "description": "Cache directory used for downloads."
     },
     "normalizedConfig": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
       "type": "object",
       "description": "Normalized configuration produced by prepare-config."
     },
     "config": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
       "type": "object",
-      "description": "Raw resolver configuration (pre-normalization)."
+      "description": "Raw resolver configuration before normalisation."
     },
     "rootId": {
-      "type": ["string", "null"],
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "type": [
+        "string",
+        "null"
+      ],
       "description": "Explicit root id if provided."
     },
     "rootDescriptor": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
       "type": "object",
       "description": "Parsed root descriptor."
     },
     "rootDescriptorText": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
       "type": "string",
       "description": "Raw root descriptor contents."
     },
     "warnings": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
       "type": "array",
-      "items": { "type": "string" },
+      "items": {
+        "type": "string"
+      },
       "description": "Existing warnings to propagate."
     },
     "registryPackages": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
       "type": "object",
       "description": "Packages indexed from the registry helper step."
     },
     "registryEntries": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
       "type": "array",
-      "items": { "type": "object" },
+      "items": {
+        "type": "object"
+      },
       "description": "Flattened registry entries used for inspection."
     },
     "registryRegistries": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
       "type": "array",
-      "items": { "type": "object" },
+      "items": {
+        "type": "object"
+      },
       "description": "Registry descriptors collected from JSONL streams."
     },
     "registryWarnings": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
       "type": "array",
-      "items": { "type": "string" },
+      "items": {
+        "type": "string"
+      },
       "description": "Warnings produced while loading registry metadata."
     }
   },
-  "additionalProperties": true
+  "required": [
+    "projectPath",
+    "cacheRoot",
+    "normalizedConfig",
+    "rootDescriptor",
+    "rootDescriptorText"
+  ],
+  "description": "Resolve the dependency graph using normalised configuration and cache information."
 }

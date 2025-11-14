@@ -1,18 +1,29 @@
-# resolve-dependencies
+<!-- AUTO-GENERATED: edit lcp.toml and run scripts/build-component-artifacts.mjs -->
+# lcod://tooling/resolver/internal/resolve-dependencies@0.1.0
 
-Builds the dependency graph for the resolver. It consumes the normalised configuration (sources, replacements, allowlist), the computed cache root, and the root descriptor to fetch each dependency, apply overrides, detect cycles, and collect warnings.
+Resolve the dependency graph using normalised configuration and cache information.
 
 ## Inputs
 
-- `projectPath` (string): base project path.
-- `cacheRoot` (string): resolved cache directory.
-- `normalizedConfig` (object): output of `prepare-config` containing `sources`, `replaceAlias`, `replaceSpec`, `allowlist`.
-- `rootId` (string, optional): explicit root component identifier.
-- `rootDescriptor` (object): parsed descriptor.
-- `rootDescriptorText` (string): raw descriptor text (for integrity hashes).
-- `warnings` (array of strings, optional): warnings accumulated so far.
+| Name | Type | Required | Description |
+| --- | --- | --- | --- |
+| `projectPath` | string | Yes | Base project directory. |
+| `cacheRoot` | string | Yes | Cache directory used for dependency downloads. |
+| `normalizedConfig` | object | Yes | Normalised resolver configuration. |
+| `config` | object | No | Raw resolver configuration (pre-normalisation). |
+| `rootId` | string | null | No | Explicit root component identifier when provided. |
+| `rootDescriptor` | object | Yes | Parsed root descriptor. |
+| `rootDescriptorText` | string | Yes | Raw root descriptor contents. |
+| `warnings` | array<string> | No | Warnings accumulated so far. |
+| `registryPackages` | object | No | Registry packages indexed from previous steps. |
+| `registryEntries` | array<object> | No | Flattened registry entries used for inspection. |
+| `registryRegistries` | array<object> | No | Registry descriptors collected from JSONL streams. |
+| `registryWarnings` | array<string> | No | Warnings produced while loading registry metadata. |
 
 ## Outputs
 
-- `resolverResult` (object): `{ root, warnings }` where `root` is the resolved dependency tree.
-- `warnings` (array of strings): warnings produced during resolution (includes input warnings).
+| Name | Type | Description |
+| --- | --- | --- |
+| `resolverResult` | object | Resolver result containing the dependency graph. |
+| `warnings` | array<string> | Warnings emitted during dependency resolution. |
+| `contractSourcesSnapshot` | object | Snapshot of the sources map passed to the resolver contract. |
