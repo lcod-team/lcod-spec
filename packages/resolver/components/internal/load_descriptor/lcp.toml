@@ -1,0 +1,101 @@
+schemaVersion = "2.0"
+id = "lcod://tooling/resolver/internal/load-descriptor@0.1.0"
+version = "0.1.0"
+kind = "function"
+summary = "Load the project descriptor (`lcp.toml`) and expose its parsed contents."
+
+[deps]
+requires = [
+  "lcod://axiom/path/join@1",
+  "lcod://axiom/fs/read-file@1",
+  "lcod://axiom/toml/parse@1",
+  "lcod://impl/set@1"
+]
+
+[inputs.projectPath]
+summary = "Absolute or relative path to the project root containing `lcp.toml`."
+required = true
+schema = """
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "string",
+  "minLength": 1,
+  "description": "Absolute or relative path to the project root containing lcp.toml."
+}"""
+
+[inputs.configPath]
+summary = "Optional resolve.config.json path (propagated downstream)."
+required = false
+schema = """
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": ["string", "null"],
+  "description": "Optional explicit resolve.config.json path."
+}"""
+
+[inputs.outputPath]
+summary = "Optional explicit lockfile output path (propagated downstream)."
+required = false
+schema = """
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": ["string", "null"],
+  "description": "Optional explicit lockfile output path."
+}"""
+
+[outputs.descriptorPath]
+summary = "Absolute path to the descriptor that was loaded."
+schema = """
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "string",
+  "description": "Path to the resolved lcp.toml file."
+}"""
+
+[outputs.descriptorText]
+summary = "Raw TOML contents of the project descriptor."
+schema = """
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "string",
+  "description": "Raw descriptor contents."
+}"""
+
+[outputs.descriptor]
+summary = "Parsed descriptor object."
+schema = """
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "description": "Parsed descriptor content."
+}"""
+
+[outputs.projectPath]
+summary = "Passthrough of the project root path."
+schema = """
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": ["string", "null"]
+}"""
+
+[outputs.configPath]
+summary = "Passthrough of the resolve.config.json path."
+schema = """
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": ["string", "null"]
+}"""
+
+[outputs.outputPath]
+summary = "Passthrough of the explicit output path."
+schema = """
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": ["string", "null"]
+}"""
+
+[tool]
+name = "load_descriptor"
+description = "Read and parse the project descriptor (`lcp.toml`)."
+inputSchema = "schema/input.json"
+outputSchema = "schema/output.json"

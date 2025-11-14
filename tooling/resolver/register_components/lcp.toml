@@ -4,11 +4,28 @@ version = "0.1.0"
 kind = "function"
 summary = "Register shared resolver helper components via the tooling/resolver/register axiom."
 
+[inputs.specRoot]
+summary = "Absolute path to the lcod-spec checkout containing helper components."
+required = false
+schema = """
+{ "type": ["string", "null"], "minLength": 1 }
+"""
+
 [deps]
 requires = [
-  "lcod://tooling/script@1",
-  "lcod://axiom/path/join@1",
-  "lcod://tooling/resolver/register@1"
+  "lcod://flow/foreach@1",
+  "lcod://flow/if@1",
+  "lcod://flow/try@1",
+  "lcod://impl/set@1",
+  "lcod://tooling/array/compact@0.1.0",
+  "lcod://tooling/array/concat@0.1.0",
+  "lcod://tooling/object/set@0.1.0",
+  "lcod://tooling/path/join_chain@0.1.0",
+  "lcod://tooling/resolver/register@1",
+  "lcod://tooling/value/default_array@0.1.0",
+  "lcod://tooling/value/is_string_nonempty@0.1.0",
+  "lcod://contract/core/object/get@1",
+  "lcod://contract/core/string/format@1"
 ]
 
 [tool]
@@ -17,5 +34,34 @@ description = "Resolves compose files within lcod-spec and registers them using 
 inputSchema = "schema/register_components.in.json"
 outputSchema = "schema/register_components.out.json"
 
+[outputs.registered]
+summary = "Number of components successfully registered."
+schema = """
+{ "type": "integer", "minimum": 0 }
+"""
+
+[outputs.warnings]
+summary = "Warnings emitted while resolving or registering components."
+schema = """
+{ "type": "array", "items": { "type": "string" } }
+"""
+
+[outputs.sources]
+summary = "Map of component IDs to their resolved sources."
+schema = """
+{
+  "type": "object",
+  "additionalProperties": {
+    "type": "object",
+    "properties": {
+      "type": { "type": "string" },
+      "path": { "type": "string" },
+      "url": { "type": "string" }
+    },
+    "required": ["type"]
+  }
+}
+"""
+
 [documentation]
-body = "Registers shared resolver helper components (registry loaders, selectors, and resolver utilities) with the runtime. The component expects a `specRoot` pointing to the `lcod-spec` repository and calls the `tooling/resolver/register@1` axiom to publish each compose."
+body = "Registers shared resolver helper components (registry loaders, selectors, and resolver utilities) with the runtime. The component expects a `specRoot` pointing to the `lcod-spec` repository, resolves all compose paths relative to it, and calls `tooling/resolver/register@1` to publish each compose while aggregating warnings."

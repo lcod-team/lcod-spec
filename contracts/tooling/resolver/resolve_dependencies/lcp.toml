@@ -10,6 +10,18 @@ description = "Resolve dependency graph for lcod-resolver."
 inputSchema = "schema/resolve_dependencies.in.json"
 outputSchema = "schema/resolve_dependencies.out.json"
 
+[inputs.specSources]
+summary = "Optional map of component IDs to source descriptors injected by register_components."
+required = false
+schema = """
+{
+  "type": "object",
+  "additionalProperties": {
+    "type": "object"
+  }
+}
+"""
+
 [documentation]
 body = """
 Resolve dependency graph for lcod-resolver.

@@ -10,7 +10,7 @@ icon = "mdi:link-variant"
 tags = [ "path", "url" ]
 
 [deps]
-requires = [ "lcod://tooling/script@1" ]
+requires = [ "lcod://contract/core/path/to_file_url@1" ]
 
 [inputs.path]
 summary = "Absolute filesystem path."

@@ -5,7 +5,16 @@ kind = "function"
 summary = "Flatten multiple warning arrays into a single list."
 
 [deps]
-requires = [ "lcod://tooling/script@1" ]
+requires = [
+  "lcod://flow/foreach@1",
+  "lcod://flow/if@1",
+  "lcod://impl/set@1",
+  "lcod://tooling/array/compact@0.1.0",
+  "lcod://tooling/array/flatten@0.1.0",
+  "lcod://tooling/value/default_array@0.1.0",
+  "lcod://tooling/value/is_array@0.1.0",
+  "lcod://tooling/value/is_string_nonempty@0.1.0",
+]
 
 [tool]
 name = "Resolver Warnings Merge"

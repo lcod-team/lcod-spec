@@ -1,0 +1,133 @@
+compose:
+  - call: lcod://flow/if@1
+    in:
+      cond: $.configPath
+    slots:
+      then:
+        - call: lcod://impl/set@1
+          in:
+            resolvedPath: $.configPath
+          out:
+            resolvedPath: resolvedPath
+      else:
+        - call: lcod://axiom/path/join@1
+          in:
+            base: $.projectPath
+            segment: "resolve.config.json"
+          out:
+            resolvedPath: path
+    out:
+      effectiveConfigPath: resolvedPath
+
+  - call: lcod://tooling/fs/read_optional@0.1.0
+    in:
+      path: $.effectiveConfigPath
+      encoding: "utf-8"
+      fallback: '{"sources":{}}'
+      warningMessage: 'Resolver configuration missing; defaulting to empty sources.'
+    out:
+      configText: text
+      readWarning: warning
+
+  - call: lcod://tooling/json/decode_object@0.1.0
+    in:
+      text: $.configText
+      fallback:
+        sources: {}
+      warningMessage: 'Resolver configuration is invalid JSON; defaulting to empty configuration.'
+    out:
+      decodedConfig: value
+      decodeWarnings: warnings
+
+  - call: lcod://tooling/value/default_array@0.1.0
+    in:
+      value: $.decodeWarnings
+    out:
+      decodeWarnings: resolved
+
+  - call: lcod://tooling/value/default_object@0.1.0
+    in:
+      value: $.decodedConfig
+    out:
+      normalizedConfig: resolved
+
+
+  - call: lcod://tooling/value/default_object@0.1.0
+    in:
+      value: $.normalizedConfig.sources
+      fallback: {}
+    out:
+      resolvedSources: resolved
+
+  - call: lcod://tooling/value/default_object@0.1.0
+    in:
+      value: $.normalizedConfig.replace
+      fallback: {}
+    out:
+      resolvedReplace: resolved
+
+  - call: lcod://tooling/value/default_array@0.1.0
+    in:
+      value: $.normalizedConfig.allowlist
+    out:
+      resolvedAllowlist: resolved
+
+  - call: lcod://tooling/value/default_array@0.1.0
+    in:
+      value: $.decodeWarnings
+    out:
+      warningsAccumulator: resolved
+
+  - call: lcod://flow/if@1
+    in:
+      cond: $.readWarning
+    slots:
+      then:
+        - call: lcod://tooling/value/default_array@0.1.0
+          in:
+            value: $.warningsAccumulator
+          out:
+            warningsAccumulator: resolved
+        - call: lcod://tooling/array/append@0.1.0
+          in:
+            items: $.warningsAccumulator
+            value: $.readWarning
+          out:
+            appendedWarnings: $
+        - call: lcod://impl/set@1
+          in:
+            finalWarnings: $.appendedWarnings.items
+          out:
+            finalWarnings: finalWarnings
+      else:
+        - call: lcod://impl/set@1
+          in:
+            finalWarnings: $.warningsAccumulator
+          out:
+            finalWarnings: finalWarnings
+    out:
+      warnings: finalWarnings
+
+  - call: lcod://core/object/merge@0.1.0
+    in:
+      left: $.normalizedConfig
+      right:
+        sources: $.resolvedSources
+        replace: $.resolvedReplace
+        allowlist: $.resolvedAllowlist
+    out:
+      resolverConfig: $
+
+  - call: lcod://impl/set@1
+    in:
+      configPath: $.effectiveConfigPath
+      config: $.resolverConfig.value
+      warnings: $.warnings
+      projectPath: $.projectPath
+      outputPath: $.outputPath
+    out:
+      configPath: configPath
+      config: config
+      warnings: warnings
+      projectPath: projectPath
+      outputPath: outputPath

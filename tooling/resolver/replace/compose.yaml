@@ -1,62 +1,184 @@
 compose:
-  - call: lcod://tooling/script@1
+  - call: lcod://tooling/value/default_object@0.1.0
     in:
-      source: |
-        async ({ input }) => {
-          const id = typeof input.id === 'string' && input.id.length > 0
-            ? input.id
-            : null;
-          const replaceAlias = input.replaceAlias && typeof input.replaceAlias === 'object'
-            ? input.replaceAlias
-            : {};
-          const replaceSpec = input.replaceSpec && typeof input.replaceSpec === 'object'
-            ? input.replaceSpec
-            : {};
-
-          const warnings = [];
-          if (!id) {
-            return { targetId: null, override: null, warnings };
-          }
-
-          const visited = new Set();
-          let current = id;
-          let override = null;
-          while (true) {
-            if (Object.prototype.hasOwnProperty.call(replaceSpec, current)) {
-              override = replaceSpec[current];
-              break;
-            }
-            if (!Object.prototype.hasOwnProperty.call(replaceAlias, current)) {
-              break;
-            }
-            const next = replaceAlias[current];
-            if (typeof next !== 'string' || next.length === 0) {
-              break;
-            }
-            if (visited.has(current)) {
-              warnings.push(`Replacement cycle detected: ${[...visited, current, next].join(' -> ')}`);
-              break;
-            }
-            visited.add(current);
-            current = next;
-          }
-
-          let overrideClone = null;
-          if (override && typeof override === 'object') {
-            try {
-              overrideClone = JSON.parse(JSON.stringify(override));
-            } catch (_err) {
-              overrideClone = override;
-            }
-          }
-
-          return { targetId: current, override: overrideClone, warnings };
-        }
-      input:
-        id: $.id
-        replaceAlias: $.replaceAlias
-        replaceSpec: $.replaceSpec
+      value: $.replaceAlias
     out:
-      targetId: =
-      override: =
-      warnings: =
+      aliasMap: resolved
+
+  - call: lcod://tooling/value/default_object@0.1.0
+    in:
+      value: $.replaceSpec
+    out:
+      specMap: resolved
+
+  - call: lcod://tooling/value/default_array@0.1.0
+    in:
+      value: $.visited
+    out:
+      visitedList: resolved
+
+  - call: lcod://tooling/value/is_string_nonempty@0.1.0
+    in:
+      value: $.id
+    out:
+      hasId: ok
+
+  - call: lcod://flow/if@1
+    in:
+      cond: $.hasId
+    out:
+      targetId: targetId
+      override: override
+      warnings: warnings
+    slots:
+      then:
+        - call: lcod://impl/set@1
+          in:
+            currentId: $.id
+            cycleDetected: false
+
+        - call: lcod://flow/foreach@1
+          in:
+            list: $.visitedList
+          out:
+            cycleDetected: cycleDetected
+          slots:
+            body:
+              - call: lcod://contract/core/value/equals@1
+                in:
+                  left: $slot.item
+                  right: $.currentId
+                out:
+                  sameId: equals
+              - call: lcod://flow/if@1
+                in:
+                  cond: $.sameId
+                slots:
+                  then:
+                    - call: lcod://impl/set@1
+                      in:
+                        cycleDetected: true
+                    - call: lcod://flow/break@1
+
+        - call: lcod://flow/if@1
+          in:
+            cond: $.cycleDetected
+          out:
+            targetId: targetId
+            override: override
+            warnings: warnings
+          slots:
+            then:
+              - call: lcod://contract/core/string/format@1
+                in:
+                  template: "Replacement cycle detected for {id}"
+                  values:
+                    id: $.currentId
+                out:
+                  warningMessage: value
+              - call: lcod://impl/set@1
+                in:
+                  targetId: $.currentId
+                  override: null
+                  warnings:
+                    - $.warningMessage
+            else:
+              - call: lcod://tooling/array/append@0.1.0
+                in:
+                  items: $.visitedList
+                  value: $.currentId
+                out:
+                  visitedNext: items
+
+              - call: lcod://impl/set@1
+                in:
+                  idPath:
+                    - $.currentId
+
+              - call: lcod://contract/core/object/get@1
+                in:
+                  object: $.specMap
+                  path: $.idPath
+                out:
+                  specOverride: value
+                  specFound: found
+
+              - call: lcod://flow/if@1
+                in:
+                  cond: $.specFound
+                out:
+                  targetId: targetId
+                  override: override
+                  warnings: warnings
+                slots:
+                  then:
+                    - call: lcod://tooling/value/is_object@0.1.0
+                      in:
+                        value: $.specOverride
+                      out:
+                        overrideIsObject: ok
+                    - call: lcod://flow/if@1
+                      in:
+                        cond: $.overrideIsObject
+                      out:
+                        normalizedOverride: normalizedOverride
+                      slots:
+                        then:
+                          - call: lcod://tooling/value/clone@0.1.0
+                            in:
+                              value: $.specOverride
+                            out:
+                              normalizedOverride: value
+                        else:
+                          - call: lcod://impl/set@1
+                            in:
+                              normalizedOverride: $.specOverride
+                    - call: lcod://impl/set@1
+                      in:
+                        targetId: $.currentId
+                        override: $.normalizedOverride
+                        warnings: []
+                  else:
+                    - call: lcod://contract/core/object/get@1
+                      in:
+                        object: $.aliasMap
+                        path: $.idPath
+                      out:
+                        aliasCandidate: value
+                        aliasFound: found
+                    - call: lcod://tooling/value/is_string_nonempty@0.1.0
+                      in:
+                        value: $.aliasCandidate
+                      out:
+                        aliasIsValid: ok
+                    - call: lcod://flow/if@1
+                      in:
+                        cond: $.aliasIsValid
+                      out:
+                        targetId: targetId
+                        override: override
+                        warnings: warnings
+                      slots:
+                        then:
+                          - call: lcod://tooling/resolver/replace@0.1.0
+                            in:
+                              id: $.aliasCandidate
+                              replaceAlias: $.aliasMap
+                              replaceSpec: $.specMap
+                              visited: $.visitedNext
+                            out:
+                              targetId: targetId
+                              override: override
+                              warnings: warnings
+                        else:
+                          - call: lcod://impl/set@1
+                            in:
+                              targetId: $.currentId
+                              override: null
+                              warnings: []
+      else:
+        - call: lcod://impl/set@1
+          in:
+            targetId: null
+            override: null
+            warnings: []

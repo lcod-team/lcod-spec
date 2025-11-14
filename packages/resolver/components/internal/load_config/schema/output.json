@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": ["configPath", "config", "warnings"],
+  "properties": {
+    "configPath": {
+      "type": "string",
+      "description": "Resolved path that was loaded."
+    },
+    "config": {
+      "type": "object",
+      "description": "Normalised configuration object."
+    },
+    "warnings": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Warnings produced while loading the configuration."
+    },
+    "projectPath": {
+      "type": ["string", "null"],
+      "description": "Passthrough of the project root path."
+    },
+    "outputPath": {
+      "type": ["string", "null"],
+      "description": "Passthrough of the optional output path."
+    }
+  },
+  "additionalProperties": true
+}

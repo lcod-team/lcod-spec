@@ -1,0 +1,36 @@
+compose:
+  - call: lcod://axiom/path/join@1
+    in:
+      base: $.projectPath
+      segment: "lcp.toml"
+    out:
+      descriptorPath: path
+
+  - call: lcod://axiom/fs/read-file@1
+    in:
+      path: $.descriptorPath
+      encoding: "utf-8"
+    out:
+      descriptorText: data
+
+  - call: lcod://axiom/toml/parse@1
+    in:
+      text: $.descriptorText
+    out:
+      descriptor: value
+
+  - call: lcod://impl/set@1
+    in:
+      descriptorPath: $.descriptorPath
+      descriptorText: $.descriptorText
+      descriptor: $.descriptor
+      projectPath: $.projectPath
+      configPath: $.configPath
+      outputPath: $.outputPath
+    out:
+      descriptorPath: descriptorPath
+      descriptorText: descriptorText
+      descriptor: descriptor
+      projectPath: projectPath
+      configPath: configPath
+      outputPath: outputPath

@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": ["descriptorPath", "descriptorText", "descriptor"],
+  "properties": {
+    "descriptorPath": {
+      "type": "string",
+      "description": "Path to the resolved lcp.toml file."
+    },
+    "descriptorText": {
+      "type": "string",
+      "description": "Raw TOML contents of the descriptor."
+    },
+    "descriptor": {
+      "type": "object",
+      "description": "Parsed descriptor content."
+    },
+    "projectPath": {
+      "type": ["string", "null"],
+      "description": "Passthrough of the project path input."
+    },
+    "configPath": {
+      "type": ["string", "null"],
+      "description": "Passthrough of the resolve.config.json path."
+    },
+    "outputPath": {
+      "type": ["string", "null"],
+      "description": "Passthrough of the explicit output path."
+    }
+  },
+  "additionalProperties": true
+}

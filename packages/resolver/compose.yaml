@@ -1,0 +1,136 @@
+compose:
+  - call: lcod://tooling/resolver/internal/load-descriptor@0.1.0
+    in:
+      projectPath: $.projectPath
+      configPath: $.configPath
+      outputPath: $.outputPath
+    out:
+      descriptor: descriptor
+      descriptorText: descriptorText
+      descriptorPath: descriptorPath
+      projectPath: projectPath
+      configPath: configPath
+      outputPath: outputPath
+
+  - call: lcod://tooling/resolver/internal/load-config@0.1.0
+    in:
+      projectPath: $.projectPath
+      configPath: $.configPath
+      outputPath: $.outputPath
+    out:
+      resolverConfig: config
+      config: config
+      configPath: resolvedConfigPath
+      warnings: configWarnings
+      projectPath: projectPath
+      outputPath: outputPath
+
+  - call: lcod://tooling/resolver/internal/lock-path@0.1.0
+    in:
+      projectPath: $.projectPath
+      outputPath: $.outputPath
+    out:
+      lockPath: lockPath
+
+  - call: lcod://tooling/resolver/internal/prepare-config@0.1.0
+    in:
+      resolverConfig: $.resolverConfig
+      config: $.config
+      warnings: $.configWarnings
+    out:
+      normalizedConfig: normalizedConfig
+      warnings: normalizedWarnings
+      config: config
+
+  - call: lcod://tooling/resolver/internal/prepare-cache@0.1.0
+    in:
+      projectPath: $.projectPath
+    out:
+      cacheRoot: cacheRoot
+
+  - call: lcod://tooling/resolver/internal/resolve-dependencies@0.1.0
+    in:
+      projectPath: $.projectPath
+      cacheRoot: $.cacheRoot
+      normalizedConfig: $.normalizedConfig
+      config: $.config
+      rootId: $.descriptor.id
+      rootDescriptor: $.descriptor
+      rootDescriptorText: $.descriptorText
+      warnings: $.normalizedWarnings
+    out:
+      resolverResult: resolverResult
+      warnings: resolveWarnings
+      contractSourcesSnapshot: contractSourcesSnapshot
+
+  - call: lcod://tooling/resolver/internal/summarize-result@0.1.0
+    in:
+      resolverResult: $.resolverResult
+      warnings: $.resolveWarnings
+    out:
+      dependencyGraph: dependencyGraph
+      rootIntegrity: rootIntegrity
+      warnings: collectedWarnings
+
+  - call: lcod://tooling/resolver/internal/build-lock@0.1.0
+    in:
+      descriptor: $.descriptor
+      dependencyGraph: $.dependencyGraph
+      warnings: $.collectedWarnings
+      rootIntegrity: $.rootIntegrity
+      resolverRoot: $.resolverResult.root
+    out:
+      lockDocument: lockDocument
+      lockText: lockText
+
+  - call: lcod://axiom/fs/write-file@1
+    in:
+      path: $.lockPath
+      data: $.lockText
+      createParents: true
+    out:
+      ok: wrote
+
+  - call: lcod://tooling/value/is_array@0.1.0
+    in:
+      value: $.lockDocument.components
+    out:
+      hasComponentsArray: ok
+
+  - call: lcod://flow/if@1
+    in:
+      cond: $.hasComponentsArray
+    out:
+      normalizedComponents: normalizedComponents
+    slots:
+      then:
+        - call: lcod://impl/set@1
+          in:
+            normalizedComponents: $.lockDocument.components
+          out:
+            normalizedComponents: normalizedComponents
+      else:
+        - call: lcod://impl/set@1
+          in:
+            normalizedComponents: []
+          out:
+            normalizedComponents: normalizedComponents
+
+  - call: lcod://tooling/value/default_array@0.1.0
+    in:
+      value: $.warnings
+      fallback: []
+    out:
+      normalizedWarnings: resolved
+
+  - call: lcod://impl/set@1
+    in:
+      lockPath: $.lockPath
+      components: $.normalizedComponents
+      warnings: $.normalizedWarnings
+      contractSourcesSnapshot: $.contractSourcesSnapshot
+    out:
+      lockPath: lockPath
+      components: components
+      warnings: warnings
+      contractSourcesSnapshot: contractSourcesSnapshot

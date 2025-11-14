@@ -1,0 +1,191 @@
+schemaVersion = "2.0"
+id = "lcod://tooling/resolver/internal/resolve-dependencies@0.1.0"
+version = "0.1.0"
+kind = "function"
+summary = "Resolve the dependency graph using normalised configuration and cache information."
+
+[deps]
+requires = [
+  "lcod://tooling/resolver/register_components@0.1.0",
+  "lcod://tooling/registry/source/load@0.1.0",
+  "lcod://tooling/registry/index@0.1.0",
+  "lcod://tooling/registry/select@0.1.0",
+  "lcod://tooling/resolver/warnings/merge@0.1.0",
+  "lcod://tooling/resolver/context/prepare@0.1.0",
+  "lcod://tooling/resolver/replace/apply@0.1.0",
+  "lcod://tooling/array/filter_objects@0.1.0",
+  "lcod://tooling/array/concat@0.1.0",
+  "lcod://tooling/script@1",
+  "lcod://axiom/path/join@1",
+  "lcod://axiom/fs/read-file@1",
+  "lcod://axiom/toml/parse@1",
+  "lcod://contract/core/hash/sha256@1",
+  "lcod://contract/core/git/clone@1",
+  "lcod://axiom/http/download@1"
+]
+
+[inputs.projectPath]
+summary = "Base project directory."
+required = true
+schema = """
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "string",
+  "description": "Base project directory."
+}"""
+
+[inputs.cacheRoot]
+summary = "Cache directory used for dependency downloads."
+required = true
+schema = """
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "string",
+  "description": "Cache directory used for downloads."
+}"""
+
+[inputs.normalizedConfig]
+summary = "Normalised resolver configuration."
+required = true
+schema = """
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "description": "Normalized configuration produced by prepare-config."
+}"""
+
+[inputs.config]
+summary = "Raw resolver configuration (pre-normalisation)."
+required = false
+schema = """
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "description": "Raw resolver configuration before normalisation."
+}"""
+
+[inputs.rootId]
+summary = "Explicit root component identifier when provided."
+required = false
+schema = """
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": ["string", "null"],
+  "description": "Explicit root id if provided."
+}"""
+
+[inputs.rootDescriptor]
+summary = "Parsed root descriptor."
+required = true
+schema = """
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "description": "Parsed root descriptor."
+}"""
+
+[inputs.rootDescriptorText]
+summary = "Raw root descriptor contents."
+required = true
+schema = """
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "string",
+  "description": "Raw root descriptor contents."
+}"""
+
+[inputs.warnings]
+summary = "Warnings accumulated so far."
+required = false
+schema = """
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "array",
+  "items": { "type": "string" },
+  "description": "Existing warnings to propagate."
+}"""
+
+[inputs.registryPackages]
+summary = "Registry packages indexed from previous steps."
+required = false
+schema = """
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "description": "Packages indexed from the registry helper step."
+}"""
+
+[inputs.registryEntries]
+summary = "Flattened registry entries used for inspection."
+required = false
+schema = """
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "array",
+  "items": { "type": "object" },
+  "description": "Flattened registry entries used for inspection."
+}"""
+
+[inputs.registryRegistries]
+summary = "Registry descriptors collected from JSONL streams."
+required = false
+schema = """
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "array",
+  "items": { "type": "object" },
+  "description": "Registry descriptors collected from JSONL streams."
+}"""
+
+[inputs.registryWarnings]
+summary = "Warnings produced while loading registry metadata."
+required = false
+schema = """
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "array",
+  "items": { "type": "string" },
+  "description": "Warnings produced while loading registry metadata."
+}"""
+
+[outputs.resolverResult]
+summary = "Resolver result containing the dependency graph."
+schema = """
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "description": "Resolver result containing root dependency graph and warnings."
+}"""
+
+[outputs.warnings]
+summary = "Warnings emitted during dependency resolution."
+schema = """
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "array",
+  "items": { "type": "string" },
+  "description": "Warnings emitted during resolution."
+}"""
+
+[outputs.contractSourcesSnapshot]
+summary = "Snapshot of the sources map passed to the resolver contract."
+schema = """
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": {
+    "type": "object",
+    "properties": {
+      "type": { "type": "string" },
+      "path": { "type": "string" },
+      "url": { "type": "string" },
+      "reference": { "type": "string" }
+    }
+  }
+}"""
+
+[tool]
+name = "resolve_dependencies"
+description = "Traverse the dependency tree, applying replacements, allowlists, cache lookups and resolver contracts."
+inputSchema = "schema/input.json"
+outputSchema = "schema/output.json"

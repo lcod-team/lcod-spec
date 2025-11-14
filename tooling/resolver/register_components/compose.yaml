@@ -3,13 +3,17 @@ compose:
     in:
       source: |
         async ({ state, imports }) => {
+          const envSpecRoot =
+            (typeof process !== 'undefined' && process && process.env && (process.env.SPEC_REPO_PATH || process.env.LCOD_HOME))
+              ? (process.env.SPEC_REPO_PATH || process.env.LCOD_HOME)
+              : null;
           const specRoot = typeof state.specRoot === 'string' && state.specRoot.length > 0
             ? state.specRoot
-            : null;
+            : envSpecRoot;
           const warnings = [];
           if (!specRoot) {
             warnings.push('resolver/register_components: specRoot is missing');
-            return { components: [], warnings };
+            return { components: [], warnings, sources: {} };
           }
 
           const definitions = [
@@ -56,20 +60,35 @@ compose:
             { id: 'lcod://tooling/resolver/warnings/merge@0.1.0', path: 'tooling/resolver/warnings/compose.yaml' },
             { id: 'lcod://tooling/resolver/context/prepare@0.1.0', path: 'tooling/resolver/context/compose.yaml' },
             { id: 'lcod://tooling/resolver/replace/apply@0.1.0', path: 'tooling/resolver/replace/compose.yaml' },
+            { id: 'lcod://tooling/resolver/internal/resolve-dependencies@0.1.0', path: 'packages/resolver/components/internal/resolve_dependencies/compose.yaml' },
             { id: 'lcod://tooling/resolver/internal/load-sources@0.1.0', path: 'packages/resolver/components/internal/load_sources/compose.yaml' }
           ];
 
           const components = [];
+          const sources = {};
+          const dirname = (fullPath) => {
+            if (typeof fullPath !== 'string' || fullPath.length === 0) {
+              return specRoot;
+            }
+            const idx = Math.max(fullPath.lastIndexOf('/'), fullPath.lastIndexOf('\\'));
+            if (idx <= 0) {
+              return specRoot;
+            }
+            return fullPath.slice(0, idx);
+          };
+
           for (const def of definitions) {
             try {
               const { path } = await imports.pathJoin({ base: specRoot, segment: def.path });
-              components.push({ id: def.id, composePath: path });
+              const directory = dirname(path);
+              components.push({ id: def.id, composePath: path, directory });
+              sources[def.id] = { type: 'path', path: directory };
             } catch (err) {
               warnings.push(`resolver/register_components: failed to resolve ${def.id}: ${err.message}`);
             }
           }
 
-          return { components, warnings };
+          return { components, warnings, sources };
         }
       input:
         specRoot: $.specRoot
@@ -78,6 +97,7 @@ compose:
     out:
       components: components
       buildWarnings: warnings
+      specSources: sources
 
   - call: lcod://tooling/resolver/register@1
     in:
@@ -101,15 +121,21 @@ compose:
           };
           collect(state.buildWarnings);
           collect(state.registerWarnings);
+          const sources = state.specSources && typeof state.specSources === 'object'
+            ? state.specSources
+            : {};
           return {
             registered: Number.isFinite(state.registered) ? state.registered : 0,
-            warnings
+            warnings,
+            sources
           };
         }
       input:
         registered: $.registered
         buildWarnings: $.buildWarnings
         registerWarnings: $.registerWarnings
+        specSources: $.specSources
     out:
       registered: registered
       warnings: warnings
+      sources: sources

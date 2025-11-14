@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": ["projectPath"],
+  "properties": {
+    "projectPath": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Root path of the project being resolved."
+    },
+    "configPath": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Optional explicit path to the resolver configuration."
+    },
+    "outputPath": {
+      "type": "string",
+      "description": "Optional explicit destination for the generated lockfile."
+    }
+  },
+  "additionalProperties": true
+}

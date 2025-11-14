@@ -6,7 +6,12 @@
   "properties": {
     "id": { "type": "string", "minLength": 1 },
     "replaceAlias": { "type": "object" },
-    "replaceSpec": { "type": "object" }
+    "replaceSpec": { "type": "object" },
+    "visited": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Internal recursion guard."
+    }
   },
   "additionalProperties": false
 }

@@ -3,31 +3,44 @@ compose:
     in:
       specRoot: $.normalizedConfig.specRoot
     out:
-      registrationWarnings: registrationWarnings
+      registrationWarnings: warnings
+      specSources: sources
+
+  - call: lcod://tooling/value/default_object@0.1.0
+    in:
+      value: $.specSources
+      fallback: {}
+    out:
+      specSourcesNormalized: resolved
 
   - call: lcod://tooling/resolver/internal/load-sources@0.1.0
     in:
       projectPath: $.projectPath
-      cacheDir: $.cacheRoot
+      cacheDir: $.cacheDir
       resolverConfig: $.resolverConfig
     out:
       pointerRegistrySources: pointerRegistrySources
       pointerWarnings: pointerWarnings
       sourcesPath: sourcesPath
 
-  - call: lcod://tooling/script@1
+  - call: lcod://tooling/array/filter_objects@0.1.0
     in:
-      source: |
-        async ({ state }) => {
-          const primary = Array.isArray(state.primary) ? state.primary.filter((entry) => entry && typeof entry === 'object') : [];
-          const extra = Array.isArray(state.extra) ? state.extra.filter((entry) => entry && typeof entry === 'object') : [];
-          return { sources: [...primary, ...extra] };
-        }
-      input:
-        primary: $.normalizedConfig.registrySources
-        extra: $.pointerRegistrySources
+      items: $.normalizedConfig.registrySources
     out:
-      combinedRegistrySources: sources
+      primaryRegistrySources: items
+
+  - call: lcod://tooling/array/filter_objects@0.1.0
+    in:
+      items: $.pointerRegistrySources
+    out:
+      pointerRegistrySourcesFiltered: items
+
+  - call: lcod://tooling/array/concat@0.1.0
+    in:
+      left: $.primaryRegistrySources
+      right: $.pointerRegistrySourcesFiltered
+    out:
+      combinedRegistrySources: items
 
   - call: lcod://tooling/registry/source/load@0.1.0
     in:
@@ -46,725 +59,325 @@ compose:
       registryPackages: registryPackages
       indexWarnings: indexWarnings
 
-  - call: lcod://tooling/script@1
+  - call: lcod://tooling/value/default_object@0.1.0
     in:
-      source: |
-        async ({ state, imports }) => {
-              const mergeWarnings = typeof imports.mergeWarnings === 'function'
-                ? imports.mergeWarnings
-                : null;
-              const contextPrepare = typeof imports.contextPrepare === 'function'
-                ? imports.contextPrepare
-                : null;
-              const replaceApply = typeof imports.replaceApply === 'function'
-                ? imports.replaceApply
-                : null;
+      value: $.normalizedConfig
+      fallback: {}
+    out:
+      normalizedConfigResolved: resolved
 
-              const registrationWarnings = Array.isArray(state.registrationWarnings)
-                ? state.registrationWarnings.filter((msg) => typeof msg === 'string' && msg.length > 0)
-                : [];
-              const baseWarnings = Array.isArray(state.warnings)
-                ? state.warnings.filter((msg) => typeof msg === 'string' && msg.length > 0)
-                : [];
-              const loadWarnings = Array.isArray(state.loadWarnings)
-                ? state.loadWarnings.filter((msg) => typeof msg === 'string' && msg.length > 0)
-                : [];
-              const indexWarnings = Array.isArray(state.indexWarnings)
-                ? state.indexWarnings.filter((msg) => typeof msg === 'string' && msg.length > 0)
-                : [];
-              const pointerWarnings = Array.isArray(state.pointerWarnings)
-                ? state.pointerWarnings.filter((msg) => typeof msg === 'string' && msg.length > 0)
-                : [];
-              const pointerRegistrySources = Array.isArray(state.pointerRegistrySources)
-                ? state.pointerRegistrySources.filter((entry) => entry && typeof entry === 'object')
-                : [];
-              const sourcesPath = typeof state.sourcesPath === 'string' && state.sourcesPath.length > 0
-                ? state.sourcesPath
-                : null;
+  - call: lcod://tooling/value/default_object@0.1.0
+    in:
+      value: $.config
+      fallback: {}
+    out:
+      configResolved: resolved
 
-              let warnings = [...baseWarnings];
-              if (mergeWarnings) {
-                try {
-                  const merged = await mergeWarnings({
-                    buckets: [baseWarnings, loadWarnings, indexWarnings, registrationWarnings, pointerWarnings]
-                  });
-                  if (merged && Array.isArray(merged.warnings)) {
-                    warnings = merged.warnings.slice();
-                  }
-                } catch (err) {
-                  warnings = [
-                    ...baseWarnings,
-                    ...loadWarnings,
-                    ...indexWarnings,
-                    ...registrationWarnings,
-                    ...pointerWarnings,
-                    `Warning merge failed: ${err.message}`
-                  ];
-                }
-              } else {
-                warnings = [...baseWarnings, ...loadWarnings, ...indexWarnings, ...registrationWarnings, ...pointerWarnings];
-              }
+  - call: lcod://tooling/value/default_array@0.1.0
+    in:
+      value: $.pointerRegistrySources
+      fallback: []
+    out:
+      pointerRegistrySourcesNormalized: resolved
 
-              let projectPath = typeof state.projectPath === 'string' && state.projectPath.length > 0
-                ? state.projectPath
-                : (typeof process?.cwd === 'function' ? process.cwd() : '.');
-              let cacheRoot = typeof state.cacheRoot === 'string' && state.cacheRoot.length > 0
-                ? state.cacheRoot
-                : projectPath;
-              let sources = state.normalizedConfig
-                && typeof state.normalizedConfig === 'object'
-                && state.normalizedConfig.sources
-                && typeof state.normalizedConfig.sources === 'object'
-                ? state.normalizedConfig.sources
-                : {};
-              if (sources && typeof sources === 'object' && Object.keys(sources).length === 0) {
-                const rawSources = state.config && typeof state.config === 'object' && state.config.sources
-                  && typeof state.config.sources === 'object'
-                  ? state.config.sources
-                  : null;
-                if (rawSources) {
-                  sources = rawSources;
-                }
-              }
-              let registrySources = Array.isArray(state.registrySources)
-                ? state.registrySources
-                : [];
-              let replaceAlias = {};
-              let replaceSpec = {};
-              let allowlist = null;
+  - call: lcod://tooling/value/default_array@0.1.0
+    in:
+      value: $.normalizedWarnings
+      fallback: []
+    out:
+      normalizedWarningsSanitized: resolved
 
-              if (contextPrepare) {
-                try {
-                  const normalizedConfig = state.normalizedConfig && typeof state.normalizedConfig === 'object'
-                    ? { ...state.normalizedConfig }
-                    : {};
-                  if (pointerRegistrySources.length) {
-                    const existing = Array.isArray(normalizedConfig.registrySources)
-                      ? normalizedConfig.registrySources.filter((entry) => entry && typeof entry === 'object')
-                      : [];
-                    normalizedConfig.registrySources = [...existing, ...pointerRegistrySources];
-                  }
-                  if (sourcesPath) {
-                    normalizedConfig.sourcesPath = sourcesPath;
-                  }
-                  const prepared = await contextPrepare({
-                    projectPath,
-                    cacheRoot,
-                    normalizedConfig,
-                    warnings,
-                    registryWarnings: indexWarnings
-                  });
-                  if (prepared) {
-                    if (typeof prepared.projectPath === 'string' && prepared.projectPath.length > 0) {
-                      projectPath = prepared.projectPath;
-                    }
-                    if (typeof prepared.cacheRoot === 'string' && prepared.cacheRoot.length > 0) {
-                      cacheRoot = prepared.cacheRoot;
-                    }
-                    if (prepared.sources && typeof prepared.sources === 'object' && !Array.isArray(prepared.sources)) {
-                      sources = prepared.sources;
-                    } else if (Array.isArray(prepared.sources)) {
-                      const normalizedSources = {};
-                      for (const entry of prepared.sources) {
-                        if (!entry || typeof entry !== 'object') continue;
-                        const key = typeof entry.id === 'string' && entry.id.length > 0
-                          ? entry.id
-                          : (typeof entry.target === 'string' && entry.target.length > 0 ? entry.target : null);
-                        if (!key) continue;
-                        if (entry.spec && typeof entry.spec === 'object') {
-                          normalizedSources[key] = entry.spec;
-                        } else {
-                          normalizedSources[key] = entry;
-                        }
-                      }
-                      sources = normalizedSources;
-                    }
-                    if (Array.isArray(prepared.registrySources)) {
-                      registrySources = prepared.registrySources;
-                    }
-                    if (prepared.replaceAlias && typeof prepared.replaceAlias === 'object') {
-                      replaceAlias = prepared.replaceAlias;
-                    }
-                    if (prepared.replaceSpec && typeof prepared.replaceSpec === 'object') {
-                      replaceSpec = prepared.replaceSpec;
-                    }
-                    if (Array.isArray(prepared.allowlist) || prepared.allowlist === null) {
-                      allowlist = prepared.allowlist;
-                    }
-                    if (Array.isArray(prepared.warnings)) {
-                      warnings = prepared.warnings.slice();
-                    }
-                  }
-                } catch (err) {
-                  warnings = [...warnings, `Context preparation failed: ${err.message}`];
-                }
-              } else {
-                const normalized = state.normalizedConfig && typeof state.normalizedConfig === 'object'
-                  ? { ...state.normalizedConfig }
-                  : {};
-                if (pointerRegistrySources.length) {
-                  const existing = Array.isArray(normalized.registrySources)
-                    ? normalized.registrySources.filter((entry) => entry && typeof entry === 'object')
-                    : [];
-                  normalized.registrySources = [...existing, ...pointerRegistrySources];
-                }
-                if (sourcesPath) {
-                  normalized.sourcesPath = sourcesPath;
-                }
-                sources = normalized.sources && typeof normalized.sources === 'object'
-                  ? normalized.sources
-                  : {};
-                replaceAlias = normalized.replaceAlias && typeof normalized.replaceAlias === 'object'
-                  ? normalized.replaceAlias
-                  : {};
-                replaceSpec = normalized.replaceSpec && typeof normalized.replaceSpec === 'object'
-                  ? normalized.replaceSpec
-                  : {};
-                allowlist = Array.isArray(normalized.allowlist)
-                  ? normalized.allowlist
-                  : null;
-              }
+  - call: lcod://tooling/value/default_array@0.1.0
+    in:
+      value: $.loadWarnings
+      fallback: []
+    out:
+      loadWarningsSanitized: resolved
 
-              const registryPackages = state.registryPackages && typeof state.registryPackages === 'object'
-                ? state.registryPackages
-                : {};
-              const registryEntries = Array.isArray(state.registryEntries)
-                ? state.registryEntries
-                : [];
-              const registryRegistries = Array.isArray(state.registryRegistries)
-                ? state.registryRegistries
-                : [];
+  - call: lcod://tooling/value/default_array@0.1.0
+    in:
+      value: $.indexWarnings
+      fallback: []
+    out:
+      indexWarningsSanitized: resolved
 
-              const sourceEntries = [];
-              if (sources && typeof sources === 'object' && !Array.isArray(sources)) {
-                for (const [key, value] of Object.entries(sources)) {
-                  if (typeof key === 'string' && key.length > 0) {
-                    sourceEntries.push([key, value]);
-                  }
-                }
-              } else if (Array.isArray(sources)) {
-                for (const entry of sources) {
-                  if (!entry || typeof entry !== 'object') continue;
-                  const key = typeof entry.id === 'string' && entry.id.length > 0
-                    ? entry.id
-                    : (typeof entry.target === 'string' && entry.target.length > 0 ? entry.target : null);
-                  if (!key) continue;
-                  const value = entry.spec && typeof entry.spec === 'object' ? entry.spec : entry;
-                  sourceEntries.push([key, value]);
-                }
-              }
-              const sourceMap = new Map(sourceEntries);
-              const replaceAliasMap = new Map(Object.entries(replaceAlias));
-              const replaceSpecMap = new Map(Object.entries(replaceSpec));
-              const resolved = new Map();
+  - call: lcod://tooling/value/default_array@0.1.0
+    in:
+      value: $.registrationWarnings
+      fallback: []
+    out:
+      registrationWarningsSanitized: resolved
 
-              const hashHex = async (text) => {
-                const res = await imports.hash({ data: text, encoding: 'utf-8' });
-                return res?.hex ? `sha256-${res.hex}` : undefined;
-              };
+  - call: lcod://tooling/value/default_array@0.1.0
+    in:
+      value: $.pointerWarnings
+      fallback: []
+    out:
+      pointerWarningsSanitized: resolved
 
-              const parseToml = async (text) => {
-                const parsed = await imports.tomlParse({ text });
-                return parsed?.value || {};
-              };
+  - call: lcod://impl/set@1
+    in:
+      warningBuckets:
+        - $.normalizedWarningsSanitized
+        - $.loadWarningsSanitized
+        - $.indexWarningsSanitized
+        - $.registrationWarningsSanitized
+        - $.pointerWarningsSanitized
+    out:
+      warningBuckets: warningBuckets
 
-              const joinPath = async (base, segment) => {
-                const joined = await imports.pathJoin({ base, segment });
-                return joined?.path || base;
-              };
+  - call: lcod://tooling/resolver/warnings/merge@0.1.0
+    in:
+      buckets: $.warningBuckets
+    out:
+      mergedWarnings: warnings
 
-              const isAllowed = (candidate) => {
-                if (!allowlist || allowlist.length === 0) return true;
-                return allowlist.some((rule) => {
-                  if (rule.endsWith('*')) {
-                    return candidate.startsWith(rule.slice(0, -1));
-                  }
-                  if (rule.endsWith('/')) {
-                    return candidate.startsWith(rule);
-                  }
-                  return candidate === rule || candidate.startsWith(`${rule}/`);
-                });
-              };
+  - call: lcod://impl/set@1
+    in:
+      normalizedWarnings: $.mergedWarnings
+      pointerWarnings: $.pointerWarningsSanitized
+      pointerRegistrySources: $.pointerRegistrySourcesNormalized
+    out:
+      normalizedWarnings: normalizedWarnings
+      pointerWarnings: pointerWarnings
+      pointerRegistrySources: pointerRegistrySources
 
-              const canonicalizeWorkspaceId = (candidate, manifest) => {
-                if (typeof candidate !== 'string' || !candidate) return candidate;
-                if (candidate.startsWith('lcod://')) return candidate;
-                const aliasMap = manifest?.workspace?.scopeAliases && typeof manifest.workspace.scopeAliases === 'object'
-                  ? manifest.workspace.scopeAliases
-                  : {};
-                const manifestId = typeof manifest?.id === 'string' ? manifest.id : null;
-                const version = typeof manifest?.version === 'string'
-                  ? manifest.version
-                  : (manifestId ? manifestId.split('@').pop() : null);
-                const basePath = (() => {
-                  if (manifestId && manifestId.startsWith('lcod://')) {
-                    return manifestId.slice('lcod://'.length).split('@')[0];
-                  }
-                  const ns = typeof manifest?.namespace === 'string' ? manifest.namespace : null;
-                  const name = typeof manifest?.name === 'string' ? manifest.name : null;
-                  return [ns, name].filter(Boolean).join('/');
-                })();
-                const segments = candidate.replace(/^\.\//, '').split('/').filter(Boolean);
-                if (!basePath || segments.length === 0) return candidate;
-                const alias = segments[0];
-                const mapped = aliasMap[alias] ?? alias;
-                const remainder = segments.slice(1);
-                const fullPath = [basePath, mapped, ...remainder].filter(Boolean).join('/');
-                const ver = version || '0.0.0';
-                return `lcod://${fullPath}@${ver}`;
-              };
+  - call: lcod://tooling/value/is_string_nonempty@0.1.0
+    in:
+      value: $.projectPath
+    out:
+      hasProjectPath: ok
 
-              const canonicalizeRequirements = (requires, manifest) => {
-                if (!Array.isArray(requires)) return [];
-                return requires
-                  .map((dep) => canonicalizeWorkspaceId(dep, manifest))
-                  .filter((dep) => typeof dep === 'string' && dep.length > 0);
-              };
+  - call: lcod://tooling/value/is_string_nonempty@0.1.0
+    in:
+      value: $.cacheRoot
+    out:
+      hasCacheRoot: ok
 
-              const parseComponentId = (identifier) => {
-                if (typeof identifier !== 'string') {
-                  return { base: identifier, version: null };
-                }
-                const atIndex = identifier.lastIndexOf('@');
-                if (atIndex <= 'lcod://'.length) {
-                  return { base: identifier, version: null };
-                }
-                return {
-                  base: identifier.slice(0, atIndex),
-                  version: identifier.slice(atIndex + 1)
-                };
-              };
+  - call: lcod://flow/if@1
+    in:
+      cond: $.hasProjectPath
+    out:
+      projectPath: projectPath
+    slots:
+      then:
+        - call: lcod://impl/set@1
+          in:
+            projectPath: $.projectPath
+          out:
+            projectPath: projectPath
+      else:
+        - call: lcod://impl/set@1
+          in:
+            projectPath: "."
+          out:
+            projectPath: projectPath
 
-              const ensureVersionId = (baseId, version) => {
-                if (!version) return baseId;
-                return `${baseId}@${version}`;
-              };
+  - call: lcod://flow/if@1
+    in:
+      cond: $.hasCacheRoot
+    out:
+      cacheRoot: cacheRoot
+    slots:
+      then:
+        - call: lcod://impl/set@1
+          in:
+            cacheRoot: $.cacheRoot
+          out:
+            cacheRoot: cacheRoot
+      else:
+        - call: lcod://impl/set@1
+          in:
+            cacheRoot: $.projectPath
+          out:
+            cacheRoot: cacheRoot
 
-              const selectReplacement = async (id) => {
-                if (replaceApply) {
-                  const result = await replaceApply({ id, replaceAlias, replaceSpec });
-                  return {
-                    targetId: result?.targetId ?? id,
-                    override: result?.override ?? null,
-                    warnings: Array.isArray(result?.warnings) ? result.warnings : []
-                  };
-                }
+  - call: lcod://tooling/value/is_array@0.1.0
+    in:
+      value: $.normalizedConfigResolved.sources
+    out:
+      normalizedSourcesIsArray: ok
 
-                let current = id;
-                let override = null;
-                const visited = new Set();
-                const localWarnings = [];
-                while (true) {
-                  if (replaceSpecMap.has(current)) {
-                    override = replaceSpecMap.get(current);
-                    break;
-                  }
-                  if (!replaceAliasMap.has(current)) {
-                    break;
-                  }
-                  if (visited.has(current)) {
-                    localWarnings.push(`Replacement cycle detected: ${[...visited, current].join(' -> ')}`);
-                    break;
-                  }
-                  visited.add(current);
-                  current = replaceAliasMap.get(current);
-                }
-                return { targetId: current, override, warnings: localWarnings };
-              };
+  - call: lcod://tooling/value/is_object@0.1.0
+    in:
+      value: $.normalizedConfigResolved.sources
+    out:
+      normalizedSourcesIsObject: ok
 
-              const readDescriptor = async (descriptorPath) => {
-                const file = await imports.fsReadFile({ path: descriptorPath, encoding: 'utf-8' });
-                const text = file?.data ?? '';
-                const descriptor = await parseToml(text);
-                const integrity = await hashHex(text);
-                const requires = Array.isArray(descriptor?.deps?.requires) ? descriptor.deps.requires : [];
-                const childIds = canonicalizeRequirements(requires, descriptor);
-                return { descriptor, descriptorText: text, integrity, childIds };
-              };
+  - call: lcod://tooling/value/is_array@0.1.0
+    in:
+      value: $.configResolved.sources
+    out:
+      configSourcesIsArray: ok
 
-              const resolvePathSpec = async (spec, preload) => {
-                const basePath = spec.path && (spec.path.startsWith('/') || spec.path.startsWith('~'))
-                  ? spec.path
-                  : await joinPath(projectPath, spec.path || '.');
-                if (preload && preload.descriptor && preload.descriptorText) {
-                  const integrity = await hashHex(preload.descriptorText);
-                  const childIds = canonicalizeRequirements(
-                    Array.isArray(preload.descriptor?.deps?.requires) ? preload.descriptor.deps.requires : [],
-                    preload.descriptor
-                  );
-                  return {
-                    descriptor: preload.descriptor,
-                    descriptorText: preload.descriptorText,
-                    integrity,
-                    source: preload.source || { type: 'path', path: basePath },
-                    childIds
-                  };
-                }
-                const descriptorPath = await joinPath(basePath, 'lcp.toml');
-                const data = await readDescriptor(descriptorPath);
-                return {
-                  ...data,
-                  source: { type: 'path', path: basePath }
-                };
-              };
+  - call: lcod://tooling/value/is_object@0.1.0
+    in:
+      value: $.configResolved.sources
+    out:
+      configSourcesIsObject: ok
 
-              const resolveGitSpec = async (id, spec) => {
-                if (typeof spec.url !== 'string' || !spec.url) {
-                  throw new Error(`Missing git url for ${id}`);
-                }
-                const keyPayload = JSON.stringify({ id, url: spec.url, ref: spec.ref ?? null, subdir: spec.subdir ?? null });
-                const keyHash = await imports.hash({ data: keyPayload, encoding: 'utf-8' });
-                const repoRoot = await joinPath(cacheRoot, 'git');
-                const repoDir = await joinPath(repoRoot, keyHash?.hex || 'repo');
-                const descriptorRoot = spec.subdir ? await joinPath(repoDir, spec.subdir) : repoDir;
-                const descriptorPath = await joinPath(descriptorRoot, 'lcp.toml');
+  - call: lcod://impl/set@1
+    in:
+      contractSources: {}
+    out:
+      contractSources: contractSources
 
-                let data;
-                let cloneMeta = null;
-                try {
-                  data = await readDescriptor(descriptorPath);
-                } catch (err) {
-                  const cloneInput = { url: spec.url, dest: repoDir };
-                  if (spec.ref) cloneInput.ref = spec.ref;
-                  if (spec.depth) cloneInput.depth = spec.depth;
-                  if (spec.subdir) cloneInput.subdir = spec.subdir;
-                  if (spec.auth) cloneInput.auth = spec.auth;
-                  cloneMeta = await imports.gitClone(cloneInput);
-                  data = await readDescriptor(descriptorPath);
-                }
+  - call: lcod://flow/if@1
+    in:
+      cond: $.normalizedSourcesIsArray
+    out:
+      contractSources: contractSources
+    slots:
+      then:
+        - call: lcod://impl/set@1
+          in:
+            contractSources: $.normalizedConfigResolved.sources
+          out:
+            contractSources: contractSources
+      else:
+        - call: lcod://flow/if@1
+          in:
+            cond: $.normalizedSourcesIsObject
+          out:
+            contractSources: contractSources
+          slots:
+            then:
+              - call: lcod://impl/set@1
+                in:
+                  contractSources: $.normalizedConfigResolved.sources
+                out:
+                  contractSources: contractSources
+            else:
+              - call: lcod://flow/if@1
+                in:
+                  cond: $.configSourcesIsArray
+                out:
+                  contractSources: contractSources
+                slots:
+                  then:
+                    - call: lcod://impl/set@1
+                      in:
+                        contractSources: $.configResolved.sources
+                      out:
+                        contractSources: contractSources
+                  else:
+                    - call: lcod://flow/if@1
+                      in:
+                        cond: $.configSourcesIsObject
+                      out:
+                        contractSources: contractSources
+                      slots:
+                        then:
+                          - call: lcod://impl/set@1
+                            in:
+                              contractSources: $.configResolved.sources
+                            out:
+                              contractSources: contractSources
+                        else:
+                          - call: lcod://impl/set@1
+                            in:
+                              contractSources: {}
+                            out:
+                              contractSources: contractSources
 
-                const source = {
-                  type: 'git',
-                  url: spec.url,
-                  path: descriptorRoot
-                };
-                if (spec.ref) source.ref = spec.ref;
-                if (spec.subdir) source.subdir = spec.subdir;
-                if (cloneMeta?.commit) source.commit = cloneMeta.commit;
-                if (!source.ref && cloneMeta?.ref) source.ref = cloneMeta.ref;
-                if (cloneMeta?.source?.fetchedAt) source.fetchedAt = cloneMeta.source.fetchedAt;
 
-                return {
-                  descriptor: data.descriptor,
-                  descriptorText: data.descriptorText,
-                  integrity: data.integrity,
-                  source,
-                  childIds: data.childIds
-                };
-              };
+  - call: lcod://core/object/merge@0.1.0
+    in:
+      left: $.specSourcesNormalized
+      right: $.contractSources
+    out:
+      contractSources: value
 
-              const resolveHttpSpec = async (id, spec) => {
-                if (typeof spec.url !== 'string' || !spec.url) {
-                  throw new Error(`Missing http url for ${id}`);
-                }
-                const keyPayload = JSON.stringify({ id, url: spec.url, descriptorPath: spec.descriptorPath ?? null });
-                const keyHash = await imports.hash({ data: keyPayload, encoding: 'utf-8' });
-                const httpRoot = await joinPath(cacheRoot, 'http');
-                const artifactDir = await joinPath(httpRoot, keyHash?.hex || 'artifact');
-                const filename = typeof spec.filename === 'string' && spec.filename ? spec.filename : 'artifact.toml';
-                const artifactPath = await joinPath(artifactDir, filename);
-                const descriptorPath = spec.descriptorPath
-                  ? await joinPath(artifactDir, spec.descriptorPath)
-                  : artifactPath;
+  - call: lcod://tooling/value/default_array@0.1.0
+    in:
+      value: $.normalizedConfigResolved.registrySources
+      fallback: []
+    out:
+      baseRegistrySources: resolved
 
-                let data;
-                try {
-                  data = await readDescriptor(descriptorPath);
-                } catch (err) {
-                  const downloadInput = { url: spec.url, path: artifactPath };
-                  if (spec.method) downloadInput.method = spec.method;
-                  if (spec.headers) downloadInput.headers = spec.headers;
-                  if (spec.query) downloadInput.query = spec.query;
-                  if (spec.timeoutMs) downloadInput.timeoutMs = spec.timeoutMs;
-                  if (spec.followRedirects !== undefined) downloadInput.followRedirects = spec.followRedirects;
-                  if (spec.body !== undefined) downloadInput.body = spec.body;
-                  if (spec.bodyEncoding) downloadInput.bodyEncoding = spec.bodyEncoding;
-                  await imports.httpDownload(downloadInput);
-                  data = await readDescriptor(descriptorPath);
-                }
+  - call: lcod://tooling/array/append@0.1.0
+    in:
+      items: $.baseRegistrySources
+      values: $.pointerRegistrySources
+    out:
+      registrySourcesCombined: items
 
-                const source = {
-                  type: 'http',
-                  url: spec.url,
-                  path: spec.descriptorPath ? artifactDir : descriptorPath
-                };
-                if (spec.descriptorPath) source.descriptorPath = spec.descriptorPath;
-                if (spec.filename) source.filename = filename;
+  - call: lcod://impl/set@1
+    in:
+      contractOverrides:
+        sources: $.contractSources
+        registrySources: $.registrySourcesCombined
+    out:
+      contractOverrides: contractOverrides
 
-                return {
-                  descriptor: data.descriptor,
-                  descriptorText: data.descriptorText,
-                  integrity: data.integrity,
-                  source,
-                  childIds: data.childIds
-                };
-              };
+  - call: lcod://tooling/value/is_string_nonempty@0.1.0
+    in:
+      value: $.sourcesPath
+    out:
+      hasSourcesPath: ok
 
-              const resolveRegistrySpec = async (_id, spec) => {
-                const entry = spec?.entry;
-                const source = entry && typeof entry === 'object'
-                  ? {
-                      type: 'registry',
-                      registryId: entry.registryId,
-                      manifest: entry.manifest,
-                      version: entry.version,
-                      sha256: entry.sha256,
-                      priority: entry.priority
-                    }
-                  : { type: 'registry', reference: spec?.registryId || _id };
-                return {
-                  descriptor: {},
-                  descriptorText: '',
-                  source,
-                  childIds: []
-                };
-              };
+  - call: lcod://flow/if@1
+    in:
+      cond: $.hasSourcesPath
+    out:
+      contractOverrides: contractOverrides
+    slots:
+      then:
+        - call: lcod://core/object/merge@0.1.0
+          in:
+            left: $.contractOverrides
+            right:
+              sourcesPath: $.sourcesPath
+          out:
+            contractOverrides: value
+      else:
+        - call: lcod://impl/set@1
+          in:
+            contractOverrides: $.contractOverrides
+          out:
+            contractOverrides: contractOverrides
 
-              const loadSpec = async (id, spec, preload) => {
-                if (spec?.type === 'path') return resolvePathSpec(spec, preload);
-                if (spec?.type === 'git') return resolveGitSpec(id, spec);
-                if (spec?.type === 'http') return resolveHttpSpec(id, spec);
-                if (spec?.type === 'registry') return resolveRegistrySpec(id, spec);
-                if (preload && preload.descriptor && preload.descriptorText) {
-                  const integrity = await hashHex(preload.descriptorText);
-                  const childIds = canonicalizeRequirements(
-                    Array.isArray(preload.descriptor?.deps?.requires) ? preload.descriptor.deps.requires : [],
-                    preload.descriptor
-                  );
-                  return {
-                    descriptor: preload.descriptor,
-                    descriptorText: preload.descriptorText,
-                    integrity,
-                    source: preload.source || { type: 'path', path: projectPath },
-                    childIds
-                  };
-                }
-                return {
-                  descriptor: {},
-                  descriptorText: '',
-                  source: { type: 'registry', reference: id },
-                  childIds: []
-                };
-              };
+  - call: lcod://tooling/value/default_object@0.1.0
+    in:
+      value: $.contractOverrides
+      fallback: {}
+    out:
+      contractOverridesNormalized: resolved
 
-              const resolveDependency = async (depId, stack = [], preload) => {
-                const originalId = typeof depId === 'string' && depId ? depId : String(depId);
-                if (resolved.has(originalId)) return resolved.get(originalId);
-                if (!isAllowed(originalId)) {
-                  throw new Error(`Dependency ${originalId} is not allowed by resolver configuration`);
-                }
+  - call: lcod://core/object/merge@0.1.0
+    in:
+      left: $.normalizedConfigResolved
+      right: $.contractOverridesNormalized
+    out:
+      normalizedConfig: value
 
-                const { targetId: replacementId, override, warnings: replacementWarnings } = await selectReplacement(originalId);
-                const targetIdInitial = replacementId ?? originalId;
-                if (Array.isArray(replacementWarnings) && replacementWarnings.length > 0) {
-                  warnings.push(...replacementWarnings);
-                }
-                if (!isAllowed(targetIdInitial)) {
-                  throw new Error(`Dependency ${targetIdInitial} (replacement for ${originalId}) is not allowed by resolver configuration`);
-                }
+  - call: lcod://impl/set@1
+    in:
+      contractSourcesSnapshot: $.contractSources
+    out:
+      contractSourcesSnapshot: contractSourcesSnapshot
 
-                if (stack.includes(originalId)) {
-                  warnings.push(`Dependency cycle detected: ${[...stack, originalId].join(' -> ')}`);
-                  return resolved.get(originalId);
-                }
-
-                let spec = override
-                  ?? (preload && originalId === targetIdInitial ? preload.source : undefined)
-                  ?? sourceMap.get(targetIdInitial)
-                  ?? sourceMap.get(originalId);
-
-                let targetId = targetIdInitial;
-
-                const parsedTarget = parseComponentId(targetIdInitial);
-                const baseTargetId = parsedTarget.base;
-                let versionHint = parsedTarget.version;
-                if (spec && typeof spec.version === 'string' && spec.version.length > 0) {
-                  versionHint = spec.version;
-                }
-                const registryHint = spec && typeof spec.registryId === 'string' && spec.registryId.length > 0
-                  ? spec.registryId
-                  : undefined;
-
-                let registryEntry = null;
-                if (!spec || spec.type === 'registry' || !spec.type) {
-                  const request = {
-                    packages: registryPackages,
-                    id: baseTargetId,
-                    range: versionHint,
-                    registryId: registryHint
-                  };
-                  try {
-                    const selection = await imports.registrySelect(request);
-                    registryEntry = selection?.entry || null;
-                    if (!registryEntry) {
-                      const parsedOriginal = parseComponentId(originalId);
-                      request.id = parsedOriginal.base;
-                      request.range = parsedOriginal.version || versionHint;
-                      const fallbackSelection = await imports.registrySelect(request);
-                      registryEntry = fallbackSelection?.entry || null;
-                    }
-                  } catch (err) {
-                    warnings.push(`Registry lookup error for ${originalId}: ${err.message}`);
-                  }
-
-                  if (registryEntry) {
-                    targetId = ensureVersionId(baseTargetId, registryEntry.version || versionHint);
-                    spec = {
-                      type: 'registry',
-                      registryId: registryEntry.registryId,
-                      entry: registryEntry
-                    };
-                  } else if (!spec) {
-                    warnings.push(`Registry lookup failed for ${originalId}`);
-                  }
-                }
-
-                let info;
-                try {
-                  const preloadCandidate = originalId === targetId ? preload : undefined;
-                  info = await loadSpec(targetId, spec, preloadCandidate);
-                } catch (err) {
-                  warnings.push(`Failed to load ${targetId} for ${originalId}: ${err.message}`);
-                  const fallbackSource = spec && spec.type ? spec.type : 'registry';
-                  const fallback = {
-                    id: originalId,
-                    resolved: targetId !== originalId ? targetId : undefined,
-                    source: { type: fallbackSource, reference: targetId },
-                    dependencies: []
-                  };
-                  resolved.set(originalId, fallback);
-                  return fallback;
-                }
-
-                let source = info?.source || { type: 'registry', reference: targetId };
-                if ((!source || source.type === 'registry') && spec && typeof spec === 'object') {
-                  if (spec.type === 'path') {
-                    const basePath = spec.path && (spec.path.startsWith('/') || spec.path.startsWith('~'))
-                      ? spec.path
-                      : await joinPath(projectPath, spec.path || '.');
-                    source = { type: 'path', path: basePath };
-                  } else if (spec.type === 'git' && typeof spec.url === 'string' && spec.url) {
-                    source = info?.source || { type: 'git', url: spec.url };
-                  } else if (spec.type === 'http' && typeof spec.url === 'string' && spec.url) {
-                    source = info?.source || { type: 'http', url: spec.url };
-                    if (!source.descriptorPath && spec.descriptorPath) {
-                      source.descriptorPath = spec.descriptorPath;
-                    }
-                  } else if (spec.type === 'registry' && spec.entry) {
-                    source = info?.source || {
-                      type: 'registry',
-                      registryId: spec.entry.registryId,
-                      manifest: spec.entry.manifest,
-                      version: spec.entry.version,
-                      sha256: spec.entry.sha256
-                    };
-                  }
-                }
-
-                const record = {
-                  id: originalId,
-                  source,
-                  dependencies: []
-                };
-                if (targetId !== originalId) {
-                  record.resolved = targetId;
-                }
-                if (info?.integrity) record.integrity = info.integrity;
-                if (spec?.type === 'registry' && spec.entry) {
-                  record.registry = {
-                    id: spec.entry.registryId,
-                    version: spec.entry.version,
-                    manifest: spec.entry.manifest
-                  };
-                  if (spec.entry.sha256) record.registry.sha256 = spec.entry.sha256;
-                }
-                resolved.set(originalId, record);
-
-                if (spec?.type === 'registry' && (!info?.descriptorText || info.descriptorText.length === 0)) {
-                  const registryLabel = spec.entry?.registryId || registryHint || 'registry';
-                  warnings.push(`Registry manifest selected for ${targetId} from ${registryLabel}; fetching component contents is not yet implemented.`);
-                }
-
-                const childIds = Array.isArray(info?.childIds) ? info.childIds : [];
-                for (const child of childIds) {
-                  if (typeof child !== 'string' || !child) continue;
-                  try {
-                    const childRecord = await resolveDependency(child, [...stack, originalId]);
-                    if (childRecord) record.dependencies.push(childRecord);
-                  } catch (err) {
-                    warnings.push(`Failed to resolve ${child} for ${originalId}: ${err.message}`);
-                  }
-                }
-
-                return record;
-              };
-
-              const rootId = typeof state.rootId === 'string' && state.rootId
-                ? state.rootId
-                : (state.rootDescriptor && state.rootDescriptor.id);
-              const preloadRoot = {
-                descriptor: state.rootDescriptor,
-                descriptorText: state.rootDescriptorText,
-                source: { type: 'path', path: projectPath }
-              };
-
-              const root = rootId
-                ? await resolveDependency(rootId, [], preloadRoot)
-                : {
-                    id: undefined,
-                    source: { type: 'path', path: projectPath },
-                    dependencies: []
-                  };
-              if (!rootId) {
-                warnings.push('Root descriptor is missing an id');
-              }
-
-              return {
-                resolverResult: {
-                  root,
-                  warnings,
-                  registry: {
-                    registries: registryRegistries,
-                    entries: registryEntries,
-                    packages: registryPackages
-                  }
-                },
-                warnings
-              };
-            }
-      input:
-        projectPath: $.projectPath
-        cacheRoot: $.cacheRoot
-        normalizedConfig: $.normalizedConfig
-        config: $.config
-        rootId: $.rootId
-        rootDescriptor: $.rootDescriptor
-        rootDescriptorText: $.rootDescriptorText
-        warnings: $.warnings
-        loadWarnings: $.loadWarnings
-        indexWarnings: $.indexWarnings
-        registrationWarnings: $.registrationWarnings
-        registrySources: $.registrySources
-        registryPackages: $.registryPackages
-        registryEntries: $.registryEntries
-        registryRegistries: $.registryRegistries
-        pointerWarnings: $.pointerWarnings
-        pointerRegistrySources: $.pointerRegistrySources
-        sourcesPath: $.sourcesPath
-      imports:
-        mergeWarnings: lcod://tooling/resolver/warnings/merge@0.1.0
-        contextPrepare: lcod://tooling/resolver/context/prepare@0.1.0
-        replaceApply: lcod://tooling/resolver/replace/apply@0.1.0
-        registrySelect: lcod://tooling/registry/select@0.1.0
-        pathJoin: lcod://axiom/path/join@1
-        fsReadFile: lcod://axiom/fs/read-file@1
-        tomlParse: lcod://axiom/toml/parse@1
-        hash: lcod://contract/core/hash/sha256@1
-        gitClone: lcod://contract/core/git/clone@1
-        httpDownload: lcod://axiom/http/download@1
-        out:
-          resolverResult: resolverResult
-          warnings: warnings
+  - call: lcod://contract/tooling/resolver/resolve_dependencies@1
+    in:
+      projectPath: $.projectPath
+      cacheRoot: $.cacheRoot
+      normalizedConfig: $.normalizedConfig
+      config: $.config
+      rootId: $.rootId
+      rootDescriptor: $.rootDescriptor
+      rootDescriptorText: $.rootDescriptorText
+      warnings: $.normalizedWarnings
+      loadWarnings: $.loadWarnings
+      indexWarnings: $.indexWarnings
+      registrationWarnings: $.registrationWarnings
+      registrySources: $.registrySources
+      registryPackages: $.registryPackages
+      registryEntries: $.registryEntries
+      registryRegistries: $.registryRegistries
+      pointerWarnings: $.pointerWarnings
+      pointerRegistrySources: $.pointerRegistrySources
+      sourcesPath: $.sourcesPath
+      specSources: $.contractSources
     out:
       resolverResult: resolverResult
-      warnings: warnings
+      warnings: resolveWarnings

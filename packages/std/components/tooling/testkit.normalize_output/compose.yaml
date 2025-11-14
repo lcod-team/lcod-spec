@@ -1,76 +1,261 @@
 compose:
-  - call: lcod://tooling/script@1
+  - call: lcod://tooling/value/is_defined@0.1.0
     in:
-      source: |
-        async ({ state }) => {
-          const clone = (value) => {
-            if (value === undefined) {
-              return undefined;
-            }
-            if (value === null) {
-              return null;
-            }
-            if (typeof value !== "object") {
-              return value;
-            }
-            if (Array.isArray(value)) {
-              try {
-                return JSON.parse(JSON.stringify(value));
-              } catch (_err) {
-                return [...value];
-              }
-            }
-            try {
-              return JSON.parse(JSON.stringify(value));
-            } catch (_err) {
-              return { ...value };
-            }
-          };
-
-          const ensurePlainObject = (value) =>
-            value && typeof value === "object" && !Array.isArray(value) ? value : null;
-
-          const normalize = (value) => {
-            if (value === undefined) {
-              return null;
-            }
-            if (value === null) {
-              return null;
-            }
-            if (typeof value !== "object" || Array.isArray(value)) {
-              return value;
-            }
-
-            const object = ensurePlainObject(clone(value));
-            if (!object) {
-              return null;
-            }
-
-            if (Object.prototype.hasOwnProperty.call(object, "result")) {
-              const nested = ensurePlainObject(object.result);
-              if (nested) {
-                return normalize(nested);
-              }
-            }
-
-            const hasShape =
-              Object.prototype.hasOwnProperty.call(object, "value") ||
-              Object.prototype.hasOwnProperty.call(object, "warnings") ||
-              Object.prototype.hasOwnProperty.call(object, "error");
-            if (!hasShape) {
-              return object;
-            }
-
-            return {
-              value: Object.prototype.hasOwnProperty.call(object, "value") ? object.value : null,
-              warnings: Array.isArray(object.warnings) ? [...object.warnings] : [],
-              error: Object.prototype.hasOwnProperty.call(object, "error") ? object.error : null
-            };
-          };
-
-          return { value: normalize(state.value) };
-        }
-      input:
-        value: $.value
+      value: $.value
     out:
-      value: normalized
+      isDefined: ok
+
+  - call: lcod://flow/if@1
+    in:
+      cond: $.isDefined
+    out:
+      normalized: normalized
+    slots:
+      then:
+        - call: lcod://tooling/value/is_object@0.1.0
+          in:
+            value: $.value
+          out:
+            isPlainObject: ok
+
+        - call: lcod://flow/if@1
+          in:
+            cond: $.isPlainObject
+          out:
+            normalized: normalized
+          slots:
+            then:
+              - call: lcod://impl/set@1
+                in:
+                  subject: $.value
+
+              - call: lcod://tooling/object/has@0.1.0
+                in:
+                  target: $.subject
+                  path:
+                    - "result"
+                out:
+                  hasResult: hasKey
+                  resultCandidate: value
+
+              - call: lcod://tooling/value/is_object@0.1.0
+                in:
+                  value: $.resultCandidate
+                out:
+                  resultIsPlain: ok
+
+              - call: lcod://impl/set@1
+                in:
+                  normalizedFromResult: null
+                  handled: false
+
+              - call: lcod://flow/if@1
+                in:
+                  cond: $.hasResult
+                out:
+                  normalizedFromResult: normalizedFromResult
+                  handled: handled
+                slots:
+                  then:
+                    - call: lcod://flow/if@1
+                      in:
+                        cond: $.resultIsPlain
+                      out:
+                        normalizedFromResult: normalizedFromResult
+                        handled: handled
+                      slots:
+                        then:
+                          - call: lcod://tooling/testkit/normalize_output@0.1.0
+                            in:
+                              value: $.resultCandidate
+                            out:
+                              nestedNormalized: value
+                          - call: lcod://impl/set@1
+                            in:
+                              normalizedFromResult: $.nestedNormalized
+                              handled: true
+                        else:
+                          - call: lcod://impl/set@1
+                            in:
+                              normalizedFromResult: null
+                              handled: false
+                  else:
+                    - call: lcod://impl/set@1
+                      in:
+                        normalizedFromResult: null
+                        handled: false
+
+              - call: lcod://flow/if@1
+                in:
+                  cond: $.handled
+                out:
+                  normalized: normalized
+                slots:
+                  then:
+                    - call: lcod://impl/set@1
+                      in:
+                        normalized: $.normalizedFromResult
+                  else:
+                    - call: lcod://tooling/object/has@0.1.0
+                      in:
+                        target: $.subject
+                        path:
+                          - "value"
+                      out:
+                        hasValue: hasKey
+                        valueField: value
+
+                    - call: lcod://tooling/object/has@0.1.0
+                      in:
+                        target: $.subject
+                        path:
+                          - "warnings"
+                      out:
+                        hasWarnings: hasKey
+                        warningsField: value
+
+                    - call: lcod://tooling/object/has@0.1.0
+                      in:
+                        target: $.subject
+                        path:
+                          - "error"
+                      out:
+                        hasError: hasKey
+                        errorField: value
+
+                    - call: lcod://impl/set@1
+                      in:
+                        shouldShape: false
+
+                    - call: lcod://flow/if@1
+                      in:
+                        cond: $.hasValue
+                      out:
+                        shouldShape: shouldShape
+                      slots:
+                        then:
+                          - call: lcod://impl/set@1
+                            in:
+                              shouldShape: true
+                        else:
+                          - call: lcod://flow/if@1
+                            in:
+                              cond: $.hasWarnings
+                            out:
+                              shouldShape: shouldShape
+                            slots:
+                              then:
+                                - call: lcod://impl/set@1
+                                  in:
+                                    shouldShape: true
+                              else:
+                                - call: lcod://flow/if@1
+                                  in:
+                                    cond: $.hasError
+                                  out:
+                                    shouldShape: shouldShape
+                                  slots:
+                                    then:
+                                      - call: lcod://impl/set@1
+                                        in:
+                                          shouldShape: true
+                                    else:
+                                      - call: lcod://impl/set@1
+                                        in:
+                                          shouldShape: false
+
+                    - call: lcod://flow/if@1
+                      in:
+                        cond: $.shouldShape
+                      out:
+                        normalized: normalized
+                      slots:
+                        then:
+                          - call: lcod://flow/if@1
+                            in:
+                              cond: $.hasValue
+                            out:
+                              resolvedValue: resolvedValue
+                            slots:
+                              then:
+                                - call: lcod://impl/set@1
+                                  in:
+                                    resolvedValue: $.valueField
+                              else:
+                                - call: lcod://impl/set@1
+                                  in:
+                                    resolvedValue: null
+
+                          - call: lcod://flow/if@1
+                            in:
+                              cond: $.hasWarnings
+                            out:
+                              resolvedWarnings: resolvedWarnings
+                            slots:
+                              then:
+                                - call: lcod://tooling/value/is_array@0.1.0
+                                  in:
+                                    value: $.warningsField
+                                  out:
+                                    warningsAreArray: ok
+                                - call: lcod://flow/if@1
+                                  in:
+                                    cond: $.warningsAreArray
+                                  out:
+                                    resolvedWarnings: resolvedWarnings
+                                  slots:
+                                    then:
+                                      - call: lcod://tooling/value/clone@0.1.0
+                                        in:
+                                          value: $.warningsField
+                                        out:
+                                          clonedWarnings: value
+                                      - call: lcod://impl/set@1
+                                        in:
+                                          resolvedWarnings: $.clonedWarnings
+                                    else:
+                                      - call: lcod://impl/set@1
+                                        in:
+                                          resolvedWarnings: []
+                              else:
+                                - call: lcod://impl/set@1
+                                  in:
+                                    resolvedWarnings: []
+
+                          - call: lcod://flow/if@1
+                            in:
+                              cond: $.hasError
+                            out:
+                              resolvedError: resolvedError
+                            slots:
+                              then:
+                                - call: lcod://impl/set@1
+                                  in:
+                                    resolvedError: $.errorField
+                              else:
+                                - call: lcod://impl/set@1
+                                  in:
+                                    resolvedError: null
+
+                          - call: lcod://impl/set@1
+                            in:
+                              normalized:
+                                value: $.resolvedValue
+                                warnings: $.resolvedWarnings
+                                error: $.resolvedError
+                        else:
+                          - call: lcod://impl/set@1
+                            in:
+                              normalized: $.subject
+            else:
+              - call: lcod://impl/set@1
+                in:
+                  normalized: $.value
+      else:
+        - call: lcod://impl/set@1
+          in:
+            normalized: null
+
+  - call: lcod://impl/set@1
+    in:
+      value: $.normalized

@@ -30,39 +30,59 @@ compose:
           out:
             warning: warning
 
-  - call: lcod://flow/try@1
+  - call: lcod://contract/core/json/decode@1
     in:
       text: $.text
+    out:
+      decodedValue: value
+      decodeError: error
+
+  - call: lcod://tooling/value/is_object@0.1.0
+    in:
+      value: $.decodedValue
+    out:
+      decodedIsObject: ok
+
+  - call: lcod://tooling/value/is_object@0.1.0
+    in:
+      value: $.decodeError
+    out:
+      decodeErrorIsObject: ok
+
+  - call: lcod://flow/if@1
+    in:
+      cond: $.decodedIsObject
     out:
       value: value
       warnings: warnings
       error: error
     slots:
-      body:
-        - call: lcod://contract/core/json/decode@1
+      then:
+        - call: lcod://impl/set@1
           in:
-            text: $.text
+            value: $.decodedValue
+            warnings: []
+            error: null
           out:
-            decoded: value
-        - call: lcod://tooling/value/is_object@0.1.0
-          in:
-            value: $.decoded
-          out:
-            isObject: ok
+            value: value
+            warnings: warnings
+            error: error
+      else:
         - call: lcod://flow/if@1
           in:
-            cond: $.isObject
+            cond: $.decodeErrorIsObject
           out:
-            normalizedValue: value
-            normalizedWarnings: warnings
-            normalizedError: error
+            value: value
+            warnings: warnings
+            error: error
           slots:
             then:
               - call: lcod://impl/set@1
                 in:
-                  value: $.decoded
-                  warnings: []
-                  error: null
+                  value: $.fallbackObject
+                  warnings:
+                    - $.resolvedWarning
+                  error: $.decodeError
                 out:
                   value: value
                   warnings: warnings
@@ -79,15 +99,3 @@ compose:
                   value: value
                   warnings: warnings
                   error: error
-      catch:
-        - call: lcod://impl/set@1
-          in:
-            value: $.fallbackObject
-            warnings:
-              - $.resolvedWarning
-            error:
-              message: $.error.message
-          out:
-            value: value
-            warnings: warnings
-            error: error

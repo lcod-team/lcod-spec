@@ -1,0 +1,60 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": ["projectPath", "cacheRoot", "normalizedConfig", "rootDescriptor", "rootDescriptorText"],
+  "properties": {
+    "projectPath": {
+      "type": "string",
+      "description": "Base project directory."
+    },
+    "cacheRoot": {
+      "type": "string",
+      "description": "Cache directory used for downloads."
+    },
+    "normalizedConfig": {
+      "type": "object",
+      "description": "Normalized configuration produced by prepare-config."
+    },
+    "config": {
+      "type": "object",
+      "description": "Raw resolver configuration (pre-normalization)."
+    },
+    "rootId": {
+      "type": ["string", "null"],
+      "description": "Explicit root id if provided."
+    },
+    "rootDescriptor": {
+      "type": "object",
+      "description": "Parsed root descriptor."
+    },
+    "rootDescriptorText": {
+      "type": "string",
+      "description": "Raw root descriptor contents."
+    },
+    "warnings": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Existing warnings to propagate."
+    },
+    "registryPackages": {
+      "type": "object",
+      "description": "Packages indexed from the registry helper step."
+    },
+    "registryEntries": {
+      "type": "array",
+      "items": { "type": "object" },
+      "description": "Flattened registry entries used for inspection."
+    },
+    "registryRegistries": {
+      "type": "array",
+      "items": { "type": "object" },
+      "description": "Registry descriptors collected from JSONL streams."
+    },
+    "registryWarnings": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Warnings produced while loading registry metadata."
+    }
+  },
+  "additionalProperties": true
+}

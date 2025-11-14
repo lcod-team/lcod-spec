@@ -1,21 +1,62 @@
 compose:
-  - call: lcod://tooling/script@1
+  - call: lcod://tooling/value/default_array@0.1.0
     in:
-      source: |
-        async ({ input }) => {
-          const buckets = Array.isArray(input.buckets) ? input.buckets : [];
-          const warnings = [];
-          for (const bucket of buckets) {
-            if (!Array.isArray(bucket)) continue;
-            for (const message of bucket) {
-              if (typeof message === 'string' && message.length > 0) {
-                warnings.push(message);
-              }
-            }
-          }
-          return { warnings };
-        }
-      input:
-        buckets: $.buckets
+      value: $.buckets
     out:
-      warnings: =
+      bucketCandidates: resolved
+
+  - call: lcod://flow/foreach@1
+    in:
+      list: $.bucketCandidates
+    collectPath: $.normalizedBucket
+    out:
+      normalizedBuckets: results
+    slots:
+      body:
+        - call: lcod://tooling/value/default_array@0.1.0
+          in:
+            value: $slot.item
+          out:
+            normalizedBucket: resolved
+      else: []
+
+  - call: lcod://tooling/array/flatten@0.1.0
+    in:
+      items: $.normalizedBuckets
+    out:
+      flatCandidates: values
+
+  - call: lcod://flow/foreach@1
+    in:
+      list: $.flatCandidates
+    collectPath: $.messageCandidate
+    out:
+      candidateWarnings: results
+    slots:
+      body:
+        - call: lcod://tooling/value/is_string_nonempty@0.1.0
+          in:
+            value: $slot.item
+          out:
+            isString: ok
+        - call: lcod://flow/if@1
+          in:
+            cond: $.isString
+          out:
+            messageCandidate: messageCandidate
+          slots:
+            then:
+              - call: lcod://impl/set@1
+                in:
+                  messageCandidate: $slot.item
+            else:
+              - call: lcod://impl/set@1
+                in:
+                  messageCandidate: null
+      else: []
+
+  - call: lcod://tooling/array/compact@0.1.0
+    in:
+      items: $.candidateWarnings
+    out:
+      warnings: values
