@@ -1,17 +1,18 @@
 # Principes LCOD (version KISS)
 
-1. **Chaque composant est une boîte noire lisible.** Son `lcp.toml` décrit inputs/outputs/slots, et le compose reste assez court pour tenir sur un écran.
-2. **Un compose raconte une histoire.** Les étapes sont nommées, les blocs sont ordonnés pour que n’importe qui comprenne le flux sans scripts.
-3. **Pas de magie implicite.** Toute dépendance (contrat, helper, manifest) est déclarée explicitement.
-4. **Les slots sont des fonctions.** Ils reçoivent un état, produisent un état, et n’éditent rien en douce.
-5. **On préfère les helpers aux scripts.** Dès qu’un pattern revient, on factorise un composant `tooling/*` plutôt que d’injecter du JS.
-6. **Les kernels restent minces.** Toute logique portable vit dans des composés/contrats ; le runtime ne gère que l’exécution.
-7. **Les manifests locaux priment.** `LCOD_WORKSPACE_PATHS` et `SPEC_REPO_PATH` sont toujours respectés pour travailler hors réseau.
-8. **Sanitizer strict.** Seuls les inputs/outputs déclarés circulent, aucun champ fantôme.
-9. **Résolution déterministe.** Resolver lit d’abord les sources locales, puis les catalogues, sans heuristiques cachées.
-10. **Testkit au même niveau que le code.** Chaque package fournit ses composes de tests (`tests/testkit/**`) et un plan pour les lancer en une commande.
-11. **Docs embarquées.** Toute nouvelle primitive vient avec README, schéma, et exemple mermaid quand pertinent.
-12. **Observabilité intégrée.** Loggers (`tooling/log`, contextes) sont présents dès le prototype pour éviter les “console.log”.
-13. **Pas de copies inutiles.** Les contrats manipulent les mêmes instances sauf si la sécurité impose une duplication.
-14. **Fallback prévisible.** Quand une ressource manque, la warning l’explique et indique la stratégie de repli.
-15. **Toujours KISS.** Si une compose nécessite plusieurs écrans ou des centaines de lignes, on la fragmente.
+1. **Composant = boîte noire lisible.** Le `lcp.toml` décrit inputs/outputs/slots ; le compose tient en un écran et reste auto-portant.
+2. **Compose = fonction.** On nomme les étapes pour la compréhension, mais on garde l’esprit “j’implémente une fonction”, sans narration inutile.
+3. **Implication évidente, pas de magie cachée.** Spread/déstructuration autorisés s’ils sont intuitifs ; toutes les dépendances restent déclarées.
+4. **Slots = lambdas avec scope parent.** Un compose crée son scope, le slot hérite du scope appelant + ses variables locales et peut modifier le parent (objectif v2 formalisé).
+5. **Factoriser dès que possible.** Dès qu’un pattern revient, on crée un helper `tooling/*` plutôt que d’injecter un script.
+6. **Kernel minimal (RPython-like).** Exécution, slots, IO : rien d’autre. Toute logique portable vit dans des composés/contrats.
+7. **Lookup déterministe : local → projet → workspace → user → cache → registry.** L’ordre est public et constant.
+8. **Sanitizer strict mais flexible.** Seuls inputs/outputs déclarés circulent ; un paramètre peut être `any` pour transporter une structure libre.
+9. **Resolver transparent.** Suit la même chaîne de lookup, warning clair dès qu’on sort du best-case.
+10. **Testkit recommandé, pas imposé.** LCOD fonctionne sans, mais chaque package devrait fournir `tests/testkit/**` + plan d’exécution local.
+11. **Docs inline uniques.** README/schémas générés depuis `lcp.toml` pour éviter les divergences.
+12. **Logs dès le prototype.** `tooling/log` et ses contextes remplacent les `console.log` dès le premier jour.
+13. **Pas de copies inutiles.** On réutilise les mêmes instances pour mémoire et perfs ; clone uniquement quand sécurité/parallélisme l’exigent.
+14. **Exceptions > fallback lourds.** Le happy path doit rester fluide ; on laisse remonter l’exception et on la traite au niveau opportun.
+15. **Scopes explicites.** Compose arrive avec son scope vierge (rempli des entrées). Sous-compose/slot garde une référence sur le scope parent + ses locales.
+16. **Toujours KISS.** Modules courts, une responsabilité, composition explicite.
