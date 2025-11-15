@@ -1,34 +1,29 @@
 # LCOD v2 – System Overview
 
 ```mermaid
-digraph G {
-  rankdir=LR;
-  subgraph cluster_runtime {
-    label="Runtime";
-    style=rounded;
-    "Compose Engine" -> "Flow Blocks";
-    "Flow Blocks" -> "Slots";
-    "Compose Engine" -> "Scope Lookup";
-  }
+flowchart LR
+  subgraph Runtime
+    direction TB
+    CE[Compose Engine] --> FB[Flow Blocks]
+    FB --> SL[Slots]
+    CE --> SC[Scope Lookup]
+  end
 
-  subgraph cluster_resolver {
-    label="Resolver";
-    style=rounded;
-    "Resolver Pipeline" -> "Catalogue Loader";
-    "Resolver Pipeline" -> "Dependency Graph";
-  }
+  subgraph Resolver
+    direction TB
+    RP[Resolver Pipeline] --> CL[Catalogue Loader]
+    RP --> DG[Dependency Graph]
+  end
 
-  subgraph cluster_tooling {
-    label="Tooling";
-    style=rounded;
-    "Spec Toolkit" -> "Testkit";
-    "Spec Toolkit" -> "Component Docs";
-  }
+  subgraph Tooling
+    direction TB
+    ST[Spec Toolkit] --> TK[Testkit]
+    ST --> CD[Component Docs]
+  end
 
-  "Runtime" -> "Resolver" [label="manifest lookup"];
-  "Resolver" -> "Tooling" [label="catalogue exports"];
-  "Tooling" -> "Runtime" [label="lcp manifests"];
-}
+  Runtime -->|manifest lookup| Resolver
+  Resolver -->|catalogue exports| Tooling
+  Tooling -->|lcp manifests| Runtime
 ```
 
 - **Runtime**: run-compose execution, slots/scopes, kernel bridges.
