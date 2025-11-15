@@ -15,4 +15,5 @@
 13. **Pas de copies inutiles.** On réutilise les mêmes instances pour mémoire et perfs ; clone uniquement quand sécurité/parallélisme l’exigent.
 14. **Exceptions > fallback lourds.** Le happy path doit rester fluide ; on laisse remonter l’exception et on la traite au niveau opportun.
 15. **Scopes explicites.** Compose arrive avec son scope vierge (rempli des entrées). Sous-compose/slot garde une référence sur le scope parent + ses locales.
-16. **Toujours KISS.** Modules courts, une responsabilité, composition explicite.
+16. **Gestion d’exception explicite.** On doit pouvoir exprimer `try/catch/finally` dans un compose : un slot capture, décide de traiter ou relancer, et une exception non gérée remonte naturellement (format `{name, message, payload}` partagé).
+17. **Toujours KISS.** Modules courts, une responsabilité, composition explicite.
