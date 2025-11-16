@@ -20,4 +20,27 @@ This folder collects design sketches, diagrams, and notes for a v2 architecture 
 - [`handles.md`](handles.md) – handle/trait model for native resources.
 - `subsystems/` – per-area breakdown (resolver, runtime, tooling, etc.).
 
+## Project matrix
+
+| Subsystem / Command | Repository (branch `v2`) | Depends on |
+| --- | --- | --- |
+| Runtime (`runComponent`, kernels) | `lcod-kernel-rs`, `lcod-kernel-js`, `lcod-kernel-java` | Resolver artifacts, spec contracts |
+| Resolver (component lookup) | `lcod-resolver` | Spec (meta+compose), handles, RAG |
+| Spec (contracts/components) | `lcod-spec` | -- |
+| Tooling/Testkit | `lcod-spec` + `lcod-components` | Runtime & resolver APIs |
+| Pipeline (extract/translate/assemble) | `lcod-spec` (`tooling/*`) | RAG bases, resolver |
+| RAG (functions/components) | `lcod-components` (or dedicated repo) | Spec schema (meta+ast) |
+| CLI/Host (`lcod run`) | `lcod-cli` | Kernels, resolver |
+| Registry/catalog | `lcod-components` / future repo | Spec exports, resolver |
+
+Dependencies (simplified):
+
+```mermaid
+flowchart LR
+  Spec --> Resolver --> Kernels --> CLI
+  Spec --> Tooling --> Pipeline --> RAG
+  Resolver --> Tooling
+  Registry --> Resolver
+```
+
 Feel free to add new sketches; keep each file focused and reference diagrams from the overview for easy navigation.
