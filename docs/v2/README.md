@@ -17,6 +17,7 @@ This folder collects design sketches, diagrams, and notes for a v2 architecture 
 - [`exceptions.md`](exceptions.md) – error handling contract.
 - [`principes.md`](principes.md) – KISS principles.
 - [`roadmap.md`](roadmap.md) – build order & branches.
+- [`handles.md`](handles.md) – handle/trait model for native resources.
 - `subsystems/` – per-area breakdown (resolver, runtime, tooling, etc.).
 
 Feel free to add new sketches; keep each file focused and reference diagrams from the overview for easy navigation.
