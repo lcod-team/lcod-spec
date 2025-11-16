@@ -8,7 +8,7 @@
 1. **Minimal runtime**: `runComponent/runCompose/runSlot`, strict sanitizer, shared scope + exceptions.
 2. **Resolver v2**: load `meta+compose`, deterministic lookup, local cache, introspection.
 3. **Tooling v2**: introspection (`meta+ast`), graphs, minimal v2 testkit.
-4. **Top-down pipeline**: `extract/*`, `translate/*`, `assemble/*` as in `approche-haut-niveau.md`.
+4. **Top-down pipeline**: `extract/*`, `translate/*`, `assemble/*` as in [`high-level-approach.md`](high-level-approach.md).
 5. **RAG v2**: YAML/JSON storage for functions/components + lookup/insert APIs.
 6. **UI/Docs**: Mermaid/UML generation for subsystems.
 

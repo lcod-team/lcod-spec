@@ -10,7 +10,8 @@
   1. If the key exists locally → update local value (classic shadowing).
   2. Else if the key exists in parent → update the parent (direct mutation).
   3. Else → create the key locally.
-  This avoids boilerplate while keeping the ability to mask values.
+  This avoids boilerplate while keeping the ability to mask values and lets deep slots (A→B→C) update ancestors when the key already exists in the parent chain.
+  New variables can still be created implicitly (no `var` required), though optional descriptors may be introduced later for tooling/linting.
 
 ## 3. Read-only slots
 - Some slots (listeners, parallel work) can be flagged **read-only**: no parent mutations allowed.
@@ -42,5 +43,5 @@ sequenceDiagram
   else key missing
     Slot->>Slot: create local key
   end
-  Parent<- -Slot: out values copied back per parent definition
+  Parent <-- Slot: out values copied back per parent definition
 ```
