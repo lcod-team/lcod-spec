@@ -58,6 +58,7 @@ sequenceDiagram
   participant Kernel
   participant Resolver
   CLI->>Kernel: runComponent(id, inputs)
+  Kernel->>Kernel: load bundled spec/resolver
   Kernel->>Resolver: resolver(id)
   Resolver-->>Kernel: meta + compose
   Kernel->>Kernel: prepareScope(meta, parentScope, inputs)
