@@ -31,6 +31,7 @@
 ## `resolver(id)`
 - Deterministic lookup (local → project → workspace → user → cache → registry).
 - Returns `meta + compose` (or axiom/contract stub).
+- Kernels ship with a bundled spec + resolver path so they can bootstrap themselves before honoring external lookup entries.
 
 ## Associated helpers
 - `runTry(scope, block)` : implements `try/catch/finally` using `{name,message,payload,trace}`.

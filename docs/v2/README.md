@@ -24,7 +24,7 @@ This folder collects design sketches, diagrams, and notes for a v2 architecture 
 
 | Subsystem / Command | Repository (branch `v2`) | Depends on |
 | --- | --- | --- |
-| Runtime (`runComponent`, kernels) | `lcod-kernel-rs`, `lcod-kernel-js`, `lcod-kernel-java` | Resolver artifacts, spec contracts |
+| Runtime (`runComponent`, kernels) | `lcod-kernel-rs`, `lcod-kernel-js`, `lcod-kernel-java` | Resolver artifacts, spec contracts (no CLI dependency) |
 | Resolver (component lookup) | `lcod-resolver` | Spec (meta+compose), handles, RAG |
 | Spec (contracts/components) | `lcod-spec` | -- |
 | Tooling/Testkit | `lcod-spec` + `lcod-components` | Runtime & resolver APIs |
@@ -32,6 +32,8 @@ This folder collects design sketches, diagrams, and notes for a v2 architecture 
 | RAG (functions/components) | `lcod-components` (or dedicated repo) | Spec schema (meta+ast) |
 | CLI/Host (`lcod run`) | `lcod-cli` | Kernels, resolver |
 | Registry/catalog | `lcod-components` / future repo | Spec exports, resolver |
+
+Kernels can run standalone (via their wrappers); the CLI simply hosts them when needed. Each kernel must embed the bundled spec + resolver in its lookup paths to bootstrap before honoring user/workspace/catalog lookups.
 
 Dependencies (simplified):
 
