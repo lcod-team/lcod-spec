@@ -10,7 +10,7 @@
   1. If the key exists locally → update local value (classic shadowing).
   2. Else if the key exists in parent → update the parent (direct mutation).
   3. Else → create the key locally.
-  This avoids boilerplate while keeping the ability to mask values and lets deep slots (A→B→C) update ancestors when the key already exists in the parent chain.
+  This avoids boilerplate while keeping the ability to mask values. **Any nested slot (A→B→C)** can update keys from the root scope as soon as those keys exist somewhere in the chain.
   New variables can still be created implicitly (no `var` required), though optional descriptors may be introduced later for tooling/linting.
 
 ## 3. Read-only slots
@@ -18,8 +18,52 @@
 - Modifiers: `writeParent: true|false`, `isolate: true|false` depending on execution constraints.
 
 ## 4. Propagation / `out`
-- `out` belongs to the parent (the caller). It states which keys from the slot should be copied back (e.g. a `filter` component expects slot `predicate` to return `true/false`).
+- `out` belongs to the parent (the caller). It describes what the parent expects to retrieve from the slot (e.g. `removeIf` expects slot `predicate` to return `true/false`).
+- Slots execute freely; once finished, the parent copies the declared values into its own scope and continues.
 - Helpers (`tooling/value/branch`, `tooling/object/apply`) encapsulate this copy for author convenience.
+
+### Example
+```yaml
+# A.yaml
+var value = 3
+call: lcod://array/remove_if@1
+  in:
+    list: $.numbers
+  slots:
+    predicate:
+      - call: lcod://number/gt@1
+        in:
+          left: $.item
+          right: $.value
+        out:
+          result: keep
+```
+
+```yaml
+# remove_if compose
+- call: lcod://flow/foreach@1
+  in:
+    items: $.list
+  slots:
+    body:
+      - call: lcod://slot/run@1
+        in:
+          slot: "predicate"
+          state:
+            item: $.item
+            index: $.index
+        out:
+          result: predicateResult
+      - call: lcod://flow/if@1
+        in:
+          cond: $.predicateResult
+        slots:
+          then:
+            - call: lcod://array/remove@1
+              in:
+                list: $.list
+                index: $.index
+```
 
 ## 5. Kernel implementation hints
 - Each `scope` carries a pointer to its parent; getters/setters walk the chain when necessary.
