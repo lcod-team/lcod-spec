@@ -32,6 +32,19 @@
 - Deterministic lookup (local → project → workspace → user → cache → registry).
 - Returns `meta + compose` (or axiom/contract stub).
 - Kernels ship with a bundled spec + resolver path so they can bootstrap themselves before honoring external lookup entries.
+- Lookup entries reference *packages* (directories, archives, registries). They simply extend the search path. Components are loaded lazily: when a `call lcod://pkg/component` appears, the resolver walks the path, fetches `meta+compose` (disk/cache/registry), caches it, then hands it to the runtime.
+
+```mermaid
+sequenceDiagram
+  participant Runtime
+  participant Resolver
+  participant Package
+  Runtime->>Resolver: resolve(lcod://pkg/component)
+  Resolver->>Package: load meta+compose (on demand)
+  Package-->>Resolver: component payload
+  Resolver-->>Runtime: meta + compose
+  Runtime->>Runtime: runCompose(meta, compose)
+```
 
 ## Associated helpers
 - `runTry(scope, block)` : implements `try/catch/finally` using `{name,message,payload,trace}`.
