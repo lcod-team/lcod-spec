@@ -15,9 +15,9 @@ Objectif : partir du besoin utilisateur (prompt) et le transformer en code exéc
    - Backend : `tooling/extract/service@0.1.0` mappe chaque service vers la base `RAG functions`. Réutilise si trouvé, sinon invente nom/description/paramètres et l’ajoute à la base.
    - Frontend : `tooling/extract/page@0.1.0` fait de même avec `RAG components` pour les structures UI.
 
-4. **Transformation YAML → code**
-   - Backend : `tooling/translate/service@0.1.0` convertit le YAML en Node/TS en invoquant les fonctions mentionnées (ou en générant des stubs).
-   - Frontend : `tooling/translate/page@0.1.0` génère HTML/CSS/JS (ou framework cible) à partir du YAML.
+4. **Transformation YAML → artefacts exécutables**
+   - Backend : `tooling/translate/service@0.1.0` prépare des descripteurs/pipelines que les kernels peuvent interpréter (YAML enrichi, manifests, stubs) pour appeler directement les fonctions référencées.
+   - Frontend : `tooling/translate/page@0.1.0` produit les descripteurs UI nécessaires pour que le kernel/frontend runner interprète les composants (avec génération de code optionnelle plus tard).
 
 5. **Assemblage**
    - `tooling/assemble/backend@0.1.0` et `tooling/assemble/frontend@0.1.0` agrègent les artefacts générés dans un projet complet.
