@@ -1,25 +1,41 @@
-# Gestion des exceptions (LCOD v2)
+# Exception handling (LCOD v2)
 
-## 1. Format standard
+## 1. Standard format
 - Exception = `{ name, message, payload, trace }`.
-- `trace` : pile des composants/slots traversés (`[{ componentId, slot?, info }]`). Mise à jour par le kernel à chaque remontée pour conserver le contexte.
+- `trace`: stack of components/slots traversed (`[{ componentId, slot?, info }]`). The kernel updates it at every hop.
 
-## 2. Primitive `throw`
-- Composant `lcod://tooling/exception/throw@1` : prend `name`, `message`, `payload`, arrête l’exécution et remonte l’exception au slot/pipeline supérieur.
+## 2. `throw` primitive
+- Component `lcod://tooling/exception/throw@1`: takes `name`, `message`, `payload`, stops execution and bubbles up the exception.
 
 ## 3. `flow/try` (v2)
-- Slots : `body`, `catch`, `finally`.
-- Exécution :
-  1. `body` s’exécute ; si aucune exception, on passe à `finally`.
-  2. Si `body` lance une exception :
-     - `catch` reçoit l’objet complet (`state.error` contient `name/message/payload/trace`). Il peut traiter l’erreur ou relancer via `throw` (la trace est préservée).
-     - `finally` s’exécute ensuite, qu’il y ait eu traitement ou non.
-- Si aucun `catch` défini, l’exception remonte immédiatement.
+- Slots: `body`, `catch`, `finally`.
+- Execution:
+  1. Run `body`; if no exception → go to `finally`.
+  2. If `body` throws:
+     - `catch` receives the full object (`state.error` has `name/message/payload/trace`). It can handle or rethrow via `throw` (trace preserved).
+     - `finally` always runs afterwards.
+- If no `catch`, the exception bubbles immediately.
 
 ## 4. Propagation
-- `runComponent` laisse remonter jusqu’au prochain `flow/try`. Sans catch, l’erreur atteint l’appelant (compose parent, puis CLI/host).
-- Les kernels peuvent ajouter des métadonnées (stack trace) mais doivent préserver la forme `{ name, message, payload }`.
+- `runComponent` lets the error climb to the next `flow/try`. Without catch, it reaches the caller (parent compose, then CLI/host).
+- Kernels may enrich metadata (stack trace) but must keep `{ name, message, payload, trace }` intact.
 
 ## 5. Helpers
-- `tooling/exception/rethrow@1` : relance l’exception reçue (utile dans un catch conditionnel).
-- `tooling/exception/match@1` : test sur `name`/`payload` pour router vers différents slots.
+- `tooling/exception/rethrow@1`: rethrow the received exception (useful in conditional catches).
+- `tooling/exception/match@1`: match `name`/`payload` to route to different slots.
+
+```mermaid
+sequenceDiagram
+  participant Body
+  participant Catch
+  participant Finally
+  Body->>Body: work()
+  alt error thrown
+    Body-->>Catch: exception {name,message,payload,trace}
+    Catch->>Catch: handle or throw
+    Catch-->>Finally: continue
+  else no error
+    Body-->>Finally: normal exit
+  end
+  Finally->>Finally: cleanup
+```

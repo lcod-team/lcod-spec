@@ -1,25 +1,36 @@
-# Composants structurants (LCOD v2)
+# Structural components (LCOD v2)
 
-## 1. Rôle
-Tous les composants ne sont pas purement algorithmiques : certains décrivent des structures (layout, pipeline, page). Les slots servent alors d'emplacements nommés pour organiser les enfants.
+## 1. Purpose
+Not every component is purely algorithmic: some describe structures (layout, pipeline, page). Slots become named positions to organize children.
 
-## 2. Slots catégorisés
-- Un composant peut définir plusieurs slots (`header`, `body`, `footer`, `sidebar`, etc.).
-- Chaque slot peut accepter zéro ou plusieurs enfants (cardinalité, optionnel, read-only...).
-- Les enfants insérés dans ces slots peuvent eux-mêmes être structurants ou algorithmiques.
+## 2. Categorized slots
+- A component may expose multiple slots (`header`, `body`, `footer`, `sidebar`, ...).
+- Each slot can accept zero or more children (cardinality, optional flag, read-only behavior).
+- Children may themselves be structural or algorithmic.
 
-## 3. Introspection nécessaire
-Pour naviguer dans ces structures (LLM ou humain), il faut pouvoir lister :
-- Les slots disponibles et leur description.
-- Les composants enfants réellement branchés dans chaque slot (via l’AST).
-- Les liens hiérarchiques (graphes Mermaid, arbres). D'où l'importance du format `meta + ast` et des outils d'introspection (`tooling/component/introspect`, `tooling/component/graph`).
+## 3. Required introspection
+To navigate these structures (LLM or human) we must list:
+- Slots and their descriptions.
+- Actual children wired into each slot (from the AST).
+- Hierarchical links (Mermaid graphs, trees). Hence the need for `meta + ast` and the introspection tooling.
 
-## 4. Exemples
-- `layout/page@1` : slots `header`, `content`, `footer`.
-- `pipeline/handler@1` : slots `before`, `after`, `error`.
-- `tooling/testkit/unit@1` : slot `compose` qui encapsule un plan de test.
+## 4. Examples
+- `layout/page@1`: slots `header`, `content`, `footer`.
+- `pipeline/handler@1`: slots `before`, `after`, `error`.
+- `tooling/testkit/unit@1`: slot `compose` encapsulating a test plan.
 
 ## 5. Implications
-- Les kernels doivent traiter ces composants comme n'importe quel compose : exécuter chaque slot si présent.
-- Les outils (docs, RAG, plan) doivent pouvoir extraire la structure pour générer des visualisations, faire de la recherche, etc.
-- Les slots peuvent imposer des contraintes (type des enfants, cardinalité). Ces contraintes doivent être décrites dans `meta` (JSON Schema, validation).
+- Kernels execute structural components like any compose: run each slot when present.
+- Tooling (docs, RAG, plan) must extract the structure for visualization and search.
+- Slots may enforce constraints (child type, cardinality) described in `meta` (JSON Schema, validation).
+
+```mermaid
+graph TD
+  Page(layout/page@1)
+  Page -->|header| HeaderSlot
+  Page -->|content| ContentSlot
+  Page -->|footer| FooterSlot
+  HeaderSlot --> ComponentA
+  ContentSlot --> ComponentB
+  FooterSlot --> ComponentC
+```

@@ -1,19 +1,28 @@
-# Principes LCOD (version KISS)
+# LCOD principles (KISS edition)
 
-1. **Composant = boîte noire lisible.** Le `lcp.toml` décrit inputs/outputs/slots ; le compose tient en un écran et reste auto-portant.
-2. **Compose = fonction.** On nomme les étapes pour la compréhension, mais on garde l’esprit “j’implémente une fonction”, sans narration inutile.
-3. **Implication évidente, pas de magie cachée.** Spread/déstructuration autorisés s’ils sont intuitifs ; toutes les dépendances restent déclarées.
-4. **Slots = lambdas avec scope parent.** Un compose crée son scope, le slot hérite du scope appelant + ses variables locales et peut modifier le parent (objectif v2 formalisé).
-5. **Factoriser dès que possible.** Dès qu’un pattern revient, on crée un helper `tooling/*` plutôt que d’injecter un script.
-6. **Kernel minimal (RPython-like).** Exécution, slots, IO : rien d’autre. Toute logique portable vit dans des composés/contrats.
-7. **Lookup déterministe : local → projet → workspace → user → cache → registry.** L’ordre est public et constant.
-8. **Sanitizer strict mais flexible.** Seuls inputs/outputs déclarés circulent ; un paramètre peut être `any` pour transporter une structure libre.
-9. **Resolver transparent.** Suit la même chaîne de lookup, warning clair dès qu’on sort du best-case.
-10. **Testkit recommandé, pas imposé.** LCOD fonctionne sans, mais chaque package devrait fournir `tests/testkit/**` + plan d’exécution local.
-11. **Docs inline uniques.** README/schémas générés depuis `lcp.toml` pour éviter les divergences.
-12. **Logs dès le prototype.** `tooling/log` et ses contextes remplacent les `console.log` dès le premier jour.
-13. **Pas de copies inutiles.** On réutilise les mêmes instances pour mémoire et perfs ; clone uniquement quand sécurité/parallélisme l’exigent.
-14. **Exceptions > fallback lourds.** Le happy path doit rester fluide ; on laisse remonter l’exception et on la traite au niveau opportun.
-15. **Scopes explicites.** Compose arrive avec son scope vierge (rempli des entrées). Sous-compose/slot garde une référence sur le scope parent + ses locales.
-16. **Gestion d’exception explicite.** On doit pouvoir exprimer `try/catch/finally` dans un compose : un slot capture, décide de traiter ou relancer, et une exception non gérée remonte naturellement (format `{name, message, payload}` partagé).
-17. **Toujours KISS.** Modules courts, une responsabilité, composition explicite.
+1. **Component = readable black box.** `lcp.toml` defines inputs/outputs/slots; the compose fits on one screen.
+2. **Compose = function.** Name steps for clarity but keep the “implement a function” mindset.
+3. **Implicit only when obvious.** Spreads/destructuring allowed if intuitive; dependencies stay declared.
+4. **Slots behave like lambdas with parent scope.** A compose creates its scope; slots inherit it and may tweak it.
+5. **Factor fast.** When a pattern repeats, build a `tooling/*` helper instead of scripts.
+6. **Minimal kernel (RPython-like).** Execution, slots, IO — nothing more. Logic lives in components/contracts.
+7. **Deterministic lookup: local → project → workspace → user → cache → registry.** Public and stable order.
+8. **Strict yet flexible sanitizer.** Only declared IO flows; parameters can be `any` when needed.
+9. **Transparent resolver.** Same chain, clear warnings outside the happy path.
+10. **Testkit recommended, not mandatory.** LCOD works without it, but each package should ship `tests/testkit/**` + a local plan.
+11. **Single source docs.** README/diagrams generated from `lcp.toml`.
+12. **Logging from day one.** `tooling/log` replaces ad-hoc console prints immediately.
+13. **No useless copies.** Reuse instances; clone only for safety/parallelism.
+14. **Exceptions beat heavy fallbacks.** Keep the happy path fluid; let errors bubble and handle them where it makes sense.
+15. **Explicit scopes.** A compose starts with a fresh scope; sub-composes/slots keep references to the parent plus locals.
+16. **Explicit exception handling.** `try/catch/finally` available everywhere using `{name,message,payload,trace}`.
+17. **Always KISS.** Short modules, single responsibility, explicit composition.
+
+```mermaid
+flowchart LR
+  Simplicity --> Runtime --> Resolver --> Tooling --> Pipeline --> RAG
+  Runtime -->|principles 1-6| Resolver
+  Resolver -->|7-10| Tooling
+  Tooling -->|11-13| Pipeline
+  Pipeline -->|14-17| RAG
+```

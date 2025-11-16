@@ -1,28 +1,39 @@
-# Roadmap LCOD v2
+# LCOD v2 roadmap
 
-## 1. Branches vides
-- Créer des branches `spec-v2`, `kernel-rs-v2`, `kernel-js-v2`, `kernel-java-v2`, `resolver-v2`, etc. (répertoires minimalistes + outillage de base).
-- Chaque branche n’hérite pas de `main` : on repart de zéro et on réintroduit les briques progressivement.
+## 1. Empty branches
+- Create branches `spec-v2`, `kernel-rs-v2`, `kernel-js-v2`, `kernel-java-v2`, `resolver-v2`, etc. (minimal directories + tooling).
+- Each branch starts from scratch (not from `main`). We reintroduce bricks progressively.
 
-## 2. Priorités (ordre de construction)
-1. **Runtime minimal** : `runComponent/runCompose/runSlot`, sanitizer strict, scope partagé + exceptions.
-2. **Resolver v2** : chargement `meta+compose`, lookup deterministe, cache local, introspection.
-3. **Tooling v2** : introspection (`meta+ast`), graphes, testkit minimal compatible v2.
-4. **Pipeline top-down** : composés `extract/*`, `translate/*`, `assemble/*` décrits dans `approche-haut-niveau.md`.
-5. **RAG v2** : stockage des fonctions/composants (YAML/JSON) + APIs de lookup/insert.
-6. **UI/Docs** : génération Mermaid/UML pour visualiser les sous-systèmes.
+## 2. Priorities (build order)
+1. **Minimal runtime**: `runComponent/runCompose/runSlot`, strict sanitizer, shared scope + exceptions.
+2. **Resolver v2**: load `meta+compose`, deterministic lookup, local cache, introspection.
+3. **Tooling v2**: introspection (`meta+ast`), graphs, minimal v2 testkit.
+4. **Top-down pipeline**: `extract/*`, `translate/*`, `assemble/*` as in `approche-haut-niveau.md`.
+5. **RAG v2**: YAML/JSON storage for functions/components + lookup/insert APIs.
+6. **UI/Docs**: Mermaid/UML generation for subsystems.
 
-## 3. Sous-systèmes à formaliser
-- **Runtime** : doc dédiée (sequence diagram) montrant `runComponent → resolver → runCompose → runSlot → exceptions`.
-- **Resolver** : diagramme de séquence (lookup local → workspace → registry, introspection, cache).
-- **Tooling/Testkit** : graphes mermaid pour les plans, slot `compose`, reporting.
-- **Pipeline top-down** : déjà esquissé mais ajouter un diagramme de séquence / UML par étape (`extract` → `translate` → `assemble`).
-- **RAG** : structure des entrées (YAML schema), workflows d’enrichissement.
+## 3. Subsystems to formalize
+- **Runtime**: dedicated doc (sequence diagram) showing `runComponent → resolver → runCompose → runSlot → exceptions`.
+- **Resolver**: sequence diagram (lookup local → workspace → registry, introspection, cache).
+- **Tooling/Testkit**: Mermaid graphs for plans, `compose` slot, reporting.
+- **Top-down pipeline**: refine with sequence/UML per step (`extract` → `translate` → `assemble`).
+- **RAG**: entry schema, enrichment workflows.
 
-## 4. Illustrations recommandées
-- Mermaid `flowchart` pour les flux, `sequenceDiagram` pour les interactions kernel/resolver, `classDiagram` pour formaliser `meta+compose`.
-- Chaque doc `docs/v2/*` devrait inclure un diagramme et lister les contrats/composés correspondants.
+## 4. Recommended diagrams
+- Mermaid `flowchart` for flows, `sequenceDiagram` for kernel/resolver interactions, `classDiagram` for `meta+compose`.
+- Each `docs/v2/*` entry should include a diagram and list the relevant contracts/components.
 
-## 5. Stratégie d’implémentation
-- Travailler branche par branche, ajouter les tests dès qu’une brique est prête, réactiver les checks progressivement.
-- Une fois les branches v2 stables, fusionner vers `main` (ou basculer `main` vers cette nouvelle base).
+## 5. Implementation strategy
+- Work branch by branch, add tests as soon as a brick is ready, reactivate checks progressively.
+- Once branches are stable, merge into `main` (or switch `main` to this new base).
+
+```mermaid
+flowchart LR
+  Runtime[Runtime v2]
+  Resolver[Resolver v2]
+  Tooling[Tooling/Testkit v2]
+  Pipeline[Top-down pipeline]
+  RAG[RAG v2]
+  Docs[UI/Docs]
+  Runtime --> Resolver --> Tooling --> Pipeline --> RAG --> Docs
+```

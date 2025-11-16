@@ -1,29 +1,46 @@
-# Modèle de scope (LCOD v2)
+# Scope model (LCOD v2)
 
-## 1. Compose vs Slot
-- **Sous-compose (`call`)** : reçoit seulement ses `inputs`. Il crée son propre scope et n'accède pas au parent (comme une fonction).
-- **Slot** : reçoit un scope local avec un pointeur vers le `parentScope`. Il peut lire/écrire selon les règles suivantes.
+## 1. Compose vs slot
+- **Sub-compose (`call`)**: receives only its `inputs`. It creates its own scope and cannot touch the parent (function semantics).
+- **Slot**: receives a local scope plus a pointer to `parentScope`. It can read/write using the rules below.
 
-## 2. Lecture / écriture
-- **Lecture** : on lit d'abord dans le scope local ; si la clé est absente, on remonte dans le parent. Comportement type closure.
-- **Écriture** :
-  1. Si la clé existe dans le scope local → on la met à jour localement (shadowing classique).
-  2. Sinon, si elle existe dans le parent → on met à jour le parent (mutation directe).
-  3. Sinon → on crée la clé dans le scope local.
-  Cette règle évite de devoir “déclarer” explicitement la remontée tout en conservant la possibilité de masquer une valeur.
+## 2. Read / write semantics
+- **Read**: look in the local scope first; if missing, walk up to the parent (closure behavior).
+- **Write**:
+  1. If the key exists locally → update local value (classic shadowing).
+  2. Else if the key exists in parent → update the parent (direct mutation).
+  3. Else → create the key locally.
+  This avoids boilerplate while keeping the ability to mask values.
 
-## 3. Slots read-only
-- Certains slots (listeners, tâches parallèles) peuvent être marqués **read-only** : ils n'ont pas le droit d'écrire dans le parentScope, seulement dans leur scope local.
-- Modificateurs possibles : `writeParent: true|false`, `isolate: true|false` selon les besoins d'exécution.
+## 3. Read-only slots
+- Some slots (listeners, parallel work) can be flagged **read-only**: no parent mutations allowed.
+- Modifiers: `writeParent: true|false`, `isolate: true|false` depending on execution constraints.
 
 ## 4. Propagation / `out`
-- Le champ `out` appartient au parent (celui qui exécute le slot). Il indique quelles clés du slot doivent être recopiées vers le parent une fois le slot exécuté (ex. un composant `filter` attend un slot `predicate` qui renvoie `true/false`).
-- Les helpers (`tooling/value/branch`, `tooling/object/apply`) encapsulent cette logique pour simplifier l’écriture côté auteur de compose.
+- `out` belongs to the parent (the caller). It states which keys from the slot should be copied back (e.g. a `filter` component expects slot `predicate` to return `true/false`).
+- Helpers (`tooling/value/branch`, `tooling/object/apply`) encapsulate this copy for author convenience.
 
-## 5. Implémentation kernel
-- Chaque `scope` contient une référence vers son parent ; les getters/setters traversent la chaîne si besoin.
-- Les mutations sont journalisées (utile pour `tooling/log`, testkit, debug).
+## 5. Kernel implementation hints
+- Each `scope` carries a pointer to its parent; getters/setters walk the chain when necessary.
+- Mutations should be logged (handy for `tooling/log`, testkit, debugging).
 
-## 6. Avantages
-- Modèle mental aligné avec des lambdas/fonctions (closure + shadowing) -> plus intuitif pour les low-coders/IA.
-- Permet de gérer aussi bien des slots structurants (layout, listeners) que des slots purement algorithmiques.
+## 6. Benefits
+- Matches lambda mental model (closure + shadowing) → intuitive for low-coders/LLMs.
+- Works for structural slots (layout, listeners) as well as algorithmic ones.
+
+```mermaid
+sequenceDiagram
+  participant Parent
+  participant Slot
+  participant ParentScope
+  Parent->>Slot: runSlot(item)
+  Slot->>ParentScope: read(key?)
+  alt key exists locally
+    Slot->>Slot: update local key
+  else key exists in parent
+    Slot->>ParentScope: update parent key
+  else key missing
+    Slot->>Slot: create local key
+  end
+  Parent<- -Slot: out values copied back per parent definition
+```

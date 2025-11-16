@@ -1,39 +1,52 @@
-# Fonctions de haut niveau (kernels LCOD)
+# High-level runtime functions (LCOD kernels)
 
 ## `runComponent(id, parentScope, inputState)`
-1. `resolver(id)` → `{ meta, compose }` (ou axiom).
-2. `scope := prepareScope(meta, parentScope, inputState)` : hydrate les inputs, initialise outputs/slots, attache logger/runtime info.
-3. `runCompose(scope, compose)` (peut appeler `runSlot`).
+1. `resolver(id)` → `{ meta, compose }` (or axiom stub).
+2. `scope := prepareScope(meta, parentScope, inputState)` : hydrate inputs, init outputs/slots, attach logger/runtime info.
+3. `runCompose(scope, compose)` (may call `runSlot`).
 4. `return extractOutputs(scope, meta.outputs)`.
 
 ## `runCompose(scope, steps)`
-- Itère sur les étapes de l’AST.
-- Pour chaque étape :
-  - Résout les entrées (`evaluate(step.in, scope)`).
-  - Appelle `runComponent(step.call, scope, inputs)` ou l’axiom correspondant.
-  - Mappe les sorties (`applyOut(scope, step.out)`).
-  - Exécute les slots via `runSlot` si présents.
-- Gère `flow/try`, `flow/foreach`, etc.
+- Iterate over AST steps.
+- For each step:
+  - Evaluate inputs (`evaluate(step.in, scope)`).
+  - Call `runComponent(step.call, scope, inputs)` or run the axiom.
+  - Apply outputs (`applyOut(scope, step.out)`).
+  - Execute slots via `runSlot` when defined.
+- Handles `flow/try`, `flow/foreach`, etc.
 
 ## `runSlot(slotName, slotDefinition, parentScope)`
-- Crée un `slotScope` (héritage du parent + locales `item`, `index`, etc.).
-- Exécute `runCompose(slotScope, slotSteps)`.
-- Propage explicitement les clés définies par `slotDefinition.out` vers `parentScope`.
+- Create `slotScope` (inherits parent + locals like `item`, `index`, ...).
+- Run `runCompose(slotScope, slotSteps)`.
+- Copy back the keys defined in `slotDefinition.out` (parent decides what to collect).
 
 ## `prepareScope(meta, parentScope, inputState)`
-- Valide/sanitise les inputs selon `meta.inputs`.
-- Instancie outputs vides, slots, contexte (`logger`, `runtimeInfo`).
-- Conserve un lien vers `parentScope` pour l’accès direct (principe v2).
+- Validate/sanitize inputs using `meta.inputs`.
+- Instantiate blank outputs, slot placeholders, and context objects (`logger`, `runtimeInfo`).
+- Keep a pointer to `parentScope` for closure-style access.
 
 ## `extractOutputs(scope, outputsMeta)`
-- Assemble l’objet de sortie (applique defaults, retire les champs non déclarés).
+- Assemble the output object (apply defaults, drop undisclosed fields).
 
 ## `resolver(id)`
-- Lookup deterministe (local → projet → workspace → user → cache → registry).
-- Retourne `meta + compose` (ou stub axiom/contrat).
+- Deterministic lookup (local → project → workspace → user → cache → registry).
+- Returns `meta + compose` (or axiom/contract stub).
 
-## Fonctions associées
-- `runTry(scope, block)` : implémente `try/catch/finally` avec format `{name,message,payload}`.
-- `runForeach(scope, items, slots)` : injecte `item/index`, délègue à `runSlot`.
-- `runBranch(scope, cond, slots)` : helper ergonomique (scope partagé) pour les conditionnelles.
-- `runInlineComponent(meta, compose, parentScope)` : exécute un composant défini inline sans passer par le resolver.
+## Associated helpers
+- `runTry(scope, block)` : implements `try/catch/finally` using `{name,message,payload,trace}`.
+- `runForeach(scope, items, slots)` : injects `item/index`, delegates to `runSlot`.
+- `runBranch(scope, cond, slots)` : ergonomic helper for conditions with shared scope.
+- `runInlineComponent(meta, compose, parentScope)` : executes inline components without resolver lookup.
+
+```mermaid
+sequenceDiagram
+  participant CLI
+  participant Kernel
+  participant Resolver
+  CLI->>Kernel: runComponent(id, inputs)
+  Kernel->>Resolver: resolver(id)
+  Resolver-->>Kernel: meta + compose
+  Kernel->>Kernel: prepareScope(meta, parentScope, inputs)
+  Kernel->>Kernel: runCompose(scope, compose)
+  Kernel-->>CLI: outputs
+```
