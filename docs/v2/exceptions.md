@@ -1,10 +1,8 @@
 # Gestion des exceptions (LCOD v2)
 
 ## 1. Format standard
-- Exception = `{ name, message, payload }`.
-- `name` : identifiant (ex. `ValidationError`).
-- `message` : texte court.
-- `payload` : données structurées optionnelles.
+- Exception = `{ name, message, payload, trace }`.
+- `trace` : pile des composants/slots traversés (`[{ componentId, slot?, info }]`). Mise à jour par le kernel à chaque remontée pour conserver le contexte.
 
 ## 2. Primitive `throw`
 - Composant `lcod://tooling/exception/throw@1` : prend `name`, `message`, `payload`, arrête l’exécution et remonte l’exception au slot/pipeline supérieur.
@@ -14,7 +12,7 @@
 - Exécution :
   1. `body` s’exécute ; si aucune exception, on passe à `finally`.
   2. Si `body` lance une exception :
-     - `catch` reçoit l’objet (accessible via `state.error`). Il peut traiter l’erreur (pas de rethrow) ou relancer via `throw`.
+     - `catch` reçoit l’objet complet (`state.error` contient `name/message/payload/trace`). Il peut traiter l’erreur ou relancer via `throw` (la trace est préservée).
      - `finally` s’exécute ensuite, qu’il y ait eu traitement ou non.
 - Si aucun `catch` défini, l’exception remonte immédiatement.
 
