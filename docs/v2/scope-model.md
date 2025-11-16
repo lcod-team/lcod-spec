@@ -43,5 +43,5 @@ sequenceDiagram
   else key missing
     Slot->>Slot: create local key
   end
-  Parent <-- Slot: out values copied back per parent definition
+  Slot -->> Parent: out values copied back per parent definition
 ```
